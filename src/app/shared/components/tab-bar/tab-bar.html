@@ -1,0 +1,56 @@
+<div class="tab-bar" role="tablist" aria-label="Primary navigation" data-testid="tab-bar">
+  @for (item of items(); track item.key) {
+    <button
+      class="tab-bar__item"
+      type="button"
+      role="tab"
+      [class.tab-bar__item--active]="item.active"
+      [attr.aria-selected]="item.active"
+      [attr.aria-label]="item.label"
+      (click)="onSelect(item.key)"
+    >
+      <span class="tab-bar__icon" aria-hidden="true">
+        @switch (item.key) {
+          @case ('settings') {
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="3" fill="currentColor" />
+              <path
+                d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9l2.1 2.1m10 10 2.1 2.1m0-14.2-2.1 2.1m-10 10-2.1 2.1"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          }
+          @case ('chats') {
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 3C7.03 3 3 6.58 3 11c0 2.1.86 4 2.26 5.48L4 22l4.5-2.2c1.1.35 2.3.52 3.5.52 4.97 0 9-3.58 9-8s-4.03-8-9-8Z"
+              />
+            </svg>
+          }
+          @case ('camera') {
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="7" width="13" height="10" rx="2" stroke="currentColor" stroke-width="2" />
+              <path d="M16 11l5-3v8l-5-3" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+            </svg>
+          }
+          @case ('calls') {
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.58 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .57 3.6 1 1 0 0 1-.25 1l-2.22 2.2Z"
+              />
+            </svg>
+          }
+          @case ('status') {
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2" />
+              <circle cx="12" cy="12" r="3" fill="currentColor" />
+            </svg>
+          }
+        }
+      </span>
+      <span class="tab-bar__label">{{ item.label }}</span>
+    </button>
+  }
+</div>

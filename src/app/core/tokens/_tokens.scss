@@ -1,0 +1,108 @@
+@use 'sass:map';
+
+$wa-colors: (
+  surface: #efeef4,
+  surface-variant: #ffffff,
+  surface-page: #e2e2e7,
+  on-surface: #000000,
+  text-secondary: #8e8e93,
+  text-tertiary: #545458,
+  accent: #007aff,
+  date: #3c3c43,
+  status-time: #171717,
+  border: #a6a6aa,
+);
+
+$wa-font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+  'Helvetica Neue', sans-serif;
+
+$wa-fs: (
+  chat-title: 16px,
+  preview: 14px,
+  nav-title: 17px,
+  nav-action: 17px,
+  message: 16px,
+  bubble-time: 11px,
+  date: 12px,
+  tab: 10px,
+  status-time: 15px,
+  hint: 12px,
+);
+
+$wa-fw: (regular: 400, medium: 500, semibold: 600);
+
+$wa-lh: (
+  chat-title: 21px,
+  preview: 16.71px,
+  nav-title: 22px,
+  nav-action: 22px,
+  message: 19.09px,
+  bubble-time: 13.13px,
+  date: 14.32px,
+  tab: 11.93px,
+  status-time: 17.9px,
+  hint: 16px,
+);
+
+$wa-ls: (-0.33, -0.15, -0.4, 0.1, 0.5);
+
+$wa-breakpoints: (
+  mobile-max: 599px,
+  tablet-min: 600px,
+  desktop-min: 1024px,
+);
+
+$wa-effects: (
+  nav-hairline: 0 -0.33px 0 #a6a6aa,
+  nav-shadow: 0 0.33px 0 rgba(60, 60, 67, 0.29),
+  composer-t: 0 -0.4px 0 #eeeef4,
+  composer-b: 0 0.4px 0 rgba(98, 98, 99, 0.2),
+);
+
+$wa-layout: (
+  shell-max-width: 480px,
+  status-bar-height: 44px,
+  nav-bar-height: 44px,
+  tab-bar-height: 49px,
+  home-indicator-height: 34px,
+  row-height: 68px,
+);
+
+:root {
+  @each $name, $value in $wa-colors {
+    --wa-#{$name}: #{$value};
+  }
+  --wa-font-family: #{$wa-font-family};
+
+  @each $name, $value in $wa-fs {
+    --wa-fs-#{$name}: #{$value};
+  }
+  @each $name, $value in $wa-fw {
+    --wa-fw-#{$name}: #{$value};
+  }
+  @each $name, $value in $wa-lh {
+    --wa-lh-#{$name}: #{$value};
+  }
+
+  --wa-ls-tight: -0.33px;
+  --wa-ls-forward: -0.15px;
+  --wa-ls-title: -0.4px;
+  --wa-ls-tab: 0.1px;
+  --wa-ls-bubble: 0.5px;
+
+  --wa-nav-hairline: #{map.get($wa-effects, nav-hairline)};
+  --wa-nav-shadow: #{map.get($wa-effects, nav-shadow)};
+  --wa-composer-shadow-a: #{map.get($wa-effects, composer-t)};
+  --wa-composer-shadow-b: #{map.get($wa-effects, composer-b)};
+
+  --wa-bp-mobile-max: #{map.get($wa-breakpoints, mobile-max)};
+  --wa-bp-tablet-min: #{map.get($wa-breakpoints, tablet-min)};
+  --wa-bp-desktop-min: #{map.get($wa-breakpoints, desktop-min)};
+
+  --wa-shell-max-width: #{map.get($wa-layout, shell-max-width)};
+  --wa-status-bar-height: #{map.get($wa-layout, status-bar-height)};
+  --wa-nav-bar-height: #{map.get($wa-layout, nav-bar-height)};
+  --wa-tab-bar-height: #{map.get($wa-layout, tab-bar-height)};
+  --wa-home-indicator-height: #{map.get($wa-layout, home-indicator-height)};
+  --wa-row-height: #{map.get($wa-layout, row-height)};
+}

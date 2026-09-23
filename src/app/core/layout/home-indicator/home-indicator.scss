@@ -1,0 +1,19 @@
+:host {
+  display: flow-root;
+  flex: none;
+}
+
+.home-indicator {
+  height: var(--wa-home-indicator-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__bar {
+    width: 134px;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--wa-on-surface);
+    opacity: 0.2;
+  }
+}

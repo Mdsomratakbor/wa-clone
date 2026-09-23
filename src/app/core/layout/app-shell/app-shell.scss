@@ -1,0 +1,33 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.app-shell {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  background: var(--wa-surface-page);
+
+  &__column {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: var(--wa-shell-max-width);
+    height: 100%;
+    background: var(--wa-surface);
+    overflow: hidden;
+  }
+
+  &__content {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+}
+
+@media (min-width: var(--wa-bp-tablet-min)) {
+  // Owner-approved drift (plan §Breakpoints): shell centres on wider viewports.
+}

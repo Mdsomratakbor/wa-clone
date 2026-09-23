@@ -1,0 +1,34 @@
+:host {
+  display: flow-root;
+  flex: none;
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--wa-status-bar-height);
+  padding: 0 22px 0 24px;
+  box-sizing: border-box;
+  color: var(--wa-status-time);
+  -webkit-user-select: none;
+  user-select: none;
+
+  &__time {
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-status-time);
+    font-weight: var(--wa-fw-semibold);
+    line-height: var(--wa-lh-status-time);
+    letter-spacing: var(--wa-ls-title);
+  }
+
+  &__slot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__icon {
+    display: block;
+  }
+}

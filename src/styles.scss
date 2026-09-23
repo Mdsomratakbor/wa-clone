@@ -6,6 +6,9 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
+// Feature design tokens (node-extracted from Figma `0:8855`; see figma/design-analysis.md).
+@use './app/core/tokens/tokens';
+
 html {
   @include mat.theme((
     color: (

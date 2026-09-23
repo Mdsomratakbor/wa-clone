@@ -1,0 +1,34 @@
+import { test, expect } from '@playwright/test';
+
+const BREAKPOINTS = [
+  { name: 'mobile', width: 375, height: 812 },
+  { name: 'tablet', width: 800, height: 600 },
+  { name: 'desktop', width: 1440, height: 900 },
+];
+
+test.describe('Responsive adaptation (owner-approved drift)', () => {
+  test('no horizontal overflow at any breakpoint', async ({ page }) => {
+    for (const vp of BREAKPOINTS) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto('/');
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      );
+      expect(overflow, `${vp.name} should not overflow horizontally`).toBe(false);
+    }
+  });
+
+  test('shell column is capped at 480px and centred on tablet/desktop', async ({ page }) => {
+    for (const vp of [BREAKPOINTS[1], BREAKPOINTS[2]]) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto('/');
+      const column = await page.locator('.app-shell__column').boundingBox();
+      expect(column?.width, `${vp.name} column width`).toBeCloseTo(480, 0);
+      const expectedX = (vp.width - 480) / 2;
+      expect(
+        Math.abs((column?.x ?? 0) - expectedX),
+        `${vp.name} column centred`,
+      ).toBeLessThan(1);
+    }
+  });
+});

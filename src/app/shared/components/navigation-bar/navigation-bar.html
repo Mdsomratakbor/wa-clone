@@ -1,0 +1,31 @@
+<nav class="navigation-bar" data-testid="navigation-bar" aria-label="Navigation bar">
+  @if (leading().length > 0) {
+    <div class="navigation-bar__group navigation-bar__group--leading">
+      @for (item of leading(); track item.id) {
+        <button
+          class="navigation-bar__action"
+          type="button"
+          (click)="onAction(item.id)"
+        >
+          {{ item.label }}
+        </button>
+      }
+    </div>
+  }
+
+  <h1 class="navigation-bar__title">{{ title() }}</h1>
+
+  @if (trailing().length > 0) {
+    <div class="navigation-bar__group navigation-bar__group--trailing">
+      @for (item of trailing(); track item.id) {
+        <button
+          class="navigation-bar__action"
+          type="button"
+          (click)="onAction(item.id)"
+        >
+          {{ item.label }}
+        </button>
+      }
+    </div>
+  }
+</nav>

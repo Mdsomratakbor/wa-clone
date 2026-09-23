@@ -1,0 +1,23 @@
+@if (showImage()) {
+  <img
+    class="user-avatar user-avatar--image"
+    [src]="src()!"
+    [style.width.px]="size()"
+    [style.height.px]="size()"
+    [attr.aria-label]="ariaLabel()"
+    role="img"
+    alt=""
+    (error)="onImageError()"
+  />
+} @else {
+  <span
+    class="user-avatar user-avatar--initials"
+    [style.width.px]="size()"
+    [style.height.px]="size()"
+    [style.font-size.px]="size() * 0.42"
+    role="img"
+    [attr.aria-label]="ariaLabel()"
+  >
+    {{ initials() }}
+  </span>
+}

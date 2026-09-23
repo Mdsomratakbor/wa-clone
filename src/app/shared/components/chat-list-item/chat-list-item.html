@@ -1,0 +1,18 @@
+<div
+  class="chat-list-item"
+  role="button"
+  tabindex="0"
+  [attr.aria-label]="chat().contactName"
+  (click)="onActivate()"
+  (keydown.enter)="onActivate()"
+  (keydown.space)="onActivate()"
+>
+  <app-user-avatar [src]="chat().avatarRef" [name]="chat().contactName" [size]="48" />
+  <div class="chat-list-item__body">
+    <div class="chat-list-item__head">
+      <span class="chat-list-item__name">{{ chat().contactName }}</span>
+      <time class="chat-list-item__timestamp">{{ chat().timestamp }}</time>
+    </div>
+    <p class="chat-list-item__preview">{{ chat().preview }}</p>
+  </div>
+</div>

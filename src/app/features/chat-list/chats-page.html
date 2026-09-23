@@ -1,0 +1,34 @@
+<app-navigation-bar
+  title="Chats"
+  [leading]="leadingActions"
+  [trailing]="trailingActions"
+  (action)="onNavAction($event)"
+/>
+
+<div class="chats-page__body">
+  @if (activeTab() === 'chats') {
+    @if (conversations().length === 0) {
+      <div class="chats-page__empty" role="status" data-testid="empty-state">
+        <p class="chats-page__empty-text">No chats</p>
+      </div>
+    } @else {
+      <ul class="chats-page__list" data-testid="chat-list">
+        @for (chat of conversations(); track chat.id) {
+          <li class="chats-page__row">
+            <app-chat-list-item [chat]="chat" (selected)="onChatSelected($event)" />
+          </li>
+        }
+      </ul>
+    }
+
+    <div class="chats-page__fab">
+      <app-fab label="Start new chat" (pressed)="onFabPressed()" />
+    </div>
+  } @else {
+    <div class="chats-page__stub" role="status" data-testid="tab-stub">
+      <p class="chats-page__stub-text">{{ activeLabel() }} — coming soon</p>
+    </div>
+  }
+</div>
+
+<app-tab-bar [items]="tabs()" (select)="onTabSelect($event)" />

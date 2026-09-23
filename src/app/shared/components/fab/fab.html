@@ -1,0 +1,10 @@
+<button
+  class="fab"
+  type="button"
+  (click)="pressed.emit()"
+  [attr.aria-label]="label()"
+>
+  <svg class="fab__icon" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+    <path d="M11 3v16M3 11h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+  </svg>
+</button>

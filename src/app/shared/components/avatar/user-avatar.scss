@@ -1,0 +1,25 @@
+:host {
+  display: inline-flex;
+  flex: none;
+}
+
+.user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+
+  &--initials {
+    background: var(--wa-accent);
+    color: var(--wa-surface-variant);
+    font-family: var(--wa-font-family);
+    font-weight: var(--wa-fw-semibold);
+    line-height: 1;
+    user-select: none;
+  }
+
+  &--image {
+    object-fit: cover;
+  }
+}

@@ -1,0 +1,31 @@
+:host {
+  display: inline-flex;
+  flex: none;
+}
+
+.fab {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--wa-accent);
+  color: var(--wa-surface-variant);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--wa-surface-variant), 0 0 0 5px var(--wa-accent);
+  }
+
+  &__icon {
+    display: block;
+  }
+}
