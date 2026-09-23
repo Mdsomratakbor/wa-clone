@@ -1,0 +1,51 @@
+<div
+  class="call-list-item"
+  role="button"
+  tabindex="0"
+  [attr.aria-label]="rowLabel()"
+  (click)="onActivate()"
+  (keydown.enter)="onActivate()"
+  (keydown.space)="onActivate()"
+>
+  <app-user-avatar [src]="call().avatarRef" [name]="call().contactName" [size]="40" />
+  <div class="call-list-item__body">
+    <div class="call-list-item__head">
+      <span
+        class="call-list-item__name"
+        [class.call-list-item__name--missed]="isMissed()"
+        >{{ call().contactName }}</span
+      >
+      <time class="call-list-item__date">{{ call().date }}</time>
+    </div>
+    <div class="call-list-item__meta">
+      <svg
+        class="call-list-item__glyph"
+        width="15"
+        height="15"
+        viewBox="0 0 12 12"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          fill="#8E8E93"
+          d="M9.34233 8.12724L11.8107 9.6598C12.1954 9.96386 11.9254 10.7147 11.6061 11.1355L11.5372 11.2204L11.4168 11.3478C10.8772 11.8771 10.109 12.1047 9.36816 11.9547L9.1978 11.9134L8.80763 11.7953C7.13688 11.257 5.56578 10.3313 4.09431 9.01796L4.08207 9.03093C3.9365 8.89422 3.7932 8.75535 3.65219 8.61434L3.5207 8.4795L3.38568 8.34783L3.17577 8.13459L2.96908 7.91794L2.98135 7.90491C1.66841 6.43368 0.742881 4.86283 0.204757 3.19239L0.0866169 2.80221C-0.137874 2.01056 0.0822188 1.16433 0.652188 0.583201L0.779645 0.462848C1.17576 0.11651 2.01444 -0.22289 2.34021 0.189298L3.87278 2.65768C4.03584 2.92174 4.07253 3.24225 3.97796 3.53324L3.92938 3.65589L3.43199 4.24895C3.278 4.57612 3.30442 4.95621 3.49448 5.25664L3.57339 5.36531C4.01866 6.02407 4.16694 6.3067 4.93161 7.07137C5.69627 7.83603 6.63471 8.42662 6.63471 8.42662L6.74337 8.50553C7.00625 8.67183 7.33011 8.71285 7.62615 8.61735L7.75106 8.56802L8.34412 8.07064L8.46678 8.02206C8.7162 7.941 8.9873 7.95637 9.22596 8.0651L9.34233 8.12724L11.8107 9.6598L9.34233 8.12724Z"
+        />
+      </svg>
+      <span class="call-list-item__direction">{{ directionLabel() }}</span>
+    </div>
+  </div>
+  <button
+    class="call-list-item__info"
+    type="button"
+    data-testid="call-info"
+    [attr.aria-label]="infoLabel()"
+    (click)="onInfo($event)"
+  >
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+      <path
+        fill="#007AFF"
+        d="M22 11C22 4.92487 17.0751 0 11 0C4.92487 0 0 4.92487 0 11C0 17.0751 4.92487 22 11 22C17.0751 22 22 17.0751 22 11ZM1 11C1 5.47715 5.47715 1 11 1C16.5228 1 21 5.47715 21 11C21 16.5228 16.5228 21 11 21C5.47715 21 1 16.5228 1 11ZM12 8.5V16.5H13V17H9V16.5H10V9H9V8.5H12ZM12.2 5.85C12.2 5.10442 11.5956 4.5 10.85 4.5C10.1044 4.5 9.5 5.10442 9.5 5.85C9.5 6.59558 10.1044 7.2 10.85 7.2C11.5956 7.2 12.2 6.59558 12.2 5.85Z"
+      />
+    </svg>
+  </button>
+</div>

@@ -7,6 +7,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/chat-list/chats-page').then((m) => m.ChatsPage),
   },
   {
+    path: 'calls',
+    loadComponent: () => import('./features/calls/calls-page').then((m) => m.CallsPage),
+  },
+  {
     path: 'chat/:id',
     loadComponent: () =>
       import('./features/chat-window/chat-window-page').then((m) => m.ChatWindowPage),

@@ -14,6 +14,13 @@
   background: var(--wa-surface-variant);
   box-shadow: var(--wa-nav-hairline), var(--wa-nav-shadow);
 
+  &__center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
+
   &__title {
     margin: 0;
     font-family: var(--wa-font-family);
@@ -61,5 +68,10 @@
       box-shadow: inset 0 0 0 2px var(--wa-accent);
       border-radius: 4px;
     }
+  }
+
+  &__icon {
+    display: block;
+    line-height: 0;
   }
 }

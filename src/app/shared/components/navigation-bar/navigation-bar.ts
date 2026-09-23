@@ -8,7 +8,7 @@ import { NavAction } from '../../../features/chat-list/chat.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavigationBar {
-  readonly title = input.required<string>();
+  readonly title = input<string>('');
   readonly leading = input<readonly NavAction[]>([]);
   readonly trailing = input<readonly NavAction[]>([]);
   readonly action = output<string>();

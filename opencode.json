@@ -1,12 +1,17 @@
 {
   "$schema": "https://opencode.ai",
   "mcp": {
-    "servers": {
-      "composio": {
-        "type": "remote",
-        "url": "https://connect.composio.dev/mcp",
-        "enabled": true
-      }
+    "composio": {
+      "type": "remote",
+      "url": "https://connect.composio.dev/mcp",
+      "enabled": true
+    },
+    "figma": {
+      "type": "local",
+      "command": ["cmd", "/c", "npx", "-y", "figma-developer-mcp", "--stdio", "--image-dir=tests/e2e/golden"],
+      "cwd": ".",
+      "enabled": true,
+      "timeout": 10000
     }
   }
 }

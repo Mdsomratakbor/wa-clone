@@ -1,0 +1,44 @@
+<app-navigation-bar
+  title=""
+  [leading]="leadingActions"
+  [trailing]="trailingActions"
+  (action)="onNavAction($event)"
+>
+  <div
+    class="calls-page__filter"
+    data-nav-center
+    role="group"
+    aria-label="Filter calls"
+    data-testid="calls-filter"
+  >
+    <button
+      type="button"
+      disabled
+      class="calls-page__filter-item calls-page__filter-item--active"
+      data-testid="filter-all"
+    >
+      All
+    </button>
+    <button type="button" disabled class="calls-page__filter-item" data-testid="filter-missed">
+      Missed
+    </button>
+  </div>
+</app-navigation-bar>
+
+<div class="calls-page__body">
+  @if (activeTab() === 'calls') {
+    <ul class="calls-page__list" data-testid="call-list">
+      @for (call of calls(); track call.id) {
+        <li class="calls-page__row">
+          <app-call-list-item [call]="call" />
+        </li>
+      }
+    </ul>
+  } @else {
+    <div class="calls-page__stub" role="status" data-testid="tab-stub">
+      <p class="calls-page__stub-text">{{ activeLabel() }} — coming soon</p>
+    </div>
+  }
+</div>
+
+<app-tab-bar [items]="tabs()" (select)="onTabSelect($event)" />

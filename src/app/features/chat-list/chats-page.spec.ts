@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { ChatsPage } from './chats-page';
 import { CHAT_SEED } from './chat-list.seed';
 
@@ -47,6 +47,19 @@ describe('ChatsPage', () => {
     const stub = fixture.nativeElement.querySelector('[data-testid="tab-stub"]');
     expect(stub).not.toBeNull();
     expect(stub?.textContent).toContain('Status');
+  });
+
+  it('navigates to /calls when the Calls tab is selected', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    fixture = TestBed.createComponent(ChatsPage);
+    fixture.detectChanges();
+    const tabs = (fixture.nativeElement as HTMLElement).querySelectorAll(
+      '[role="tab"]',
+    ) as NodeListOf<HTMLButtonElement>;
+    tabs[3].click(); // Calls
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/calls']);
   });
 
   describe('edit mode', () => {

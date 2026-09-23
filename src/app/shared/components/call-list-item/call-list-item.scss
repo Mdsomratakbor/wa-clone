@@ -1,0 +1,113 @@
+:host {
+  position: relative;
+  display: block;
+  background: var(--wa-surface-variant);
+}
+
+:host::after {
+  content: '';
+  position: absolute;
+  left: 68px;
+  right: 0;
+  bottom: 0;
+  height: 0.33px;
+  background: rgba(60, 60, 67, 0.29);
+}
+
+.call-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--wa-call-row-height);
+  padding: 9px 16px;
+  box-sizing: border-box;
+  cursor: pointer;
+  outline: none;
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--wa-accent);
+  }
+
+  &:hover {
+    background: color-mix(in srgb, var(--wa-accent) 5%, transparent);
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__name {
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-chat-title);
+    font-weight: var(--wa-fw-regular);
+    line-height: 19px;
+    letter-spacing: var(--wa-ls-tight);
+    color: var(--wa-on-surface);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &--missed {
+      color: #ff3b30;
+    }
+  }
+
+  &__date {
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-preview);
+    font-weight: var(--wa-fw-regular);
+    line-height: var(--wa-lh-preview);
+    letter-spacing: var(--wa-ls-forward);
+    color: var(--wa-text-secondary);
+    white-space: nowrap;
+    flex: none;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__glyph {
+    line-height: 0;
+    flex: none;
+  }
+
+  &__direction {
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-preview);
+    font-weight: var(--wa-fw-regular);
+    line-height: var(--wa-lh-preview);
+    letter-spacing: var(--wa-ls-forward);
+    color: var(--wa-text-secondary);
+  }
+
+  &__info {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    line-height: 0;
+    cursor: pointer;
+    flex: none;
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--wa-accent);
+      border-radius: 6px;
+    }
+  }
+}

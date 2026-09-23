@@ -69,6 +69,10 @@ export class ChatsPage {
     if (this.editing()) {
       return;
     }
+    if (key === 'calls') {
+      void this.router.navigate(['/calls']);
+      return;
+    }
     this.activeTab.set(key);
   }
 
