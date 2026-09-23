@@ -1,12 +1,47 @@
 <div
   class="chat-list-item"
-  role="button"
+  [class.chat-list-item--selectable]="selectMode()"
+  [attr.role]="selectMode() ? 'checkbox' : 'button'"
+  [attr.aria-checked]="selectMode() ? checked() : null"
   tabindex="0"
   [attr.aria-label]="chat().contactName"
   (click)="onActivate()"
   (keydown.enter)="onActivate()"
   (keydown.space)="onActivate()"
 >
+  @if (selectMode()) {
+    <svg
+      class="chat-list-item__select"
+      data-testid="select-circle"
+      [class.chat-list-item__select--checked]="checked()"
+      width="21"
+      height="21"
+      viewBox="0 0 21 21"
+      aria-hidden="true"
+    >
+      @if (checked()) {
+        <circle cx="10.5" cy="10.5" r="10" fill="#007AFF" />
+        <path
+          d="M6 10.8l3 3 6-6"
+          fill="none"
+          stroke="#FFFFFF"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      } @else {
+        <circle
+          cx="10.5"
+          cy="10.5"
+          r="9.25"
+          fill="none"
+          stroke="#3C3C43"
+          stroke-width="1.5"
+          opacity="0.42"
+        />
+      }
+    </svg>
+  }
   <app-user-avatar [src]="chat().avatarRef" [name]="chat().contactName" [size]="48" />
   <div class="chat-list-item__body">
     <div class="chat-list-item__head">

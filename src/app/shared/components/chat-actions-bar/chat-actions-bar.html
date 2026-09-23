@@ -1,0 +1,31 @@
+<nav
+  class="chat-actions"
+  role="toolbar"
+  aria-label="Chat actions"
+  data-testid="chat-actions"
+>
+  <button
+    class="chat-actions__item"
+    type="button"
+    [disabled]="!hasSelection()"
+    (click)="archive.emit()"
+  >
+    Archive
+  </button>
+  <button
+    class="chat-actions__item chat-actions__item--centre"
+    type="button"
+    [disabled]="!hasSelection()"
+    (click)="readAll.emit()"
+  >
+    Read All
+  </button>
+  <button
+    class="chat-actions__item chat-actions__item--delete"
+    type="button"
+    [disabled]="!hasSelection()"
+    (click)="delete.emit()"
+  >
+    Delete
+  </button>
+</nav>

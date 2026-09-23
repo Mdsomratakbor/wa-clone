@@ -31,9 +31,11 @@ test.describe('Keyboard focus & interactions (US3)', () => {
     const pageErrors: string[] = [];
     page.on('pageerror', (e) => pageErrors.push(e.message));
 
-    await page.getByRole('button', { name: 'Edit' }).click();
     await page.getByRole('button', { name: 'Broadcast Lists' }).click();
     await page.getByRole('button', { name: 'New Group' }).click();
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await expect(page.getByRole('button', { name: 'Done' })).toBeVisible();
+    await page.getByRole('button', { name: 'Done' }).click();
     await page.getByRole('button', { name: 'Start new chat' }).click();
     await page.getByRole('button', { name: 'Maximillian Jacobson' }).click();
 

@@ -11,6 +11,8 @@ import { UserAvatar } from '../avatar/user-avatar';
 })
 export class ChatListItem {
   readonly chat = input.required<ChatPreview>();
+  readonly selectMode = input(false);
+  readonly checked = input(false);
   readonly selected = output<ChatPreview>();
 
   protected onActivate(): void {
