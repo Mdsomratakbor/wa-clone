@@ -91,4 +91,46 @@ describe('CallListItem', () => {
     expect(emitted).toBe(CALL);
     expect(activateSpy).not.toHaveBeenCalled();
   });
+
+  it('hides the info button and shifts content in edit mode', () => {
+    const el = render(CALL);
+    fixture.componentRef.setInput('editMode', true);
+    fixture.detectChanges();
+    expect(el.querySelector('[data-testid="call-info"]')).toBeNull();
+    expect(el.querySelector('[data-testid="call-remove"]')).not.toBeNull();
+    expect(el.querySelector('.call-list-item')?.classList.contains('call-list-item--edit')).toBe(true);
+  });
+
+  it('renders the red minus with a descriptive label in edit mode', () => {
+    render(CALL);
+    fixture.componentRef.setInput('editMode', true);
+    fixture.detectChanges();
+    const minus = fixture.nativeElement.querySelector('[data-testid="call-remove"]');
+    expect(minus?.getAttribute('aria-label')).toBe('Remove call for Martin Randolph');
+    expect(minus?.querySelector('svg')).not.toBeNull();
+  });
+
+  it('emits remove from the minus without activating the row', () => {
+    render(CALL);
+    fixture.componentRef.setInput('editMode', true);
+    fixture.detectChanges();
+    let removed: CallEntry | undefined;
+    const activateSpy = jasmine.createSpy();
+    fixture.componentInstance.remove.subscribe((v) => (removed = v));
+    fixture.componentInstance.selected.subscribe(activateSpy);
+    (fixture.nativeElement.querySelector('[data-testid="call-remove"]') as HTMLElement).click();
+    fixture.detectChanges();
+    expect(removed).toBe(CALL);
+    expect(activateSpy).not.toHaveBeenCalled();
+  });
+
+  it('restores the info button when edit mode is off', () => {
+    const el = render(CALL);
+    fixture.componentRef.setInput('editMode', true);
+    fixture.detectChanges();
+    fixture.componentRef.setInput('editMode', false);
+    fixture.detectChanges();
+    expect(el.querySelector('[data-testid="call-info"]')).not.toBeNull();
+    expect(el.querySelector('[data-testid="call-remove"]')).toBeNull();
+  });
 });

@@ -11,8 +11,10 @@ import { UserAvatar } from '../avatar/user-avatar';
 })
 export class CallListItem {
   readonly call = input.required<CallEntry>();
+  readonly editMode = input(false);
   readonly selected = output<CallEntry>();
   readonly info = output<CallEntry>();
+  readonly remove = output<CallEntry>();
 
   protected readonly isMissed = computed(() => isMissedCall(this.call()));
   protected readonly directionLabel = computed(() => CALL_DIRECTION_LABELS[this.call().direction]);
@@ -21,6 +23,7 @@ export class CallListItem {
     return `${call.contactName}, ${this.directionLabel()}, ${call.date}`;
   });
   protected readonly infoLabel = computed(() => `Call info for ${this.call().contactName}`);
+  protected readonly removeLabel = computed(() => `Remove call for ${this.call().contactName}`);
 
   protected onActivate(): void {
     this.selected.emit(this.call());
@@ -29,5 +32,10 @@ export class CallListItem {
   protected onInfo(event: Event): void {
     event.stopPropagation();
     this.info.emit(this.call());
+  }
+
+  protected onRemove(event: Event): void {
+    event.stopPropagation();
+    this.remove.emit(this.call());
   }
 }

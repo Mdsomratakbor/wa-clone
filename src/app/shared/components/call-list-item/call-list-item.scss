@@ -14,7 +14,12 @@
   background: rgba(60, 60, 67, 0.29);
 }
 
+:host:has(.call-list-item--edit)::after {
+  left: 99px;
+}
+
 .call-list-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -30,6 +35,31 @@
 
   &:hover {
     background: color-mix(in srgb, var(--wa-accent) 5%, transparent);
+  }
+
+  &--edit {
+    padding-left: 47px;
+  }
+
+  &__remove {
+    position: absolute;
+    left: 17px;
+    top: 50%;
+    translate: 0 -50%;
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    line-height: 0;
+    cursor: pointer;
+    flex: none;
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--wa-accent);
+      border-radius: 6px;
+    }
   }
 
   &__body {

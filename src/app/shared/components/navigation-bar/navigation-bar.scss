@@ -63,6 +63,11 @@
     color: var(--wa-accent);
     cursor: pointer;
 
+    &:disabled {
+      color: #c7c7cc;
+      cursor: default;
+    }
+
     &:focus-visible {
       outline: none;
       box-shadow: inset 0 0 0 2px var(--wa-accent);

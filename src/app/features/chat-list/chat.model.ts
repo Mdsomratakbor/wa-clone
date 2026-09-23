@@ -18,4 +18,5 @@ export interface NavAction {
   id: string;
   label: string;
   icon?: 'new-call';
+  disabled?: boolean;
 }

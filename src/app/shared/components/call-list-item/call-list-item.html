@@ -1,5 +1,6 @@
 <div
   class="call-list-item"
+  [class.call-list-item--edit]="editMode()"
   role="button"
   tabindex="0"
   [attr.aria-label]="rowLabel()"
@@ -7,6 +8,28 @@
   (keydown.enter)="onActivate()"
   (keydown.space)="onActivate()"
 >
+  @if (editMode()) {
+    <button
+      class="call-list-item__remove"
+      type="button"
+      data-testid="call-remove"
+      [attr.aria-label]="removeLabel()"
+      (click)="onRemove($event)"
+    >
+      <svg width="21" height="21" viewBox="0 0 21 21" fill="none" aria-hidden="true">
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M10.5 21C16.299 21 21 16.299 21 10.5C21 4.70101 16.299 0 10.5 0C4.70101 0 0 4.70101 0 10.5C0 16.299 4.70101 21 10.5 21Z"
+          fill="#FF3B30"
+        />
+        <path
+          d="M6 11.25H15.5C15.9142 11.25 16.25 10.9142 16.25 10.5C16.25 10.0858 15.9142 9.75 15.5 9.75H6C5.58579 9.75 5.25 10.0858 5.25 10.5C5.25 10.9142 5.58579 11.25 6 11.25Z"
+          fill="#FFFFFF"
+        />
+      </svg>
+    </button>
+  }
   <app-user-avatar [src]="call().avatarRef" [name]="call().contactName" [size]="40" />
   <div class="call-list-item__body">
     <div class="call-list-item__head">
@@ -34,18 +57,20 @@
       <span class="call-list-item__direction">{{ directionLabel() }}</span>
     </div>
   </div>
-  <button
-    class="call-list-item__info"
-    type="button"
-    data-testid="call-info"
-    [attr.aria-label]="infoLabel()"
-    (click)="onInfo($event)"
-  >
+  @if (!editMode()) {
+    <button
+      class="call-list-item__info"
+      type="button"
+      data-testid="call-info"
+      [attr.aria-label]="infoLabel()"
+      (click)="onInfo($event)"
+    >
     <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
       <path
         fill="#007AFF"
         d="M22 11C22 4.92487 17.0751 0 11 0C4.92487 0 0 4.92487 0 11C0 17.0751 4.92487 22 11 22C17.0751 22 22 17.0751 22 11ZM1 11C1 5.47715 5.47715 1 11 1C16.5228 1 21 5.47715 21 11C21 16.5228 16.5228 21 11 21C5.47715 21 1 16.5228 1 11ZM12 8.5V16.5H13V17H9V16.5H10V9H9V8.5H12ZM12.2 5.85C12.2 5.10442 11.5956 4.5 10.85 4.5C10.1044 4.5 9.5 5.10442 9.5 5.85C9.5 6.59558 10.1044 7.2 10.85 7.2C11.5956 7.2 12.2 6.59558 12.2 5.85Z"
       />
     </svg>
-  </button>
+    </button>
+  }
 </div>

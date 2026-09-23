@@ -42,9 +42,8 @@ test.describe('Calls screen (US1)', () => {
     expect(color).toBe('rgb(255, 59, 48)');
   });
 
-  test('all header and row controls are no-ops', async ({ page }) => {
+  test('row controls are no-ops', async ({ page }) => {
     const url = new URL(page.url()).pathname;
-    await page.getByRole('button', { name: 'Edit' }).click();
     await page.getByRole('button', { name: 'New call' }).click();
     await page.getByRole('button', { name: 'Martin Randolph, outgoing, 10/13/19' }).click();
     await page.getByRole('button', { name: 'Call info for Martin Randolph' }).click();

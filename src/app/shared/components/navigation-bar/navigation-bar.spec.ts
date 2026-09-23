@@ -96,4 +96,46 @@ describe('NavigationBar', () => {
       expect(button?.getAttribute('aria-label')).not.toBeNull();
     });
   });
+
+  describe('extended contract (feature 005 - disabled actions)', () => {
+    it('renders a disabled action without emitting on click', () => {
+      TestBed.configureTestingModule({
+        imports: [NavigationBar],
+      });
+      const fixture = TestBed.createComponent(NavigationBar);
+      fixture.componentRef.setInput('trailing', [
+        { id: 'clear', label: 'Clear', disabled: true },
+      ] satisfies NavAction[]);
+      fixture.detectChanges();
+      let emitted: string | undefined;
+      fixture.componentInstance.action.subscribe((v) => (emitted = v));
+      const button = (
+        fixture.nativeElement as HTMLElement
+      ).querySelector('.navigation-bar__action') as HTMLButtonElement;
+      expect(button?.disabled).toBe(true);
+      button?.click();
+      fixture.detectChanges();
+      expect(emitted).toBeUndefined();
+    });
+
+    it('keeps enabled actions clickable', () => {
+      TestBed.configureTestingModule({
+        imports: [NavigationBar],
+      });
+      const fixture = TestBed.createComponent(NavigationBar);
+      fixture.componentRef.setInput('trailing', [
+        { id: 'clear', label: 'Clear', disabled: false },
+      ] satisfies NavAction[]);
+      fixture.detectChanges();
+      let emitted: string | undefined;
+      fixture.componentInstance.action.subscribe((v) => (emitted = v));
+      const button = (
+        fixture.nativeElement as HTMLElement
+      ).querySelector('.navigation-bar__action') as HTMLButtonElement;
+      expect(button?.disabled).toBe(false);
+      button?.click();
+      fixture.detectChanges();
+      expect(emitted).toBe('clear');
+    });
+  });
 });

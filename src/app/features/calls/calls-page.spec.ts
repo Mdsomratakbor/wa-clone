@@ -76,23 +76,124 @@ describe('CallsPage', () => {
     expect(el.querySelector('[data-testid="call-list"]')).toBeNull();
   });
 
-  it('edit and new-call are no-ops: list untouched, no navigation', () => {
+  it('new-call is a no-op: list untouched, no navigation', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
-    const actionIndex = Object.fromEntries(
-      [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].map((b, i) => [
-        b.textContent?.trim() || b.getAttribute('aria-label'),
-        i,
-      ]),
+    const newCall = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+      (b) => b.getAttribute('aria-label') === 'New call',
     );
-    const actions = [
-      ...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action'),
-    ];
-    actions[(actionIndex['Edit'] as number) ?? 0].click();
-    actions[(actionIndex['New call'] as number) ?? actions.length - 1].click();
+    newCall?.click();
     fixture.detectChanges();
     expect(router.navigate).not.toHaveBeenCalled();
     expect(el.querySelectorAll('app-call-list-item').length).toBe(CALL_SEED.length);
+  });
+
+  it('Edit enters edit mode: Done + Clear header, minus circles, no info buttons', () => {
+    const el = render();
+    const edit = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+      (b) => b.textContent?.trim() === 'Edit',
+    );
+    edit?.click();
+    fixture.detectChanges();
+    const actions = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')];
+    expect(actions[0]?.textContent?.trim()).toBe('Done');
+    expect(actions.at(-1)?.textContent?.trim()).toBe('Clear');
+    expect(el.querySelectorAll('[data-testid="call-remove"]').length).toBe(CALL_SEED.length);
+    expect(el.querySelectorAll('[data-testid="call-info"]').length).toBe(0);
+    expect((el.querySelector('[data-testid="filter-all"]') as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('Done exits edit mode and restores the 004 header with info buttons', () => {
+    const el = render();
+    const edit = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+      (b) => b.textContent?.trim() === 'Edit',
+    );
+    edit?.click();
+    fixture.detectChanges();
+    const done = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+      (b) => b.textContent?.trim() === 'Done',
+    );
+    done?.click();
+    fixture.detectChanges();
+    const actions = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')];
+    expect(actions[0]?.textContent?.trim()).toBe('Edit');
+    expect(actions.at(-1)?.getAttribute('aria-label')).toBe('New call');
+    expect(el.querySelectorAll('[data-testid="call-remove"]').length).toBe(0);
+    expect(el.querySelectorAll('[data-testid="call-info"]').length).toBe(CALL_SEED.length);
+  });
+
+  it('removing a row via the minus deletes exactly that row', () => {
+    const el = render();
+    const edit = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+      (b) => b.textContent?.trim() === 'Edit',
+    );
+    edit?.click();
+    fixture.detectChanges();
+    const minus = el.querySelector('[data-testid="call-remove"]') as HTMLButtonElement;
+    const removedName = minus?.getAttribute('aria-label');
+    minus?.click();
+    fixture.detectChanges();
+    expect(el.querySelectorAll('app-call-list-item').length).toBe(CALL_SEED.length - 1);
+    expect(
+      [...el.querySelectorAll('.call-list-item__name')].some(
+        (n) => n.textContent?.trim() === removedName?.replace('Remove call for ', ''),
+      ),
+    ).toBe(false);
+  });
+
+  it('Clear empties the list, disables Clear and shows the No calls empty state', () => {
+    const el = render();
+    const edit = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+      (b) => b.textContent?.trim() === 'Edit',
+    );
+    edit?.click();
+    fixture.detectChanges();
+    const clear = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+      (b) => b.textContent?.trim() === 'Clear',
+    );
+    clear?.click();
+    fixture.detectChanges();
+    expect(el.querySelectorAll('app-call-list-item').length).toBe(0);
+    const actions = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')];
+    expect(actions.at(-1)?.textContent?.trim()).toBe('Clear');
+    expect(actions.at(-1)?.disabled).toBe(true);
+    expect(el.querySelector('[data-testid="empty-state"]')?.textContent).toContain('No calls');
+  });
+
+  it('row-body activation is a no-op in edit mode', () => {
+    const el = render();
+    const edit = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+      (b) => b.textContent?.trim() === 'Edit',
+    );
+    edit?.click();
+    fixture.detectChanges();
+    const row = el.querySelector('.call-list-item') as HTMLElement;
+    row?.click();
+    fixture.detectChanges();
+    expect(el.querySelectorAll('app-call-list-item').length).toBe(CALL_SEED.length);
+  });
+
+  it('tab selection is inert while editing', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+    const edit = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+      (b) => b.textContent?.trim() === 'Edit',
+    );
+    edit?.click();
+    fixture.detectChanges();
+    const statusTab = [...el.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find((b) =>
+      b.textContent?.trim()?.startsWith('Status'),
+    );
+    const chatsTab = [...el.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find((b) =>
+      b.textContent?.trim()?.startsWith('Chats'),
+    );
+    statusTab?.click();
+    chatsTab?.click();
+    fixture.detectChanges();
+    expect(router.navigate).not.toHaveBeenCalled();
+    expect(el.querySelector('[data-testid="call-list"]')).not.toBeNull();
+    expect(el.querySelector('[data-testid="tab-stub"]')).toBeNull();
   });
 });

@@ -30,6 +30,21 @@
     justify-content: center;
   }
 
+  &__empty {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__empty-text {
+    margin: 0;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-preview);
+    font-weight: var(--wa-fw-regular);
+    color: var(--wa-text-secondary);
+  }
+
   &__stub-text {
     margin: 0;
     font-family: var(--wa-font-family);

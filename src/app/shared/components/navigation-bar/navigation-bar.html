@@ -5,6 +5,7 @@
         <button
           class="navigation-bar__action"
           type="button"
+          [disabled]="item.disabled || undefined"
           (click)="onAction(item.id)"
         >
           {{ item.label }}
@@ -27,6 +28,7 @@
           class="navigation-bar__action"
           type="button"
           [attr.aria-label]="item.icon === 'new-call' ? item.label : null"
+          [disabled]="item.disabled || undefined"
           (click)="onAction(item.id)"
         >
           @if (item.icon === 'new-call') {

@@ -1,7 +1,7 @@
 <app-navigation-bar
   title=""
-  [leading]="leadingActions"
-  [trailing]="trailingActions"
+  [leading]="leadingActions()"
+  [trailing]="trailingActions()"
   (action)="onNavAction($event)"
 >
   <div
@@ -27,13 +27,25 @@
 
 <div class="calls-page__body">
   @if (activeTab() === 'calls') {
-    <ul class="calls-page__list" data-testid="call-list">
-      @for (call of calls(); track call.id) {
-        <li class="calls-page__row">
-          <app-call-list-item [call]="call" />
-        </li>
-      }
-    </ul>
+    @if (items().length > 0) {
+      <ul class="calls-page__list" data-testid="call-list">
+        @for (call of items(); track call.id) {
+          <li class="calls-page__row">
+            <app-call-list-item
+              [call]="call"
+              [editMode]="editing()"
+              (selected)="onCallSelected($event)"
+              (info)="onCallInfo($event)"
+              (remove)="onCallRemove($event)"
+            />
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="calls-page__empty" role="status" data-testid="empty-state">
+        <p class="calls-page__empty-text">No calls</p>
+      </div>
+    }
   } @else {
     <div class="calls-page__stub" role="status" data-testid="tab-stub">
       <p class="calls-page__stub-text">{{ activeLabel() }} — coming soon</p>

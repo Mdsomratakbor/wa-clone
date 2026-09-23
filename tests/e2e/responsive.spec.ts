@@ -65,4 +65,16 @@ test.describe('Responsive adaptation (owner-approved drift)', () => {
       expect(overflow, `${vp.name} calls screen should not overflow`).toBe(false);
     }
   });
+
+  test('calls edit mode never overflows horizontally at any breakpoint', async ({ page }) => {
+    for (const vp of BREAKPOINTS) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto('/calls');
+      await page.getByRole('button', { name: 'Edit' }).click();
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      );
+      expect(overflow, `${vp.name} calls edit mode should not overflow`).toBe(false);
+    }
+  });
 });
