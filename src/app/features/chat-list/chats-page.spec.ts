@@ -36,17 +36,17 @@ describe('ChatsPage', () => {
     expect(empty?.textContent).toContain('No chats');
   });
 
-  it('switches to a placeholder when a non-chats tab is selected', () => {
+  it('switches to a placeholder when a non-chats, non-status, non-calls tab is selected', () => {
     fixture = TestBed.createComponent(ChatsPage);
     fixture.detectChanges();
     const tabs = (fixture.nativeElement as HTMLElement).querySelectorAll(
       '[role="tab"]',
     ) as NodeListOf<HTMLButtonElement>;
-    tabs[4].click(); // Status
+    tabs[2].click(); // Camera
     fixture.detectChanges();
     const stub = fixture.nativeElement.querySelector('[data-testid="tab-stub"]');
     expect(stub).not.toBeNull();
-    expect(stub?.textContent).toContain('Status');
+    expect(stub?.textContent).toContain('Camera');
   });
 
   it('navigates to /calls when the Calls tab is selected', () => {
@@ -60,6 +60,20 @@ describe('ChatsPage', () => {
     tabs[3].click(); // Calls
     fixture.detectChanges();
     expect(router.navigate).toHaveBeenCalledWith(['/calls']);
+  });
+
+  it('navigates to /status when the Status tab is selected', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    fixture = TestBed.createComponent(ChatsPage);
+    fixture.detectChanges();
+    const tabs = (fixture.nativeElement as HTMLElement).querySelectorAll(
+      '[role="tab"]',
+    ) as NodeListOf<HTMLButtonElement>;
+    tabs[4].click(); // Status
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/status']);
+    expect(fixture.nativeElement.querySelector('[data-testid="tab-stub"]')).toBeNull();
   });
 
   describe('edit mode', () => {

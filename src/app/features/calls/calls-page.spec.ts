@@ -63,17 +63,30 @@ describe('CallsPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/chats']);
   });
 
-  it('show the stub when a non-chats, non-calls tab is selected', () => {
+  it('shows the stub when a non-chats, non-calls, non-status tab is selected', () => {
+    const el = render();
+    const cameraTab = [...el.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find((b) =>
+      b.textContent?.trim()?.startsWith('Camera'),
+    );
+    cameraTab?.click();
+    fixture.detectChanges();
+    const stub = el.querySelector('[data-testid="tab-stub"]');
+    expect(stub).not.toBeNull();
+    expect(stub?.textContent).toContain('Camera');
+    expect(el.querySelector('[data-testid="call-list"]')).toBeNull();
+  });
+
+  it('navigates to /status when the Status tab is activated', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
     const statusTab = [...el.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find((b) =>
       b.textContent?.trim()?.startsWith('Status'),
     );
     statusTab?.click();
     fixture.detectChanges();
-    const stub = el.querySelector('[data-testid="tab-stub"]');
-    expect(stub).not.toBeNull();
-    expect(stub?.textContent).toContain('Status');
-    expect(el.querySelector('[data-testid="call-list"]')).toBeNull();
+    expect(router.navigate).toHaveBeenCalledWith(['/status']);
+    expect(el.querySelector('[data-testid="tab-stub"]')).toBeNull();
   });
 
   it('new-call is a no-op: list untouched, no navigation', () => {

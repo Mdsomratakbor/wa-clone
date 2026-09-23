@@ -70,6 +70,10 @@ export class CallsPage {
       void this.router.navigate(['/chats']);
       return;
     }
+    if (key === 'status') {
+      void this.router.navigate(['/status']);
+      return;
+    }
     if (key === 'calls') {
       return;
     }

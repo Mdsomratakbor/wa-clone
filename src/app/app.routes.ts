@@ -11,6 +11,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/calls/calls-page').then((m) => m.CallsPage),
   },
   {
+    path: 'status',
+    loadComponent: () => import('./features/status/status-page').then((m) => m.StatusPage),
+  },
+  {
     path: 'chat/:id',
     loadComponent: () =>
       import('./features/chat-window/chat-window-page').then((m) => m.ChatWindowPage),

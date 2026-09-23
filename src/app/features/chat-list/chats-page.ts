@@ -73,6 +73,10 @@ export class ChatsPage {
       void this.router.navigate(['/calls']);
       return;
     }
+    if (key === 'status') {
+      void this.router.navigate(['/status']);
+      return;
+    }
     this.activeTab.set(key);
   }
 
