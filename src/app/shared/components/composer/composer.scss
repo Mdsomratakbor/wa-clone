@@ -1,0 +1,75 @@
+:host {
+  display: block;
+  flex: none;
+}
+
+.composer {
+  display: flex;
+  align-items: center;
+  height: var(--wa-composer-height);
+  padding: 0 18px 0 14px;
+  box-sizing: border-box;
+  background: var(--wa-bar-surface);
+  box-shadow: var(--wa-composer-shadow-a);
+
+  &__field {
+    position: relative;
+    flex: 1;
+    margin-left: 14px;
+  }
+
+  &__input {
+    appearance: none;
+    width: 100%;
+    height: var(--wa-composer-field-height);
+    padding: 0 46px 0 12px;
+    box-sizing: border-box;
+    border: 0;
+    border-radius: 8px;
+    background: var(--wa-input-surface);
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-message);
+    line-height: var(--wa-lh-message);
+    color: var(--wa-on-surface);
+
+    &:focus {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--wa-accent);
+    }
+  }
+
+  &__control {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 6px 2px;
+    color: var(--wa-accent);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--wa-accent);
+      border-radius: 6px;
+    }
+  }
+
+  &__icon {
+    display: block;
+  }
+
+  &__sticker {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 4px;
+  }
+
+  &__camera {
+    margin-left: 19px;
+  }
+
+  &__mic {
+    margin-left: 24px;
+  }
+}

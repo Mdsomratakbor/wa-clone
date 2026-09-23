@@ -38,6 +38,6 @@ test.describe('Keyboard focus & interactions (US3)', () => {
     await page.getByRole('button', { name: 'Maximillian Jacobson' }).click();
 
     expect(pageErrors).toEqual([]);
-    await expect(page.getByTestId('chat-list')).toBeVisible();
+    await expect(page).toHaveURL(/\/chat\/chat-001/);
   });
 });

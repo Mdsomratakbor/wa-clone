@@ -1,0 +1,52 @@
+<div
+  class="message-bubble message-bubble--{{ message().sender }}"
+  [attr.data-testid]="'bubble-' + message().id"
+  [attr.aria-label]="ariaLabel()"
+>
+  @if (message().file; as file) {
+    <div class="message-bubble__file">
+      <div class="message-bubble__file-card">
+        <svg class="message-bubble__file-icon" width="20" height="24" viewBox="0 0 20 24" fill="none" aria-hidden="true">
+          <path
+            d="M2 1.5h10.5L18 7v14.5a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-19a1 1 0 0 1 1-1Z"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linejoin="round"
+          />
+          <path d="M12 1.5V7h5.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+        </svg>
+        <span class="message-bubble__file-name">{{ file.filename }}</span>
+      </div>
+      <div class="message-bubble__file-meta">
+        <span class="message-bubble__file-size">{{ file.size }}</span>
+        <span class="message-bubble__file-dot" aria-hidden="true"></span>
+        <span class="message-bubble__file-ext">{{ file.ext }}</span>
+      </div>
+    </div>
+  } @else {
+    <p class="message-bubble__text">{{ message().text }}</p>
+  }
+
+  <span class="message-bubble__meta">
+    @if (message().sender === 'outgoing') {
+      <svg class="message-bubble__ticks" width="15" height="9" viewBox="0 0 15 9" fill="none" aria-hidden="true">
+        <path
+          d="M1 5.2 3.9 8l4.4-5"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M6.4 5.2 9.3 8l4.4-5"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          opacity="0.55"
+        />
+      </svg>
+    }
+    <time class="message-bubble__time">{{ message().time }}</time>
+  </span>
+</div>

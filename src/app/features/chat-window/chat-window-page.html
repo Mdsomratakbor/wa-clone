@@ -1,0 +1,24 @@
+<div class="chat-window">
+  <app-chat-header [contact]="contact" (back)="onBack()" />
+
+  <div class="chat-window__thread" data-testid="message-thread" role="list" [attr.aria-label]="'Conversation with ' + contact.name">
+    @if (!listEmpty()) {
+      <ol class="chat-window__list">
+        @for (message of messages(); track message.id; let index = $index) {
+          @if (index === 2) {
+            <li class="chat-window__chip-row">
+              <div class="chat-window__date" role="status">
+                <span class="chat-window__date-chip">{{ dateChip }}</span>
+              </div>
+            </li>
+          }
+          <li class="chat-window__row chat-window__row--{{ message.sender }}">
+            <app-message-bubble [message]="message" />
+          </li>
+        }
+      </ol>
+    }
+  </div>
+
+  <app-composer />
+</div>

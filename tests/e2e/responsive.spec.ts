@@ -31,4 +31,15 @@ test.describe('Responsive adaptation (owner-approved drift)', () => {
       ).toBeLessThan(1);
     }
   });
+
+  test('chat window never overflows horizontally at any breakpoint', async ({ page }) => {
+    for (const vp of BREAKPOINTS) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto('/chat/chat-006');
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      );
+      expect(overflow, `${vp.name} chat window should not overflow`).toBe(false);
+    }
+  });
 });

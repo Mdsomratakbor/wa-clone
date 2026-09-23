@@ -1,0 +1,62 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--wa-surface);
+}
+
+.chat-window {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &__thread {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 8px 8px 2px;
+    box-sizing: border-box;
+    scroll-behavior: auto;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__row {
+    display: flex;
+
+    &--outgoing {
+      justify-content: flex-end;
+    }
+
+    &--incoming {
+      justify-content: flex-start;
+    }
+  }
+
+  &__chip-row {
+    display: flex;
+    justify-content: center;
+    padding: 7px 0;
+  }
+
+  &__date-chip {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--wa-date-chip);
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-date);
+    font-weight: var(--wa-fw-medium);
+    line-height: var(--wa-lh-date);
+    letter-spacing: var(--wa-ls-tight);
+    color: var(--wa-date);
+    white-space: nowrap;
+  }
+}

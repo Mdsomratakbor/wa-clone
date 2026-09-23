@@ -6,5 +6,10 @@ export const routes: Routes = [
     path: 'chats',
     loadComponent: () => import('./features/chat-list/chats-page').then((m) => m.ChatsPage),
   },
+  {
+    path: 'chat/:id',
+    loadComponent: () =>
+      import('./features/chat-window/chat-window-page').then((m) => m.ChatWindowPage),
+  },
   { path: '**', redirectTo: 'chats' },
 ];

@@ -1,0 +1,119 @@
+:host {
+  display: block;
+  max-width: calc(100% - 24px);
+}
+
+.message-bubble {
+  position: relative;
+  display: inline-block;
+  max-width: var(--wa-message-max-width);
+  padding: 5px 9px 8px 8px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  font-family: var(--wa-font-family);
+  box-shadow: 0 1px 0 var(--wa-bubble-shadow);
+
+  &:not(:has(.message-bubble__file)) {
+    min-height: 34px;
+  }
+
+  &--outgoing {
+    background: var(--wa-bubble-outgoing);
+    border-top-right-radius: 4px;
+  }
+
+  &--incoming {
+    background: var(--wa-bubble-incoming);
+    border-top-left-radius: 4px;
+  }
+
+  &__text {
+    margin: 0;
+    font-size: var(--wa-fs-message);
+    font-weight: var(--wa-fw-regular);
+    line-height: var(--wa-lh-message);
+    letter-spacing: var(--wa-ls-bubble);
+    color: var(--wa-on-surface);
+    overflow-wrap: break-word;
+  }
+
+  &__meta {
+    position: absolute;
+    right: 9px;
+    bottom: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  &__ticks {
+    display: block;
+    color: var(--wa-read-tick);
+  }
+
+  &__time {
+    font-size: var(--wa-fs-bubble-time);
+    font-weight: var(--wa-fw-regular);
+    line-height: var(--wa-lh-bubble-time);
+    letter-spacing: var(--wa-ls-tight);
+    color: var(--wa-bubble-time);
+    white-space: nowrap;
+  }
+
+  &__file {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__file-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: var(--wa-file-card);
+    margin-bottom: 4px;
+    min-width: 150px;
+  }
+
+  &__file-icon {
+    display: block;
+    flex: none;
+    color: var(--wa-on-surface);
+  }
+
+  &__file-name {
+    font-size: var(--wa-fs-chat-title);
+    font-weight: var(--wa-fw-medium);
+    line-height: var(--wa-lh-message);
+    letter-spacing: var(--wa-ls-tight);
+    color: var(--wa-file-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__file-meta {
+    display: flex;
+    align-items: center;
+    font-size: var(--wa-fs-bubble-time);
+    font-weight: var(--wa-fw-regular);
+    line-height: var(--wa-lh-bubble-time);
+    letter-spacing: var(--wa-ls-tight);
+    color: var(--wa-file-meta);
+    white-space: nowrap;
+  }
+
+  &__file-dot {
+    width: 2.5px;
+    height: 2.5px;
+    border-radius: 50%;
+    background: var(--wa-file-dot);
+    margin: 0 4px;
+  }
+
+  &__file-size,
+  &__file-ext {
+    white-space: nowrap;
+  }
+}

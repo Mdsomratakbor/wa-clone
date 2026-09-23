@@ -1,0 +1,94 @@
+:host {
+  display: flow-root;
+  flex: none;
+}
+
+.chat-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--wa-chat-header-height);
+  padding: 0 18px 0 9px;
+  box-sizing: border-box;
+  background: var(--wa-bar-surface);
+  box-shadow: var(--wa-composer-shadow-b);
+
+  &__back {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 8px 6px;
+    margin-right: 18px;
+    color: var(--wa-accent);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--wa-accent);
+      border-radius: 6px;
+    }
+  }
+
+  &__icon {
+    display: block;
+  }
+
+  &__titles {
+    flex: 1;
+    min-width: 0;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  &__name {
+    margin: 0;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-chat-title);
+    font-weight: var(--wa-fw-semibold);
+    line-height: var(--wa-lh-chat-title);
+    letter-spacing: var(--wa-ls-tight);
+    color: var(--wa-on-surface);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__subtitle {
+    margin: 0;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-preview);
+    font-weight: var(--wa-fw-regular);
+    line-height: 16px;
+    letter-spacing: var(--wa-ls-forward);
+    color: var(--wa-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__spacer {
+    flex: none;
+    width: 24px;
+  }
+
+  &__icon-button {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 8px 4px;
+    color: var(--wa-accent);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--wa-accent);
+      border-radius: 6px;
+    }
+
+    & + & {
+      margin-left: 18px;
+    }
+  }
+}

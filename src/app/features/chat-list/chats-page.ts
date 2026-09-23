@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { ChatListItem } from '../../shared/components/chat-list-item/chat-list-item';
 import { Fab } from '../../shared/components/fab/fab';
 import { NavigationBar } from '../../shared/components/navigation-bar/navigation-bar';
@@ -23,6 +24,8 @@ const TAB_LABELS: Record<TabKey, string> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatsPage {
+  private readonly router = inject(Router);
+
   readonly conversations = input<ChatPreview[]>(CHAT_SEED as ChatPreview[]);
 
   protected readonly activeTab = signal<TabKey>('chats');
@@ -45,7 +48,7 @@ export class ChatsPage {
   }
 
   protected onChatSelected(chat: ChatPreview): void {
-    void chat; // F-001: chat-window navigation is a later feature.
+    void this.router.navigate(['/chat', chat.id]);
   }
 
   protected onNavAction(_id: string): void {
