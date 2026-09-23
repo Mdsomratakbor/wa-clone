@@ -89,4 +89,16 @@ test.describe('Responsive adaptation (owner-approved drift)', () => {
       expect(overflow, `${vp.name} status feed should not overflow`).toBe(false);
     }
   });
+
+  test('status compose never overflows horizontally at any breakpoint', async ({ page }) => {
+    for (const vp of BREAKPOINTS) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto('/status/compose');
+      await page.getByTestId('compose-page').waitFor();
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      );
+      expect(overflow, `${vp.name} status compose should not overflow`).toBe(false);
+    }
+  });
 });

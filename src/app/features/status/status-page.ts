@@ -55,10 +55,12 @@ export class StatusPage {
   }
 
   protected onCamera(): void {
-    // F-006: Status compose (photo/camera) is a later feature (design-map row 7).
+    // F-007: camera entry opens the text-status composer (design-map row 7).
+    void this.router.navigate(['/status/compose']);
   }
 
   protected onNote(): void {
-    // F-006: Status compose (text note) is a later feature (design-map row 7).
+    // F-007: note entry opens the text-status composer (design-map row 7).
+    void this.router.navigate(['/status/compose']);
   }
 }

@@ -1,0 +1,66 @@
+<div class="compose" data-testid="compose-page">
+  <div class="compose__top" data-testid="compose-top">
+    <button
+      class="compose__glyph compose__glyph--start"
+      data-testid="compose-close"
+      type="button"
+      aria-label="Close"
+      (click)="onClose()"
+    >
+      <svg width="19" height="23" viewBox="0 0 19 23" fill="none" aria-hidden="true">
+        <path
+          d="M6.98107 12.8606L0.436555 6.31538C-0.0521276 5.8267 -0.141229 5.07188 0.224554 4.45992L0.33205 4.30937L0.436555 4.19247C0.973287 3.65574 1.82398 3.60574 2.41851 4.06802L2.55944 4.19245L9.10473 10.737L15.6507 4.19247C16.1875 3.65574 17.0382 3.60574 17.6568 4.08797L17.7737 4.19247C18.3104 4.7292 18.3604 5.57989 17.8782 6.19849L17.7736 6.31541L11.2274 12.8606L17.7737 19.4067C18.3104 19.9434 18.3604 20.7941 17.8782 21.4127L17.7737 21.5296C17.2369 22.0663 16.3862 22.1163 15.7676 21.6341L15.6507 21.5296L9.10473 14.9834L2.55946 21.5296C2.02273 22.0663 1.17204 22.1163 0.553448 21.6341L0.436555 21.5296C-0.100177 20.9928 -0.150174 20.1422 0.33205 19.5236L0.436514 19.4067L6.98107 12.8606Z"
+          fill="currentColor"
+        />
+      </svg>
+    </button>
+
+    <div class="compose__send">
+      <button
+        class="compose__glyph compose__glyph--end"
+        data-testid="compose-send-text"
+        type="button"
+        aria-label="Type status"
+        (click)="onSendAlt()"
+      >
+        <svg width="19" height="23" viewBox="265.4 0.5 18.6 23" fill="none" aria-hidden="true">
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M265.446 4.003V0.500375H283.96V4.003H276.454V23.5176H272.951V4.003H265.446Z"
+            fill="currentColor"
+          />
+        </svg>
+      </button>
+
+      <button
+        class="compose__glyph"
+        data-testid="compose-send"
+        type="button"
+        aria-label="Send status"
+        (click)="onSend()"
+      >
+        <svg width="24" height="24" viewBox="313.98 0 24.04 23.63" fill="none" aria-hidden="true">
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M325.991 0C332.623 0 338 4.48051 338 10.0075C338 20.1346 328.386 15.5407 327.065 18.1165C326.251 19.7721 330.38 23.6279 325.991 23.6279C316.964 23.6279 313.982 15.5345 313.982 10.0075C313.982 4.48051 319.359 0 325.991 0ZM318.986 7.50562C317.88 7.50562 316.984 8.40172 316.984 9.50712C316.984 10.6125 317.88 11.5086 318.986 11.5086C320.091 11.5086 320.987 10.6125 320.987 9.50712C320.987 8.40172 320.091 7.50562 318.986 7.50562ZM332.996 7.50562C331.891 7.50562 330.995 8.40172 330.995 9.50712C330.995 10.6125 331.891 11.5086 332.996 11.5086C334.102 11.5086 334.998 10.6125 334.998 9.50712C334.998 8.40172 334.102 7.50562 332.996 7.50562ZM322.989 2.50187C321.883 2.50187 320.987 3.39798 320.987 4.50337C320.987 5.60877 321.883 6.50487 322.989 6.50487C324.094 6.50487 324.99 5.60877 324.99 4.50337C324.99 3.39798 324.094 2.50187 322.989 2.50187ZM328.993 2.50187C327.888 2.50187 326.992 3.39798 326.992 4.50337C326.992 5.60877 327.888 6.50487 328.993 6.50487C330.099 6.50487 330.995 5.60877 330.995 4.50337C330.995 3.39798 330.099 2.50187 328.993 2.50187Z"
+            fill="currentColor"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="compose__type" data-testid="compose-type" aria-hidden="true">
+    <p class="compose__placeholder">Type a status</p>
+    <span class="compose__caret"></span>
+  </div>
+
+  <img
+    class="compose__keyboard"
+    data-testid="compose-keyboard"
+    src="/status-compose-keyboard.png"
+    alt=""
+  />
+</div>

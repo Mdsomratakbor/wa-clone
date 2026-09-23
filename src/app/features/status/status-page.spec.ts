@@ -109,16 +109,23 @@ describe('StatusPage', () => {
     expect(el.querySelector('[data-testid="tab-stub"]')).toBeNull();
   });
 
-  it('Privacy, camera, note and row activation are no-ops', () => {
+  it('camera and note navigate to compose; Privacy and row stay no-ops', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
+
+    (el.querySelector('[data-testid="status-camera"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/status/compose']);
+
+    (el.querySelector('[data-testid="status-note"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/status/compose']);
+
     el.querySelector('.navigation-bar__action')?.dispatchEvent(new MouseEvent('click'));
-    (el.querySelector('[data-testid="status-camera"]') as HTMLButtonElement)?.click();
-    (el.querySelector('[data-testid="status-note"]') as HTMLButtonElement)?.click();
     (el.querySelector('[data-testid="status-my"]') as HTMLElement)?.click();
     fixture.detectChanges();
-    expect(router.navigate).not.toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledTimes(2);
     expect(el.querySelector('[data-testid="status-feed"]')).not.toBeNull();
   });
 });

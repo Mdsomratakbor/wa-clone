@@ -86,18 +86,25 @@ test.describe('Status routing + no-ops (US2)', () => {
     await page.getByTestId('status-my').waitFor();
   });
 
-  test('Privacy, camera, note and row activation are no-ops', async ({ page }) => {
+  test('camera and note navigate to compose; Privacy and row stay no-ops', async ({ page }) => {
     await page.goto('/status');
     await page.getByTestId('status-my').waitFor();
-    const url = page.url();
 
-    await page.getByRole('button', { name: 'Privacy' }).click();
     await page.getByTestId('status-camera').click();
-    await page.getByTestId('status-note').click();
-    await page.getByTestId('status-my').click();
+    await expect(page).toHaveURL(/\/status\/compose$/);
+    await page.getByTestId('compose-page').waitFor();
 
-    await expect(page).toHaveURL(url);
-    await expect(page.getByTestId('status-my')).toBeVisible();
+    await page.goto('/status');
+    await page.getByTestId('status-my').waitFor();
+    await page.getByTestId('status-note').click();
+    await expect(page).toHaveURL(/\/status\/compose$/);
+    await page.getByTestId('compose-page').waitFor();
+
+    await page.goto('/status');
+    await page.getByTestId('status-my').waitFor();
+    await page.getByRole('button', { name: 'Privacy' }).click();
+    await page.getByTestId('status-my').click();
+    await expect(page).toHaveURL(/\/status$/);
     await expect(page.getByTestId('status-tip')).toBeVisible();
   });
 });
