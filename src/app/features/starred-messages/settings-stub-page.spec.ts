@@ -43,4 +43,63 @@ describe('SettingsStubPage', () => {
     fixture.detectChanges();
     expect(router.navigate).toHaveBeenCalledWith(['/starred-messages']);
   });
+
+  it('renders the Settings options trigger with an aria-label', () => {
+    const el = render();
+    const trigger = el.querySelector<HTMLButtonElement>('[data-testid="settings-options"]');
+    expect(trigger).not.toBeNull();
+    expect(trigger?.getAttribute('aria-label')).toBe('Settings options');
+  });
+
+  it('does not render the settings sheet when closed', () => {
+    const el = render();
+    expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+  });
+
+  it('opens the settings sheet from the trigger', () => {
+    const el = render();
+    el.querySelector<HTMLButtonElement>('[data-testid="settings-options"]')?.click();
+    fixture.detectChanges();
+    expect(el.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
+    expect(el.querySelector('[data-testid="action-sheet-backdrop"]')).not.toBeNull();
+  });
+
+  it('renders the settings rows from the seed', () => {
+    const el = render();
+    el.querySelector<HTMLButtonElement>('[data-testid="settings-options"]')?.click();
+    fixture.detectChanges();
+    const rows = Array.from(
+      el.querySelectorAll('[data-testid="action-sheet-row"]') as NodeListOf<HTMLElement>,
+    );
+    expect(rows.map((r) => r.textContent?.trim())).toEqual(['Notifications', 'Storage', 'More']);
+  });
+
+  it('keeps the sheet open when a row is activated (targets are later features)', () => {
+    const el = render();
+    el.querySelector<HTMLButtonElement>('[data-testid="settings-options"]')?.click();
+    fixture.detectChanges();
+    el.querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[0]?.click();
+    fixture.detectChanges();
+    expect(el.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
+  });
+
+  it('dismisses on backdrop and restores focus to the trigger', () => {
+    const el = render();
+    el.querySelector<HTMLButtonElement>('[data-testid="settings-options"]')?.click();
+    fixture.detectChanges();
+    el.querySelector<HTMLButtonElement>('[data-testid="action-sheet-backdrop"]')?.click();
+    fixture.detectChanges();
+    expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+    expect(document.activeElement).toBe(el.querySelector('[data-testid="settings-options"]'));
+  });
+
+  it('dismisses on Escape and restores focus to the trigger', () => {
+    const el = render();
+    el.querySelector<HTMLButtonElement>('[data-testid="settings-options"]')?.click();
+    fixture.detectChanges();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    fixture.detectChanges();
+    expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+    expect(document.activeElement).toBe(el.querySelector('[data-testid="settings-options"]'));
+  });
 });

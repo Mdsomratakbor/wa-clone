@@ -5,12 +5,39 @@
 }
 
 .settings {
+  position: relative;
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 0;
   background: var(--wa-surface);
+
+  &__options-row {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 8px;
+  }
+
+  &__options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--wa-accent);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--wa-accent);
+      outline-offset: 2px;
+    }
+  }
 
   &__stub {
     margin: 0;

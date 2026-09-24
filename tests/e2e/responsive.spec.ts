@@ -151,4 +151,17 @@ test.describe('Responsive adaptation (owner-approved drift)', () => {
       expect(overflow, `${vp.name} chat actions modal should not overflow`).toBe(false);
     }
   });
+
+  test('settings modal never overflows horizontally at any breakpoint', async ({ page }) => {
+    for (const vp of BREAKPOINTS) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto('/settings');
+      await page.getByRole('button', { name: 'Settings options' }).click();
+      await page.getByTestId('action-sheet').waitFor();
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      );
+      expect(overflow, `${vp.name} settings modal should not overflow`).toBe(false);
+    }
+  });
 });
