@@ -4,10 +4,11 @@
 
 **Created**: 2026-09-24
 
-**Status**: **Proposed — blocked on Figma node capture.** The frame `0:9072` payload is
-unavailable (REST 429 until ~2026-09-28). All visual facts below are **PENDING** and marked
-accordingly; nothing is implemented until the node inventory is recorded and clarifications are
-approved (gate G1).
+**Status**: **In progress — structural scope landed pre-capture per owner directive
+(`2026-09-24`).** Shared `action-sheet` + Add Modal + Chats FAB wiring implemented and green
+(unit 119/119, e2e 231 total -> 228 passed / 6 skipped). Exact geometry, row content, glyphs and
+golden remain PENDING the Figma capture (~2026-09-28) and are gated at G1; provisional/hypothesis
+values in place until then.
 
 **Input**: `figma/design-map.md` row 9 (`0:9072`) + `specs/009-new-chat-modal/research.md`
 

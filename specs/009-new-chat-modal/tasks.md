@@ -27,7 +27,8 @@ G1 depends on them. No implementation before G1.
 - [ ] T003 Row glyph SVGs (from per-row icon nodes; export to `tests/e2e/golden`) -
       BLOCKED: Figma 429
 - [ ] T004 `contracts/ui-contracts.md`: `Action` row model + `ActionSheetComponent` input/output
-      contract + exact geometry/type values from node inventory
+      contract exists; exact geometry/type values from node inventory still PENDING (agreed model
+      is `{ id, label, icon? }`)
 
 **Checkpoint**: G1 — owner approval of Clarifications 1-5. Assets present or explicitly deferred.
 
@@ -35,12 +36,12 @@ G1 depends on them. No implementation before G1.
 
 ## Phase 2: Shared component (contract basis for rows 9/10/11)
 
-- [ ] T005 `action-sheet.model.ts`: `Action { id: string; label: string; icon?: string }` (icon ref
+- [x] T005 `action-sheet.model.ts`: `Action { id: string; label: string; icon?: string }` (icon ref
       resolved by the sheet; exact color/geometry from T004)
-- [ ] T006 Unit `action-sheet.spec.ts` (write-first): renders rows from `Action[]`; emits
+- [x] T006 Unit `action-sheet.spec.ts` (write-first): renders rows from `Action[]`; emits
       `action(id)`; backdrop tap emits `dismiss`; no hard-coded labels; sheet data-testids
-- [ ] T007 `shared/components/action-sheet/{action-sheet.ts,html,scss}`: dimmed backdrop + bottom
-      sheet; rows as real `<button>`s; a11y roles/labels; geometry from T004
+- [x] T007 `shared/components/action-sheet/{action-sheet.ts,html,scss}`: dimmed backdrop + bottom
+      sheet; rows as real `<button>`s; a11y roles/labels; geometry provisional until T004
 
 **Checkpoint**: shared component unit-green in isolation.
 
@@ -48,13 +49,13 @@ G1 depends on them. No implementation before G1.
 
 ## Phase 3: Add Modal instance + entry (US1 + US2)
 
-- [ ] T008 `features/new-chat-modal/add-modal.{ts,html,scss}`: 009 rows (labels/order from T001)
-      feeding the shared `action-sheet`; `dismiss` -> close
-- [ ] T009 `chats-page.ts:105-107`: replace `onFabPressed()` TODO no-op with open-modal logic;
+- [x] T008 `features/new-chat-modal/add-modal.{ts,html,scss}`: 009 rows (provisional hypothesis
+      labels/order pending T001/T004) feeding the shared `action-sheet`; `dismiss` -> close
+- [x] T009 `chats-page.ts:105-107`: replace `onFabPressed()` TODO no-op with open-modal logic;
       `chats-page.html`: host the modal atop the routed content (inside shell content area)
-- [ ] T010 Unit extension `chats-page.spec.ts` (write-first): FAB press opens sheet; row
+- [x] T010 Unit extension `chats-page.spec.ts` (write-first): FAB press opens sheet; row
       activation emits id; dismiss closes and focus returns to trigger
-- [ ] T011 E2E `tests/e2e/add-modal.spec.ts` (write-first, part): US1 FAB opens sheet (backdrop +
+- [x] T011 E2E `tests/e2e/add-modal.spec.ts` (write-first, part): US1 FAB opens sheet (backdrop +
       sheet visible); US2 rows labeled and focusable
 
 **Checkpoint**: US1/US2 unit + e2e passing.
@@ -63,12 +64,12 @@ G1 depends on them. No implementation before G1.
 
 ## Phase 4: US3 - a11y, focus, responsive, golden
 
-- [ ] T012 E2E (part): backdrop tap dismisses; focus returns to FAB; Escape dismisses (if in
-      design)
-- [ ] T013 Responsive: append `/chats` FAB-modal no-overflow cases (open + close) to
+- [x] T012 E2E (part): backdrop tap dismisses; focus returns to FAB; Escape dismisses
+- [x] T013 Responsive: append `/chats` FAB-modal no-overflow cases (open + close) to
       `tests/e2e/responsive.spec.ts` (all 3 breakpoints)
 - [ ] T014 Golden `0-9072-add-modal.png`: open modal in default state; measure baseline diff, set
-      `maxDiffPixelRatio = measured + 0.05` (gated on T002)
+      `maxDiffPixelRatio = measured + 0.05` (gated on T002) - BLOCKED: golden test `.skip`'d until
+      capture + G1 geometry
 
 **Checkpoint**: US1-US3 all passing.
 
@@ -76,8 +77,9 @@ G1 depends on them. No implementation before G1.
 
 ## Phase 5: Polish + closure
 
-- [ ] T015 Verify no secrets/credentials in diff; full suite: `npm run build` + unit + `npm run e2e`;
-      record visual diff result
+- [x] T015 Verify no secrets/credentials in diff; full suite: `npm run build` + unit + `npm run e2e`;
+      record visual diff result - build green; unit 119/119; e2e 231 total -> 228 passed / 6 skipped
+      (gated goldens: 008 starred + 009 add-modal); visual baseline measurement pending T014
 - [ ] T016 Update `figma/design-map.md` row 9 to implemented + spec `009`; set spec status to
       Implemented; write session report per Review gate
 - [ ] T017 Commit (e.g. `feat(new-chat-modal): implement WhatsApp New Chat (Add) Modal
@@ -91,8 +93,10 @@ G1 depends on them. No implementation before G1.
   US3 (T012-T014) -> polish/closure (T015-T017).**
 - Write-first tests (T006, T010, T011) are authored before their code and must FAIL before the
   implementation lands.
-- Asset-gated tasks (T002/T003/T014) wait on the 429 retry (see plan's retry strategy). No code
-  before G1.
+- Owner authorized starting implementation pre-capture (`2026-09-24`): structural scope
+  (T005-T013) is landed and green against provisional/hypothesis values; T001-T003/T014 remain
+  capture-gated and the final geometry/content is locked at G1 (capture + owner approval).
+- Asset-gated tasks (T002/T003/T014) wait on the 429 retry (see plan's retry strategy).
 
 ## Swap list (places that may already reference the FAB / new-chat flow)
 
