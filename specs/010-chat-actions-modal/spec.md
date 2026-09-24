@@ -4,10 +4,11 @@
 
 **Created**: 2026-09-24
 
-**Status**: **Proposed — blocked on Figma node capture.** The frame `0:10087` payload is
-unavailable (REST 429 until ~2026-09-28). All visual facts below are **PENDING** and marked
-accordingly; final geometry/content is locked at gate G1 (capture + owner approval). Structural
-scope may start pre-capture **only** with owner approval (precedent: feature 009, `2026-09-24`).
+**Status**: **In progress — structural scope landed pre-capture per owner directive
+(`2026-09-24`).** Header More-options entry + Chat Actions sheet reusing the shared `action-sheet`
+(009) are implemented and green (unit 128/128; e2e 243 passed / 9 skipped). Exact geometry, row
+content, glyphs and golden remain PENDING the Figma capture (~2026-09-28) and are gated at G1;
+provisional/hypothesis values in place until then.
 
 **Input**: `figma/design-map.md` row 10 (`0:10087`) + `specs/010-chat-actions-modal/research.md`
 

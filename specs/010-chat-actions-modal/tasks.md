@@ -35,11 +35,11 @@ G1 depends on them. Structural implementation may start pre-capture only with ow
 
 ## Phase 2: Reuse check + unit (write-first)
 
-- [ ] T005 Verify the shared `action-sheet` contract is consumed unchanged; no churn to
+- [x] T005 Verify the shared `action-sheet` contract is consumed unchanged; no churn to
       `shared/components/action-sheet/*`
-- [ ] T006 Unit `chat-header.spec.ts` (extension): More-options affordance renders with
+- [x] T006 Unit `chat-header.spec.ts` (extension): More-options affordance renders with
       aria-label + `data-testid`; activation emits `actions` (write-first, FAIL before impl)
-- [ ] T007 Unit `chat-window-page.spec.ts` (extension): trigger opens sheet; row activation emits
+- [x] T007 Unit `chat-window-page.spec.ts` (extension): trigger opens sheet; row activation emits
       id; dismiss closes and focus returns to the trigger (write-first, FAIL before impl)
 
 **Checkpoint**: unit-green in isolation before entry wiring.
@@ -48,13 +48,13 @@ G1 depends on them. Structural implementation may start pre-capture only with ow
 
 ## Phase 3: Entry + wiring (US1 + US2)
 
-- [ ] T008 `chat-header.html/ts`: trailing More-options icon button + `actions` output (glyph/label
+- [x] T008 `chat-header.html/ts`: trailing More-options icon button + `actions` output (glyph/label
       provisional until T004; a11y label + `data-testid`)
-- [ ] T009 `features/chat-window/chat-actions.*`: provisional `CHAT_ACTIONS` seed feeding the shared
+- [x] T009 `features/chat-window/chat-actions.*`: provisional `CHAT_ACTIONS` seed feeding the shared
       `action-sheet`; `dismiss` -> close
-- [ ] T010 `chat-window-page.ts/html`: `chatActionsOpen` host + handlers + modal block; focus
+- [x] T010 `chat-window-page.ts/html`: `chatActionsOpen` host + handlers + modal block; focus
       return to the trigger
-- [ ] T011 E2E `tests/e2e/chat-actions.spec.ts` (write-first, part): US1 trigger opens sheet
+- [x] T011 E2E `tests/e2e/chat-actions.spec.ts` (write-first, part): US1 trigger opens sheet
       (backdrop + sheet visible); US2 rows labeled and focusable
 
 **Checkpoint**: US1/US2 unit + e2e passing.
@@ -63,8 +63,8 @@ G1 depends on them. Structural implementation may start pre-capture only with ow
 
 ## Phase 4: US3 - a11y, focus, responsive, golden
 
-- [ ] T012 E2E (part): backdrop tap dismisses; focus returns to trigger; Escape dismisses
-- [ ] T013 Responsive: append `/chat/chat-001` chat-actions no-overflow cases (open + close) to
+- [x] T012 E2E (part): backdrop tap dismisses; focus returns to trigger; Escape dismisses
+- [x] T013 Responsive: append `/chat/chat-001` chat-actions no-overflow cases (open + close) to
       `tests/e2e/responsive.spec.ts` (all 3 breakpoints)
 - [ ] T014 Golden `0-10087-chat-actions.png`: open modal in default state; measure baseline diff,
       set `maxDiffPixelRatio = measured + 0.05` (gated on T002) - BLOCKED until capture + G1 rows
@@ -75,8 +75,10 @@ G1 depends on them. Structural implementation may start pre-capture only with ow
 
 ## Phase 5: Polish + closure
 
-- [ ] T015 Verify no secrets/credentials in diff; full suite: `npm run build` + unit + `npm run e2e`;
-      record visual diff result
+- [x] T015 Verify no secrets/credentials in diff; full suite: `npm run build` + unit + `npm run e2e`;
+      record visual diff result - build green; unit 128/128; e2e 252 total -> 243 passed / 9 skipped
+      (gated goldens: 008 starred, 009 add-modal, 010 chat-actions); visual baseline measurement
+      pending T014
 - [ ] T016 Update `figma/design-map.md` row 10 to implemented + spec `010`; set spec status to
       Implemented; write session report per Review gate
 - [ ] T017 Commit (e.g. `feat(chat-actions-modal): implement WhatsApp Chat Actions Modal
@@ -91,6 +93,9 @@ G1 depends on them. Structural implementation may start pre-capture only with ow
 - Write-first tests (T006, T007, T011) are authored before their code and must FAIL before the
   implementation lands.
 - Shared `action-sheet` (from 009) is reused, not re-authored; any delta = drift (owner approval).
+- Owner authorized starting implementation pre-capture (`2026-09-24`): structural scope
+  (T005-T013) is landed and green against provisional/hypothesis values; T001-T003/T014 remain
+  capture-gated and the final geometry/content is locked at G1 (capture + owner approval).
 - Asset-gated tasks (T002/T003/T014) wait on the 429 retry (see plan's retry strategy).
 
 ## Swap list (places that may already reference the chat header / chat window)
