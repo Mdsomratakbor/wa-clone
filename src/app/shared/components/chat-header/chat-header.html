@@ -47,4 +47,19 @@
       />
     </svg>
   </button>
+
+  <button
+    #actionsTrigger
+    class="chat-header__icon-button"
+    type="button"
+    data-testid="chat-header__more"
+    aria-label="More options"
+    (click)="actions.emit()"
+  >
+    <svg class="chat-header__icon" width="4" height="18" viewBox="0 0 4 18" fill="currentColor" aria-hidden="true">
+      <circle cx="2" cy="2" r="2" />
+      <circle cx="2" cy="9" r="2" />
+      <circle cx="2" cy="16" r="2" />
+    </svg>
+  </button>
 </header>

@@ -45,7 +45,7 @@ test.describe('Chat window (feature 002)', () => {
     await page.goto('/chat/chat-006');
     const labels: (string | null)[] = [];
     let sawFocusRing = false;
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 12; i++) {
       const info = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement | null;
         if (!el || el === document.body) return null;

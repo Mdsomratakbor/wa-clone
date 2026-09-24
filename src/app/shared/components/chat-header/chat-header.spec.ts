@@ -54,4 +54,38 @@ describe('ChatHeader', () => {
     expect(el.querySelector('[aria-label^="Video call"]')).not.toBeNull();
     expect(el.querySelector('[aria-label^="Call"]')).not.toBeNull();
   });
+
+  it('renders the More options affordance', () => {
+    fixture = TestBed.createComponent(ChatHeader);
+    fixture.componentRef.setInput('contact', CONTACT);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('[data-testid="chat-header__more"]')).not.toBeNull();
+    expect(el.querySelector('[data-testid="chat-header__more"]')?.getAttribute('aria-label')).toBe(
+      'More options',
+    );
+  });
+
+  it('emits actions when More options is activated', () => {
+    fixture = TestBed.createComponent(ChatHeader);
+    fixture.componentRef.setInput('contact', CONTACT);
+    fixture.detectChanges();
+    let emitted = false;
+    fixture.componentInstance.actions.subscribe(() => (emitted = true));
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="chat-header__more"]')
+      ?.click();
+    expect(emitted).toBe(true);
+  });
+
+  it('focus() focuses the More options trigger', () => {
+    fixture = TestBed.createComponent(ChatHeader);
+    fixture.componentRef.setInput('contact', CONTACT);
+    fixture.detectChanges();
+    fixture.componentInstance.focus();
+    const trigger = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+      '[data-testid="chat-header__more"]',
+    );
+    expect(document.activeElement).toBe(trigger);
+  });
 });

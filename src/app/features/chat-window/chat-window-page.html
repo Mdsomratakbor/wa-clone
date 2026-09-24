@@ -1,5 +1,5 @@
 <div class="chat-window">
-  <app-chat-header [contact]="contact" (back)="onBack()" />
+  <app-chat-header [contact]="contact" (back)="onBack()" (actions)="onChatActions()" />
 
   <div class="chat-window__thread" data-testid="message-thread" role="list" [attr.aria-label]="'Conversation with ' + contact.name">
     @if (!listEmpty()) {
@@ -21,4 +21,8 @@
   </div>
 
   <app-composer />
+
+  @if (chatActionsOpen()) {
+    <app-chat-actions-modal (action)="onChatAction($event)" (dismiss)="onDismissChatActions()" />
+  }
 </div>
