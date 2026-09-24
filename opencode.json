@@ -11,7 +11,7 @@
       "command": ["cmd", "/c", "npx", "-y", "figma-developer-mcp", "--stdio", "--image-dir=tests/e2e/golden"],
       "cwd": ".",
       "enabled": true,
-      "timeout": 10000
+      "timeout": 120000
     }
   }
 }
