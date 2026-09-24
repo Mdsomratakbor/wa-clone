@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { ChatsPage } from './chats-page';
 import { CHAT_SEED } from './chat-list.seed';
+import { NEW_CHAT_ACTIONS } from '../new-chat-modal/new-chat-modal.seed';
 
 describe('ChatsPage', () => {
   let fixture: ComponentFixture<ChatsPage>;
@@ -234,6 +235,79 @@ describe('ChatsPage', () => {
           el.querySelectorAll('.navigation-bar__group--trailing .navigation-bar__action'),
         ).map((b) => b.textContent?.trim()),
       ).toEqual(['Done']);
+    });
+  });
+
+  describe('new chat modal', () => {
+    function fabButton(el: HTMLElement): HTMLButtonElement {
+      return el.querySelector('.fab') as HTMLButtonElement;
+    }
+
+    function openModal(el: HTMLElement): void {
+      fabButton(el).click();
+      fixture.detectChanges();
+    }
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(ChatsPage);
+      fixture.detectChanges();
+    });
+
+    it('opens the action sheet from the FAB', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+      openModal(el);
+      expect(el.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
+      expect(el.querySelector('[data-testid="action-sheet-backdrop"]')).not.toBeNull();
+    });
+
+    it('renders the new chat rows from the seed', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      openModal(el);
+      expect(
+        el.querySelectorAll('[data-testid="action-sheet-row"]').length,
+      ).toBe(NEW_CHAT_ACTIONS.length);
+      NEW_CHAT_ACTIONS.forEach((action, index) => {
+        expect(
+          el.querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[index]
+            .textContent?.trim(),
+        ).toBe(action.label);
+      });
+    });
+
+    it('keeps the sheet open when a row is activated (targets are later features)', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      openModal(el);
+      el.querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[0].click();
+      fixture.detectChanges();
+      expect(el.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
+      expect(el.querySelector('[data-testid="chat-list"]')).not.toBeNull();
+    });
+
+    it('dismisses on backdrop and restores focus to the FAB', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      openModal(el);
+      el.querySelector<HTMLButtonElement>('[data-testid="action-sheet-backdrop"]')?.click();
+      fixture.detectChanges();
+      expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+      expect(document.activeElement).toBe(fabButton(el));
+    });
+
+    it('dismisses on Escape and restores focus to the FAB', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      openModal(el);
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+      fixture.detectChanges();
+      expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+      expect(document.activeElement).toBe(fabButton(el));
+    });
+
+    it('does not open a second sheet while one is already open', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      openModal(el);
+      fabButton(el).click();
+      fixture.detectChanges();
+      expect(el.querySelectorAll('[data-testid="action-sheet"]').length).toBe(1);
     });
   });
 });

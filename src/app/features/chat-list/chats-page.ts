@@ -6,8 +6,11 @@ import {
   inject,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { AddModal } from '../new-chat-modal/add-modal';
+import { Action } from '../../shared/components/action-sheet/action-sheet.model';
 import { ChatActionsBar } from '../../shared/components/chat-actions-bar/chat-actions-bar';
 import { ChatListItem } from '../../shared/components/chat-list-item/chat-list-item';
 import { Fab } from '../../shared/components/fab/fab';
@@ -15,6 +18,7 @@ import { NavigationBar } from '../../shared/components/navigation-bar/navigation
 import { TabBar } from '../../shared/components/tab-bar/tab-bar';
 import { CHAT_SEED } from './chat-list.seed';
 import { ChatPreview, NavAction, TabItem, TabKey } from './chat.model';
+import { NEW_CHAT_ACTIONS } from '../new-chat-modal/new-chat-modal.seed';
 
 const TAB_KEYS: readonly TabKey[] = ['settings', 'chats', 'camera', 'calls', 'status'];
 const TAB_LABELS: Record<TabKey, string> = {
@@ -27,13 +31,14 @@ const TAB_LABELS: Record<TabKey, string> = {
 
 @Component({
   selector: 'app-chats-page',
-  imports: [NavigationBar, ChatListItem, Fab, TabBar, ChatActionsBar],
+  imports: [NavigationBar, ChatListItem, Fab, TabBar, ChatActionsBar, AddModal],
   templateUrl: './chats-page.html',
   styleUrl: './chats-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatsPage {
   private readonly router = inject(Router);
+  private readonly fabRef = viewChild(Fab);
 
   readonly conversations = input<ChatPreview[]>(CHAT_SEED as ChatPreview[]);
 
@@ -41,6 +46,8 @@ export class ChatsPage {
   protected readonly editing = signal(false);
   protected readonly selectedIds = signal<ReadonlySet<string>>(new Set());
   protected readonly items = signal<ChatPreview[]>([]);
+  protected readonly modalOpen = signal(false);
+  protected readonly newChatActions: readonly Action[] = NEW_CHAT_ACTIONS;
 
   constructor() {
     effect(() => {
@@ -103,7 +110,16 @@ export class ChatsPage {
   }
 
   protected onFabPressed(): void {
-    // F-001: new-chat action sheet is a later feature.
+    this.modalOpen.set(true);
+  }
+
+  protected onAddModalAction(_id: string): void {
+    // Row targets (new group / contact / community) are later features (spec Non-Goals).
+  }
+
+  protected onDismissModal(): void {
+    this.modalOpen.set(false);
+    this.fabRef()?.focus();
   }
 
   protected isSelected(id: string): boolean {

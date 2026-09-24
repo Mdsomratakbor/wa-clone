@@ -1,0 +1,81 @@
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.action-sheet {
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  &__backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.4);
+    cursor: default;
+  }
+
+  &__sheet {
+    position: relative;
+    width: 100%;
+    max-width: var(--wa-shell-max-width);
+    background: var(--wa-surface-variant);
+    border-radius: 16px 16px 0 0;
+    padding-bottom: 8px;
+    max-height: 80%;
+    overflow-y: auto;
+  }
+
+  &__title {
+    margin: 0;
+    padding: 14px 16px 8px;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-nav-title);
+    font-weight: var(--wa-fw-semibold);
+    color: var(--wa-on-surface);
+  }
+
+  &__rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__row {
+    display: block;
+  }
+
+  &__row-button {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-message);
+    font-weight: var(--wa-fw-regular);
+    color: var(--wa-on-surface);
+    text-align: left;
+    padding: 14px 16px;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--wa-file-card);
+    }
+
+    &:focus-visible {
+      outline: none;
+      background: var(--wa-file-card);
+    }
+  }
+}

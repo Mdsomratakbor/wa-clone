@@ -48,3 +48,11 @@
 } @else {
   <app-tab-bar [items]="tabs()" (select)="onTabSelect($event)" />
 }
+
+@if (modalOpen()) {
+  <app-add-modal
+    [actions]="newChatActions"
+    (action)="onAddModalAction($event)"
+    (dismiss)="onDismissModal()"
+  />
+}

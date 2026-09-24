@@ -37,6 +37,8 @@ test.describe('Keyboard focus & interactions (US3)', () => {
     await expect(page.getByRole('button', { name: 'Done' })).toBeVisible();
     await page.getByRole('button', { name: 'Done' }).click();
     await page.getByRole('button', { name: 'Start new chat' }).click();
+    await expect(page.getByTestId('action-sheet')).toBeVisible();
+    await page.keyboard.press('Escape');
     await page.getByRole('button', { name: 'Maximillian Jacobson' }).click();
 
     expect(pageErrors).toEqual([]);

@@ -26,4 +26,12 @@ describe('Fab', () => {
     (fixture.nativeElement as HTMLElement).querySelector('button')?.click();
     expect(pressed).toBe(1);
   });
+
+  it('focus() focuses the trigger button', () => {
+    fixture = TestBed.createComponent(Fab);
+    fixture.detectChanges();
+    fixture.componentInstance.focus();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(document.activeElement).toBe(el.querySelector('button'));
+  });
 });

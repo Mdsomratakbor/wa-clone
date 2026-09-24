@@ -125,4 +125,17 @@ test.describe('Responsive adaptation (owner-approved drift)', () => {
       expect(overflow, `${vp.name} settings stub should not overflow`).toBe(false);
     }
   });
+
+  test('new chat modal never overflows horizontally at any breakpoint', async ({ page }) => {
+    for (const vp of BREAKPOINTS) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto('/chats');
+      await page.getByRole('button', { name: 'Start new chat' }).click();
+      await page.getByTestId('action-sheet').waitFor();
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      );
+      expect(overflow, `${vp.name} new chat modal should not overflow`).toBe(false);
+    }
+  });
 });
