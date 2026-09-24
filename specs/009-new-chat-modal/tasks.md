@@ -17,9 +17,11 @@ G1 depends on them. No implementation before G1.
 
 ## Phase 1: Capture & contracts (BLOCKED until ~09-28)
 
-- [ ] T001 Capture node inventory: `figma_get_figma_data` `0:9072` (+ walk children) depth ≈ 6;
-      record into `research.md`; verify shared group `0:9075` against `0:10087`/`0:9778` -
-      BLOCKED: Figma 429 (~09-28); retry MCP then Composio
+- [ ] T001 Capture node inventory: `npx -y figma-developer-mcp fetch --file-key
+      PcGX72lSWkYIk3pL5V8PS3 --node-id 0:9072 --depth 6 --format json` (CLI; fallback: local MCP
+      `get_figma_data`, then Composio `FIGMA_GET_FILE_NODES`); record into `research.md`; verify
+      shared group `0:9075` against `0:10087`/`0:9778` - BLOCKED: Figma 429 (~09-28); retry MCP
+      then Composio
 - [ ] T002 Golden `tests/e2e/golden/0-9072-add-modal.png` (node `0:9072`, native 1x) -
       BLOCKED: Figma 429
 - [ ] T003 Row glyph SVGs (from per-row icon nodes; export to `tests/e2e/golden`) -

@@ -34,15 +34,22 @@ with action rows) is **not assumed**; the following will be confirmed/corrected 
 
 ## Capture plan (run once 429 clears — ~2026-09-28)
 
-1. `figma_get_figma_data` (local MCP) for `0:9072` at depth ≈ 6; if truncated/offloaded, walk
-   children iteratively (re-query sub-instance ids) per Composio guidance.
+1. **Node inventory (deterministic, shell-automatable)** — the local MCP server exposes a CLI
+   `fetch` subcommand; no agent tool required:
+   ```powershell
+   npx -y figma-developer-mcp fetch --file-key PcGX72lSWkYIk3pL5V8PS3 --node-id 0:9072 --depth 6 --format json
+   ```
+   Re-run with `--node-id` for sub-instances (walk children iteratively) or `--depth` as needed.
+   Falls back (same payload): local MCP `figma_get_figma_data` `0:9072`; then Composio
+   `FIGMA_GET_FILE_NODES`.
 2. Extract (record in this file as "Node inventory", mirroring 008):
    - frame dims/fills; backdrop; sheet geometry; handle; per-row values; text runs + letter
      spacing; separators.
 3. Verify the shared group `0:9075` against rows 10/11 frames (`0:10087`, `0:9778`) so the shared
    `action-sheet` contract is componentized once, reused three times.
 4. Downloads (same retry window): golden `tests/e2e/golden/0-9072-add-modal.png` (native 1x) and
-   any vector icon/glyph SVGs needed (`--image-dir=tests/e2e/golden` on the local MCP).
+   row glyph SVGs via `figma_download_figma_images`/Composio `FIGMA_DOWNLOAD_FIGMA_IMAGES`
+   (`--image-dir=tests/e2e/golden` on the local MCP restricts write targets).
 5. Pixel-sampling (node + pngjs) for exact colors/geometry if node payload is ambiguous.
 
 ## Entry-point analysis (certain)
