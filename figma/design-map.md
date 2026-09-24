@@ -21,7 +21,7 @@ Node IDs below are taken directly from Figma via the Figma API. URLs use the hyp
 | 9 | New Chat (Add) Modal | WhatsApp Add Modal | `0:9072` | `shared/components/action-sheet` — ✅ **implemented** (US1–US3 structure, 2026-09-24; exact geometry/glyphs/golden deferred to Figma capture ~09-28) | [`009`](../specs/009-new-chat-modal) |
 | 10 | Chat Actions Modal | WhatsApp Chat Actions | `0:10087` | `shared/components/action-sheet` — ✅ **implemented** (US1–US3 structure via chat-header More options, 2026-09-24; exact geometry/glyphs/golden deferred to Figma capture ~09-28) | [`010`](../specs/010-chat-actions-modal) |
 | 11 | Settings Modal | WhatsApp Settings Modal | `0:9778` | `shared/components/action-sheet` — ✅ **implemented** (US1–US3 structure via Settings stub trigger, 2026-09-24; exact geometry/glyphs/golden deferred to Figma capture ~09-28; row 13 hosts later) | [`011`](../specs/011-settings-modal) |
-| 12 | Camera | WhatsApp Camera | `0:9155` | `feature/camera` | — |
+| 12 | Camera | WhatsApp Camera | `0:9155` | `feature/camera` — ✅ **implemented** (US1–US3 structure: Camera tab navigates from chats/calls/status; viewport + Close/Shutter/Flip hypothesis controls, 2026-09-24; exact geometry/glyphs/golden deferred to Figma capture ~09-28) | [`012`](../specs/012-camera) |
 | 13 | Settings | WhatsApp Settings | `0:9198` | `feature/settings` | — |
 | 14 | Account | WhatsApp Account | `0:9371` | `feature/settings/account` | — |
 | 15 | Contact Info | WhatsApp Contact Info | `0:9486` | `feature/contact-info` | — |
