@@ -43,6 +43,10 @@ export class StatusPage {
       void this.router.navigate(['/calls']);
       return;
     }
+    if (key === 'camera') {
+      void this.router.navigate(['/camera']);
+      return;
+    }
     this.activeTab.set(key);
   }
 

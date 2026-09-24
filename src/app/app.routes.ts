@@ -11,6 +11,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/calls/calls-page').then((m) => m.CallsPage),
   },
   {
+    path: 'camera',
+    loadComponent: () => import('./features/camera/camera-page').then((m) => m.CameraPage),
+  },
+  {
     path: 'status',
     loadComponent: () => import('./features/status/status-page').then((m) => m.StatusPage),
   },

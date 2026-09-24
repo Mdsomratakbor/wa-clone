@@ -84,6 +84,10 @@ export class ChatsPage {
       void this.router.navigate(['/status']);
       return;
     }
+    if (key === 'camera') {
+      void this.router.navigate(['/camera']);
+      return;
+    }
     this.activeTab.set(key);
   }
 

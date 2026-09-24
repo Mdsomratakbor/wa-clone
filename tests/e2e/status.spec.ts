@@ -42,14 +42,18 @@ test.describe('Status feed (US1)', () => {
 });
 
 test.describe('Status routing + no-ops (US2)', () => {
-  test('Chats and Calls tabs navigate away; Camera/Settings show the stub', async ({
+  test('Chats, Calls and Camera tabs navigate away; Settings shows the stub', async ({
     page,
   }) => {
     await page.goto('/status');
     await page.getByTestId('status-my').waitFor();
 
     await page.getByRole('tab', { name: 'Camera' }).click();
-    await expect(page.getByTestId('tab-stub')).toContainText('Camera');
+    await expect(page).toHaveURL(/\/camera$/);
+    await page.getByTestId('camera-page').waitFor();
+    await page.goto('/status');
+    await page.getByTestId('status-my').waitFor();
+
     await page.getByRole('tab', { name: 'Settings' }).click();
     await expect(page.getByTestId('tab-stub')).toContainText('Settings');
     await page.getByRole('tab', { name: 'Status' }).click();

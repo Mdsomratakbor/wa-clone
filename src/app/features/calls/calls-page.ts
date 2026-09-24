@@ -77,6 +77,10 @@ export class CallsPage {
     if (key === 'calls') {
       return;
     }
+    if (key === 'camera') {
+      void this.router.navigate(['/camera']);
+      return;
+    }
     this.activeTab.set(key);
   }
 

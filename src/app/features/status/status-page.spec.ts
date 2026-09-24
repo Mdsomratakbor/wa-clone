@@ -82,17 +82,17 @@ describe('StatusPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/calls']);
   });
 
-  it('shows the stub when a non-status, non-chats, non-calls tab is selected', () => {
+  it('navigates to /camera when the Camera tab is activated (feature 012)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
     const cameraTab = [...el.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find((b) =>
       b.textContent?.trim()?.startsWith('Camera'),
     );
     cameraTab?.click();
     fixture.detectChanges();
-    const stub = el.querySelector('[data-testid="tab-stub"]');
-    expect(stub).not.toBeNull();
-    expect(stub?.textContent).toContain('Camera');
-    expect(el.querySelector('[data-testid="status-feed"]')).toBeNull();
+    expect(router.navigate).toHaveBeenCalledWith(['/camera']);
+    expect(el.querySelector('[data-testid="tab-stub"]')).toBeNull();
   });
 
   it('keeps the feed when the active Status tab is re-selected', () => {

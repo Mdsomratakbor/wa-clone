@@ -37,7 +37,9 @@ describe('ChatsPage', () => {
     expect(empty?.textContent).toContain('No chats');
   });
 
-  it('switches to a placeholder when a non-chats, non-status, non-calls tab is selected', () => {
+  it('navigates to /camera when the Camera tab is selected (feature 012)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
     fixture = TestBed.createComponent(ChatsPage);
     fixture.detectChanges();
     const tabs = (fixture.nativeElement as HTMLElement).querySelectorAll(
@@ -45,9 +47,20 @@ describe('ChatsPage', () => {
     ) as NodeListOf<HTMLButtonElement>;
     tabs[2].click(); // Camera
     fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/camera']);
+  });
+
+  it('switches to a placeholder when the Settings tab is selected', () => {
+    fixture = TestBed.createComponent(ChatsPage);
+    fixture.detectChanges();
+    const tabs = (fixture.nativeElement as HTMLElement).querySelectorAll(
+      '[role="tab"]',
+    ) as NodeListOf<HTMLButtonElement>;
+    tabs[0].click(); // Settings
+    fixture.detectChanges();
     const stub = fixture.nativeElement.querySelector('[data-testid="tab-stub"]');
     expect(stub).not.toBeNull();
-    expect(stub?.textContent).toContain('Camera');
+    expect(stub?.textContent).toContain('Settings');
   });
 
   it('navigates to /calls when the Calls tab is selected', () => {
