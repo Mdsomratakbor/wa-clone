@@ -1,0 +1,24 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.settings {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  background: var(--wa-surface);
+
+  &__stub {
+    margin: 0;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-nav-title);
+    line-height: var(--wa-lh-nav-title);
+    font-weight: var(--wa-fw-regular);
+    letter-spacing: var(--wa-ls-title);
+    color: var(--wa-text-secondary);
+  }
+}

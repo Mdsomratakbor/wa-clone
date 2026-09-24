@@ -17,7 +17,7 @@ Node IDs below are taken directly from Figma via the Figma API. URLs use the hyp
 | 5 | Calls (Edit mode) | WhatsApp Calls Edit | `0:8597` | `feature/calls` (edit) — ✅ **implemented** (US1-US3, 2026-09-23) | 005 |
 | 6 | Status (feed) | WhatsApp Status | `0:8498` | `feature/status` - ? **implemented** (US1-US3, 2026-09-23) | 006 |
 | 7 | Status (compose) | WhatsApp Status | `0:9634` | `feature/status` (compose) — ✅ **implemented** (US1–US3, 2026-09-23) | 007 |
-| 8 | Starred Messages | WhatsApp Starred Messages | `0:8820` | `feature/starred-messages` | — |
+| 8 | Starred Messages | WhatsApp Starred Messages | `0:8820` | `feature/starred-messages` — ✅ **implemented** (US1–US3, 2026-09-23; golden/chevron assets deferred to Figma capture ~09-28) | 008 |
 | 9 | New Chat (Add) Modal | WhatsApp Add Modal | `0:9072` | `shared/components/action-sheet` | — |
 | 10 | Chat Actions Modal | WhatsApp Chat Actions | `0:10087` | `shared/components/action-sheet` | — |
 | 11 | Settings Modal | WhatsApp Settings Modal | `0:9778` | `shared/components/action-sheet` | — |

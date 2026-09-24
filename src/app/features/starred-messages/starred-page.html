@@ -1,0 +1,23 @@
+<app-navigation-bar
+  title="Starred Messages"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="starred" data-testid="starred-page">
+  <section class="starred__tip" data-testid="starred-tip">
+    <img
+      class="starred__tip-avatar"
+      data-testid="starred-tip-avatar"
+      src="/starred-messages-avatar.png"
+      alt=""
+      aria-hidden="true"
+      width="132"
+      height="132"
+    />
+    <h2 class="starred__tip-title" data-testid="starred-tip-title">No Starred Messages</h2>
+    <p class="starred__tip-body" data-testid="starred-tip-body">
+      Tap and hold on any message to star it, so you can easily find it later.
+    </p>
+  </section>
+</main>

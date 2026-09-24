@@ -24,5 +24,15 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/chat-window/chat-window-page').then((m) => m.ChatWindowPage),
   },
+  {
+    path: 'starred-messages',
+    loadComponent: () =>
+      import('./features/starred-messages/starred-page').then((m) => m.StarredPage),
+  },
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('./features/starred-messages/settings-stub-page').then((m) => m.SettingsStubPage),
+  },
   { path: '**', redirectTo: 'chats' },
 ];

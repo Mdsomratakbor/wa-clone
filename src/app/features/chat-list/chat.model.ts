@@ -17,6 +17,6 @@ export interface TabItem {
 export interface NavAction {
   id: string;
   label: string;
-  icon?: 'new-call';
+  icon?: 'new-call' | 'back';
   disabled?: boolean;
 }

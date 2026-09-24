@@ -138,4 +138,41 @@ describe('NavigationBar', () => {
       expect(emitted).toBe('clear');
     });
   });
+
+  describe('extended contract (feature 008 - back actions)', () => {
+    it('renders a back action with the chevron icon, label text and icon modifier', () => {
+      TestBed.configureTestingModule({ imports: [NavigationBar] });
+      const fixture = TestBed.createComponent(NavigationBar);
+      fixture.componentRef.setInput('leading', [
+        { id: 'back', label: 'Settings', icon: 'back' },
+      ] satisfies NavAction[]);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      const button = el.querySelector(
+        '.navigation-bar__group--leading .navigation-bar__action',
+      ) as HTMLButtonElement;
+      expect(button).not.toBeNull();
+      expect(button.classList.contains('navigation-bar__action--icon')).toBe(true);
+      expect(button.querySelector('svg.navigation-bar__icon')).not.toBeNull();
+      expect(button.getAttribute('aria-label')).toBeNull();
+      expect(button.textContent?.trim()).toBe('Settings');
+    });
+
+    it('emits the back id on click', () => {
+      TestBed.configureTestingModule({ imports: [NavigationBar] });
+      const fixture = TestBed.createComponent(NavigationBar);
+      fixture.componentRef.setInput('leading', [
+        { id: 'back', label: 'Settings', icon: 'back' },
+      ] satisfies NavAction[]);
+      fixture.detectChanges();
+      let emitted: string | undefined;
+      fixture.componentInstance.action.subscribe((v) => (emitted = v));
+      const button = (
+        fixture.nativeElement as HTMLElement
+      ).querySelector('.navigation-bar__action') as HTMLButtonElement;
+      button?.click();
+      fixture.detectChanges();
+      expect(emitted).toBe('back');
+    });
+  });
 });

@@ -101,4 +101,28 @@ test.describe('Responsive adaptation (owner-approved drift)', () => {
       expect(overflow, `${vp.name} status compose should not overflow`).toBe(false);
     }
   });
+
+  test('starred messages never overflows horizontally at any breakpoint', async ({ page }) => {
+    for (const vp of BREAKPOINTS) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto('/starred-messages');
+      await page.getByTestId('starred-page').waitFor();
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      );
+      expect(overflow, `${vp.name} starred messages should not overflow`).toBe(false);
+    }
+  });
+
+  test('settings stub never overflows horizontally at any breakpoint', async ({ page }) => {
+    for (const vp of BREAKPOINTS) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto('/settings');
+      await page.getByTestId('settings-page').waitFor();
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      );
+      expect(overflow, `${vp.name} settings stub should not overflow`).toBe(false);
+    }
+  });
 });
