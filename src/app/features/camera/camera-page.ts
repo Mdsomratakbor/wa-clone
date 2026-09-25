@@ -28,8 +28,6 @@ export class CameraPage {
     TAB_KEYS.map((key) => ({ key, label: TAB_LABELS[key], active: key === this.activeTab() })),
   );
 
-  protected readonly activeLabel = computed(() => TAB_LABELS[this.activeTab()]);
-
   protected onTabSelect(key: TabKey): void {
     if (key === 'chats') {
       void this.router.navigate(['/chats']);
@@ -43,8 +41,11 @@ export class CameraPage {
       void this.router.navigate(['/status']);
       return;
     }
-    // F-012: Settings (row 13) takes over this stub; camera tab is the active screen.
-    this.activeTab.set(key);
+    if (key === 'settings') {
+      void this.router.navigate(['/settings']);
+      return;
+    }
+    // F-012: camera tab is the active screen.
   }
 
   protected onClose(): void {

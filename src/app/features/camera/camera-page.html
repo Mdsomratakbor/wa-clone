@@ -1,6 +1,5 @@
-@if (activeTab() === 'camera') {
-  <div class="camera-page__viewport" data-testid="camera-page">
-    <div class="camera-page__controls">
+<div class="camera-page__viewport" data-testid="camera-page">
+  <div class="camera-page__controls">
     <button
       type="button"
       class="camera-page__control"
@@ -37,10 +36,5 @@
     </button>
   </div>
 </div>
-} @else {
-  <div class="camera-page__stub" role="status" data-testid="tab-stub">
-    <p class="camera-page__stub-text">{{ activeLabel() }} — coming soon</p>
-  </div>
-}
 
 <app-tab-bar [items]="tabs()" (select)="onTabSelect($event)" />

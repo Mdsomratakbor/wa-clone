@@ -62,14 +62,15 @@ describe('CameraPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/status']);
   });
 
-  it('shows the stub for the Settings tab (local fallback, row 13 takes over)', () => {
+  it('navigates to /settings when the Settings tab is activated (feature 013)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
     const settingsTab = [...el.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find((b) =>
       b.textContent?.trim()?.startsWith('Settings'),
     );
     settingsTab?.click();
     fixture.detectChanges();
-    const stub = el.querySelector('[data-testid="tab-stub"]');
-    expect(stub).not.toBeNull();
+    expect(router.navigate).toHaveBeenCalledWith(['/settings']);
   });
 });

@@ -36,7 +36,7 @@ export const routes: Routes = [
   {
     path: 'settings',
     loadComponent: () =>
-      import('./features/starred-messages/settings-stub-page').then((m) => m.SettingsStubPage),
+      import('./features/settings/settings-page').then((m) => m.SettingsPage),
   },
   { path: '**', redirectTo: 'chats' },
 ];

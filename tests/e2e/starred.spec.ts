@@ -41,7 +41,8 @@ test.describe('Starred routing (US2)', () => {
     await page.getByRole('button', { name: 'Settings' }).click();
     await expect(page).toHaveURL(/\/settings$/);
     await page.getByTestId('settings-page').waitFor();
-    await expect(page.getByTestId('settings-page')).toContainText('coming soon');
+    await expect(page.getByTestId('settings-list')).toBeVisible();
+    await expect(page.getByTestId('settings-name')).toContainText('Ani');
 
     await page.getByRole('button', { name: 'Back' }).click();
     await expect(page).toHaveURL(/\/starred-messages$/);

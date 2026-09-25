@@ -88,6 +88,10 @@ export class ChatsPage {
       void this.router.navigate(['/camera']);
       return;
     }
+    if (key === 'settings') {
+      void this.router.navigate(['/settings']);
+      return;
+    }
     this.activeTab.set(key);
   }
 

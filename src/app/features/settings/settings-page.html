@@ -1,0 +1,60 @@
+<app-navigation-bar
+  title="Settings"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="settings" data-testid="settings-page">
+  <section class="settings__profile" data-testid="settings-profile" aria-label="Profile">
+    <div class="settings__avatar" data-testid="settings-avatar" aria-hidden="true"></div>
+    <div class="settings__identity">
+      <span class="settings__name" data-testid="settings-name">{{ profile.name }}</span>
+      <span class="settings__subtitle">{{ profile.subtitle }}</span>
+    </div>
+    <svg class="settings__chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+      <path d="M1.5 1 6.5 6.5 1.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </section>
+
+  <div class="settings__options-row">
+    <button
+      #settingsOptionsTrigger
+      class="settings__options"
+      type="button"
+      data-testid="settings-options"
+      aria-label="Settings options"
+      (click)="onSettingsOptions()"
+    >
+      <svg width="4" height="18" viewBox="0 0 4 18" fill="currentColor" aria-hidden="true">
+        <circle cx="2" cy="2" r="2" />
+        <circle cx="2" cy="9" r="2" />
+        <circle cx="2" cy="16" r="2" />
+      </svg>
+    </button>
+  </div>
+
+  <ul class="settings__list" data-testid="settings-list">
+    @for (row of rows; track row.id) {
+      <li class="settings__row">
+        <button
+          type="button"
+          class="settings__row-button"
+          data-testid="settings-row"
+          [attr.aria-label]="row.label"
+          (click)="onRowActivate(row)"
+        >
+          <span class="settings__row-label">{{ row.label }}</span>
+          <svg class="settings__chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+            <path d="M1.5 1 6.5 6.5 1.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </li>
+    }
+  </ul>
+
+  @if (settingsModalOpen()) {
+    <app-settings-modal (action)="onSettingsAction($event)" (dismiss)="onDismissSettings()" />
+  }
+</main>
+
+<app-tab-bar [items]="tabs()" (select)="onTabSelect($event)" />
