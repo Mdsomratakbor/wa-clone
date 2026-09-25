@@ -77,12 +77,21 @@ describe('SettingsPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/status']);
   });
 
-  it('row activation is a no-op (sub-pages are later features)', () => {
+  it('routes to /settings/account from the Account row (feature 014)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
     el.querySelectorAll<HTMLButtonElement>('[data-testid="settings-row"]')[0]?.click();
     fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/settings/account']);
+  });
+
+  it('other row activation is a no-op (sub-pages are later features)', () => {
+    const el = render();
+    el.querySelectorAll<HTMLButtonElement>('[data-testid="settings-row"]')[1]?.click();
+    fixture.detectChanges();
     const rows = el.querySelectorAll('[data-testid="settings-row"]');
-    expect(rows[0]?.getAttribute('aria-label')).toBe('Account');
+    expect(rows[1]?.getAttribute('aria-label')).toBe('Chats Settings');
   });
 
   it('renders the Settings options trigger with an aria-label', () => {

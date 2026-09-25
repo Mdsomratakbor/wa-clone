@@ -1,0 +1,33 @@
+<app-navigation-bar
+  title="Account"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="account" data-testid="account-page">
+  <div class="account__hero" data-testid="account-hero" aria-hidden="true">
+    <svg class="account__hero-glyph" width="64" height="48" viewBox="0 0 64 48" fill="none" aria-hidden="true">
+      <rect x="2" y="6" width="60" height="40" rx="6" fill="currentColor" opacity="0.25" />
+      <circle cx="32" cy="26" r="10" fill="currentColor" />
+    </svg>
+  </div>
+
+  <ul class="account__list" data-testid="account-list">
+    @for (row of rows; track row.id) {
+      <li class="account__row">
+        <button
+          type="button"
+          class="account__row-button"
+          data-testid="account-row"
+          [attr.aria-label]="row.label"
+          (click)="onRowActivate(row)"
+        >
+          <span class="account__row-label">{{ row.label }}</span>
+          <svg class="account__chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+            <path d="M1.5 1 6.5 6.5 1.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </li>
+    }
+  </ul>
+</main>

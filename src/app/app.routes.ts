@@ -38,5 +38,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/settings/settings-page').then((m) => m.SettingsPage),
   },
+  {
+    path: 'settings/account',
+    loadComponent: () => import('./features/settings/account-page').then((m) => m.AccountPage),
+  },
   { path: '**', redirectTo: 'chats' },
 ];

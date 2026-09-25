@@ -45,16 +45,22 @@ test.describe('Settings screen (US1)', () => {
 });
 
 test.describe('Settings routing (US2)', () => {
-  test('Back returns to /starred-messages; rows are no-ops', async ({ page }) => {
+  test('Account row navigates to /settings/account; other rows are no-ops; Back returns', async ({
+    page,
+  }) => {
     await page.goto('/settings');
     await page.getByTestId('settings-page').waitFor();
 
-    await page.getByTestId('settings-row').first().click();
+    await page.getByTestId('settings-row').nth(1).click();
     await expect(page.getByTestId('settings-page')).toBeVisible();
 
+    await page.getByTestId('settings-row').first().click();
+    await expect(page).toHaveURL(/\/settings\/account$/);
+    await page.getByTestId('account-page').waitFor();
+
     await page.getByRole('button', { name: 'Back' }).click();
-    await expect(page).toHaveURL(/\/starred-messages$/);
-    await page.getByTestId('starred-page').waitFor();
+    await expect(page).toHaveURL(/\/settings$/);
+    await page.getByTestId('settings-page').waitFor();
   });
 });
 

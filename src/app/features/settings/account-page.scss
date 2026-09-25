@@ -1,0 +1,62 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.account {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--wa-surface);
+}
+
+.account__hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 0;
+  color: var(--wa-accent);
+}
+
+.account__hero-glyph {
+  display: block;
+}
+
+.account__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.account__row {
+  display: block;
+}
+
+.account__row-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  padding: 16px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-preview);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-text-primary);
+  text-align: left;
+  appearance: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--wa-accent);
+    outline-offset: -2px;
+  }
+}
+
+.account__chevron {
+  margin-left: auto;
+  color: var(--wa-text-secondary);
+  flex: 0 0 auto;
+}

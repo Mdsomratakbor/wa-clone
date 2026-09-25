@@ -28,3 +28,10 @@ export const SETTINGS_ROWS: readonly SettingsRowSeed[] = [
   { id: 'data-storage', label: 'Data and Storage' },
   { id: 'contacts', label: 'Contacts' },
 ];
+
+export const ACCOUNT_ROWS: readonly SettingsRowSeed[] = [
+  { id: 'security', label: 'Security' },
+  { id: 'two-step-verification', label: 'Two-step verification' },
+  { id: 'change-number', label: 'Change number' },
+  { id: 'delete-account', label: 'Delete my account' },
+];

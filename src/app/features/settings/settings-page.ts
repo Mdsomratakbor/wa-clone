@@ -75,8 +75,13 @@ export class SettingsPage {
     // F-013: Settings tab is the active screen.
   }
 
-  protected onRowActivate(_row: SettingsRowSeed): void {
-    // F-013: row targets (rows 14-20) are later features.
+  protected onRowActivate(row: SettingsRowSeed): void {
+    if (row.id === 'account') {
+      // F-014: Account screen (design-map row 14).
+      void this.router.navigate(['/settings/account']);
+      return;
+    }
+    // F-013: remaining row targets (rows 15-20) are later features.
   }
 
   protected onSettingsOptions(): void {
