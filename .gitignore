@@ -46,6 +46,9 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Local tool logs
+*.log
+
 # Playwright
 test-results/
 playwright-report/
