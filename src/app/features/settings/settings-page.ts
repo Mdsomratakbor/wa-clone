@@ -81,7 +81,12 @@ export class SettingsPage {
       void this.router.navigate(['/settings/account']);
       return;
     }
-    // F-013: remaining row targets (rows 15-20) are later features.
+    if (row.id === 'chats-settings') {
+      // F-016: Chats Settings screen (design-map row 16).
+      void this.router.navigate(['/settings/chats']);
+      return;
+    }
+    // F-013: remaining row targets (rows 17-20) are later features.
   }
 
   protected onSettingsOptions(): void {

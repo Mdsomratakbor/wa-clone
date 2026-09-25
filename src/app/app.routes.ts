@@ -43,6 +43,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/settings/account-page').then((m) => m.AccountPage),
   },
   {
+    path: 'settings/chats',
+    loadComponent: () =>
+      import('./features/settings/chats-settings-page').then((m) => m.ChatsSettingsPage),
+  },
+  {
     path: 'contact/:id',
     loadComponent: () =>
       import('./features/contact-info/contact-page').then((m) => m.ContactPage),

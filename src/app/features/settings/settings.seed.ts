@@ -35,3 +35,11 @@ export const ACCOUNT_ROWS: readonly SettingsRowSeed[] = [
   { id: 'change-number', label: 'Change number' },
   { id: 'delete-account', label: 'Delete my account' },
 ];
+
+export const CHATS_SETTINGS_ROWS: readonly SettingsRowSeed[] = [
+  { id: 'chats-wallpaper', label: 'Wallpaper' },
+  { id: 'chats-font-size', label: 'Font size' },
+  { id: 'chats-keyboard', label: 'Keyboard' },
+  { id: 'chats-enter-sends', label: 'Enter key sends' },
+  { id: 'chats-media-visibility', label: 'Media visibility' },
+];
