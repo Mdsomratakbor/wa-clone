@@ -24,7 +24,7 @@ Node IDs below are taken directly from Figma via the Figma API. URLs use the hyp
 | 12 | Camera | WhatsApp Camera | `0:9155` | `feature/camera` — ✅ **implemented** (US1–US3 structure: Camera tab navigates from chats/calls/status; viewport + Close/Shutter/Flip hypothesis controls, 2026-09-24; exact geometry/glyphs/golden deferred to Figma capture ~09-28) | [`012`](../specs/012-camera) |
 | 13 | Settings | WhatsApp Settings | `0:9198` | `feature/settings` — ✅ **implemented** (US1–US3 structure: real screen replaces the stub, 011 modal re-hosted, Settings tab navigates everywhere, 2026-09-24; exact profile/rows/glyphs/golden deferred to Figma capture ~09-28) | [`013`](../specs/013-settings) |
 | 14 | Account | WhatsApp Account | `0:9371` | `feature/settings/account` — ✅ **implemented** (US1–US3 structure: Settings Account row navigates, pushed screen w/ hero + hypothesis rows, 2026-09-24; exact rows/hero/glyphs/golden deferred to Figma capture ~09-28) | [`014`](../specs/014-account) |
-| 15 | Contact Info | WhatsApp Contact Info | `0:9486` | `feature/contact-info` | — |
+| 15 | Contact Info | WhatsApp Contact Info | `0:9486` | `feature/contact-info` — ✅ **implemented** (US1–US3 structure: chat header identity tap opens `/contact/:id`, pushed screen w/ hero + Messages + hypothesis rows, 2026-09-24; exact rows/hero/phone/glyphs/golden deferred to Figma capture ~09-28) | [`015`](../specs/015-contact-info) |
 | 16 | Chats Settings | WhatsApp Chats Settings | `0:9973` | `feature/settings` | — |
 | 17 | Notifications | WhatsApp Notifications | `0:10758` | `feature/settings` | — |
 | 18 | Data & Storage | WhatsApp Data and Storage Usage | `0:10894` | `feature/settings` | — |
