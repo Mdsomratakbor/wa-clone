@@ -16,12 +16,20 @@
     </svg>
   </button>
 
-  <app-user-avatar [src]="contact().avatarRef" [name]="contact().name" [size]="36" />
+  <button
+    type="button"
+    class="chat-header__identity"
+    data-testid="chat-header__identity"
+    [attr.aria-label]="'Open contact info'"
+    (click)="identity.emit()"
+  >
+    <app-user-avatar [src]="contact().avatarRef" [name]="contact().name" [size]="36" />
 
-  <div class="chat-header__titles">
-    <h1 class="chat-header__name">{{ contact().name }}</h1>
-    <p class="chat-header__subtitle">{{ contact().subtitle }}</p>
-  </div>
+    <div class="chat-header__titles">
+      <h1 class="chat-header__name">{{ contact().name }}</h1>
+      <p class="chat-header__subtitle">{{ contact().subtitle }}</p>
+    </div>
+  </button>
 
   <span class="chat-header__spacer" aria-hidden="true"></span>
 

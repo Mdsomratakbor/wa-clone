@@ -55,6 +55,15 @@ describe('ChatWindowPage', () => {
     expect(navSpy).toHaveBeenCalledWith(['/chats']);
   });
 
+  it('navigates to contact info on identity activation', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="chat-header__identity"]')
+      ?.click();
+    expect(navSpy).toHaveBeenCalledWith(['/contact', 'chat-006']);
+  });
+
   it('renders a wallpaper-only thread for an unknown contact', async () => {
     await TestBed.resetTestingModule();
     await TestBed.configureTestingModule({

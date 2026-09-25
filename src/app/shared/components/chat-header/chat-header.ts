@@ -23,6 +23,7 @@ export class ChatHeader {
   readonly contact = input.required<ContactHeader>();
   readonly backLabel = input<string>('Back to chats');
   readonly back = output<void>();
+  readonly identity = output<void>();
   readonly actions = output<void>();
 
   focus(): void {

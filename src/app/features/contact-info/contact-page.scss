@@ -1,0 +1,92 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.contact {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--wa-surface);
+}
+
+.contact__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 16px 24px;
+}
+
+.contact__name {
+  margin: 0;
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-preview);
+  font-weight: var(--wa-fw-medium);
+  color: var(--wa-text-primary);
+  text-align: center;
+}
+
+.contact__actions {
+  display: flex;
+  justify-content: center;
+  padding: 0 16px 24px;
+}
+
+.contact__messages {
+  min-width: 160px;
+  height: 44px;
+  border: 0;
+  border-radius: 22px;
+  background: var(--wa-accent);
+  color: var(--wa-surface-variant);
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-preview);
+  font-weight: var(--wa-fw-medium);
+  cursor: pointer;
+  appearance: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--wa-accent);
+    outline-offset: 2px;
+  }
+}
+
+.contact__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.contact__row {
+  display: block;
+}
+
+.contact__row-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  padding: 16px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-preview);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-text-primary);
+  text-align: left;
+  appearance: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--wa-accent);
+    outline-offset: -2px;
+  }
+}
+
+.contact__chevron {
+  margin-left: auto;
+  color: var(--wa-text-secondary);
+  flex: 0 0 auto;
+}

@@ -1,5 +1,10 @@
 <div class="chat-window">
-  <app-chat-header [contact]="contact" (back)="onBack()" (actions)="onChatActions()" />
+  <app-chat-header
+    [contact]="contact"
+    (back)="onBack()"
+    (identity)="onIdentity()"
+    (actions)="onChatActions()"
+  />
 
   <div class="chat-window__thread" data-testid="message-thread" role="list" [attr.aria-label]="'Conversation with ' + contact.name">
     @if (!listEmpty()) {

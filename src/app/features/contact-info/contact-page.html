@@ -1,0 +1,42 @@
+<app-navigation-bar
+  [title]="name()"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="contact" data-testid="contact-page">
+  <section class="contact__hero" data-testid="contact-hero" aria-label="Contact">
+    <app-user-avatar [src]="null" [name]="name()" [size]="96" />
+    <h2 class="contact__name" data-testid="contact-name">{{ name() }}</h2>
+  </section>
+
+  <div class="contact__actions">
+    <button
+      type="button"
+      class="contact__messages"
+      data-testid="contact-messages"
+      (click)="onMessages()"
+    >
+      Messages
+    </button>
+  </div>
+
+  <ul class="contact__list" data-testid="contact-list">
+    @for (row of rows; track row.id) {
+      <li class="contact__row">
+        <button
+          type="button"
+          class="contact__row-button"
+          data-testid="contact-row"
+          [attr.aria-label]="row.label"
+          (click)="onRowActivate(row)"
+        >
+          <span class="contact__row-label">{{ row.label }}</span>
+          <svg class="contact__chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+            <path d="M1.5 1 6.5 6.5 1.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </li>
+    }
+  </ul>
+</main>

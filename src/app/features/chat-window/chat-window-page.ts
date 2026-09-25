@@ -28,10 +28,17 @@ export class ChatWindowPage {
     this.route.snapshot.paramMap.get('id') === THREADED_CONTACT_ID ? CHAT_SEED : [],
   );
 
+  protected readonly chatId = computed(() => this.route.snapshot.paramMap.get('id') ?? '');
+
   protected readonly listEmpty = computed(() => this.messages().length === 0);
 
   protected onBack(): void {
     void this.router.navigate(['/chats']);
+  }
+
+  protected onIdentity(): void {
+    // F-015: header tap opens Contact Info (design-map row 15).
+    void this.router.navigate(['/contact', this.chatId()]);
   }
 
   protected onChatActions(): void {
