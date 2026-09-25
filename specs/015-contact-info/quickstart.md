@@ -7,15 +7,14 @@ npm run build
 npx ng test --watch=false --reporters=progress
 ```
 
-## E2E (runs against the local dev server on port 4200)
+## E2E (reuses the running `ng serve` on port 4200 — keep it alive, don't restart)
 
 ```bash
-# 1. fresh server (kill stale node on 4200 first)
-npm run start
-# 2. targeted
-npx playwright test tests/e2e/contact-info.spec.ts tests/e2e/chat-window.spec.ts tests/e2e/responsive.spec.ts
-# 3. full suite
-npx playwright test
+npm run start          # once per session; playwright reuses it
+npm run test:e2e:fast  # dev loop — mobile project only (~1/3 of matrix, ~1 min)
+npx playwright test tests/e2e/contact-info.spec.ts tests/e2e/chat-window.spec.ts --project=chromium-mobile
+npm run test:e2e:responsive
+npm run e2e            # closure only — full 3-project matrix
 ```
 
 ## Relevant paths
