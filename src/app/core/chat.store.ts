@@ -6,13 +6,17 @@ import { ContactHeader, Message } from '../features/chat-window/chat-window.mode
 
 export const THREADED_CONTACT_ID = 'chat-006';
 export const CONTACT_SUBTITLE = 'tap here for contact info';
+export const PERSISTENCE_KEY = 'wa.chat-store.v1';
 
-let messageSequence = 1000;
-
-function nextMessageId(): string {
-  messageSequence += 1;
-  return `msg-${messageSequence}`;
+interface ChatStoreSnapshot {
+  version: 1;
+  conversations: ChatPreview[];
+  threads: Record<string, Message[]>;
+  messageSequence: number;
+  newChatCounter: number;
 }
+
+const STORE_VERSION = 1;
 
 function nowTime(): string {
   const d = new Date();
@@ -25,8 +29,33 @@ function normalizeChats(seed: readonly ChatPreview[]): readonly ChatPreview[] {
   return seed.map((chat) => ({ ...chat, read: false }));
 }
 
+function readStorage(key: string): string | null {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeStorage(key: string, value: string): void {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Storage unavailable/blocked: persist is best-effort.
+  }
+}
+
+function clearStorage(key: string): void {
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    // Ignore: storage unavailable.
+  }
+}
+
 @Injectable({ providedIn: 'root' })
 export class ChatStore {
+  private messageSequence = 1000;
   private newChatCounter = 0;
 
   readonly conversations = signal<readonly ChatPreview[]>(normalizeChats(CHAT_SEED));
@@ -34,6 +63,10 @@ export class ChatStore {
   readonly threads = signal<Readonly<Record<string, readonly Message[]>>>({
     [THREADED_CONTACT_ID]: THREAD_SEED,
   });
+
+  constructor() {
+    this.hydrate();
+  }
 
   conversationMessages(chatId: string): readonly Message[] {
     return this.threads()[chatId] ?? [];
@@ -52,6 +85,7 @@ export class ChatStore {
     };
     this.conversations.update((chats) => [...chats, chat]);
     this.threads.update((threads) => ({ ...threads, [id]: [] }));
+    this.persist();
     return id;
   }
 
@@ -69,12 +103,14 @@ export class ChatStore {
 
   setConversations(list: readonly ChatPreview[]): void {
     this.conversations.set(list);
+    this.persist();
   }
 
   openConversation(chatId: string): void {
     this.conversations.update((chats) =>
       chats.map((chat) => (chat.id === chatId && !chat.read ? { ...chat, read: true } : chat)),
     );
+    this.persist();
   }
 
   sendMessage(chatId: string, text: string): void {
@@ -83,7 +119,7 @@ export class ChatStore {
       return;
     }
     const message: Message = {
-      id: nextMessageId(),
+      id: this.nextMessageId(),
       sender: 'outgoing',
       text: body,
       time: nowTime(),
@@ -100,15 +136,56 @@ export class ChatStore {
           : chat,
       ),
     );
+    this.persist();
   }
 
   markAllRead(): void {
     this.conversations.update((chats) => chats.map((chat) => ({ ...chat, read: true })));
+    this.persist();
   }
 
   reset(): void {
+    clearStorage(PERSISTENCE_KEY);
+    this.messageSequence = 1000;
     this.newChatCounter = 0;
     this.conversations.set(normalizeChats(CHAT_SEED));
     this.threads.set({ [THREADED_CONTACT_ID]: THREAD_SEED });
+  }
+
+  private nextMessageId(): string {
+    this.messageSequence += 1;
+    return `msg-${this.messageSequence}`;
+  }
+
+  private persist(): void {
+    const snapshot: ChatStoreSnapshot = {
+      version: STORE_VERSION,
+      conversations: this.conversations() as ChatPreview[],
+      threads: this.threads() as Record<string, Message[]>,
+      messageSequence: this.messageSequence,
+      newChatCounter: this.newChatCounter,
+    };
+    writeStorage(PERSISTENCE_KEY, JSON.stringify(snapshot));
+  }
+
+  private hydrate(): void {
+    const raw = readStorage(PERSISTENCE_KEY);
+    if (raw === null) {
+      return;
+    }
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return;
+    }
+    const snapshot = parsed as ChatStoreSnapshot;
+    if (snapshot?.version !== STORE_VERSION) {
+      return;
+    }
+    this.conversations.set(snapshot.conversations);
+    this.threads.set(snapshot.threads);
+    this.messageSequence = snapshot.messageSequence;
+    this.newChatCounter = snapshot.newChatCounter;
   }
 }

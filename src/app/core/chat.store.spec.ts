@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { ChatStore, THREADED_CONTACT_ID, CONTACT_SUBTITLE } from './chat.store';
+import { ChatStore, THREADED_CONTACT_ID, CONTACT_SUBTITLE, PERSISTENCE_KEY } from './chat.store';
 import { ChatPreview } from '../features/chat-list/chat.model';
 import { CHAT_SEED } from '../features/chat-list/chat-list.seed';
 import { CHAT_SEED as THREAD_SEED } from '../features/chat-window/chat-window.seed';
@@ -123,5 +123,76 @@ describe('ChatStore', () => {
     store.reset();
     expect(store.conversationMessages(THREADED_CONTACT_ID).length).toBe(THREAD_SEED.length);
     expect(store.conversations().every((chat) => chat.read === false)).toBe(true);
+  });
+
+  it('persists mutations and hydrates a fresh store with continuing counters', () => {
+    store.sendMessage(THREADED_CONTACT_ID, 'persist-me');
+    const created = store.createConversation();
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const reloaded = TestBed.inject(ChatStore);
+    store = reloaded;
+
+    const thread = reloaded.conversationMessages(THREADED_CONTACT_ID);
+    expect(thread.length).toBe(THREAD_SEED.length + 1);
+    expect(thread[thread.length - 1].text).toBe('persist-me');
+    expect(reloaded.conversations().some((c) => c.id === created)).toBe(true);
+    expect(reloaded.conversationMessages(created)).toEqual([]);
+    expect(reloaded.createConversation()).toBe('chat-new-2');
+  });
+
+  it('hydrates read state and openConversation changes', () => {
+    store.markAllRead();
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const reloaded = TestBed.inject(ChatStore);
+    store = reloaded;
+
+    expect(reloaded.conversations().every((c) => c.read === true)).toBe(true);
+  });
+
+  it('falls back to seeded defaults on absent storage', () => {
+    window.localStorage.removeItem(PERSISTENCE_KEY);
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const reloaded = TestBed.inject(ChatStore);
+    store = reloaded;
+
+    expect(reloaded.conversations().length).toBe(CHAT_SEED.length);
+    expect(reloaded.conversationMessages(THREADED_CONTACT_ID).length).toBe(THREAD_SEED.length);
+  });
+
+  it('falls back to seeded defaults on corrupt storage', () => {
+    window.localStorage.setItem(PERSISTENCE_KEY, 'not-json{');
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const reloaded = TestBed.inject(ChatStore);
+    store = reloaded;
+
+    expect(reloaded.conversations().length).toBe(CHAT_SEED.length);
+  });
+
+  it('falls back to seeded defaults on a version mismatch', () => {
+    window.localStorage.setItem(
+      PERSISTENCE_KEY,
+      JSON.stringify({ version: 99, conversations: [], threads: {} }),
+    );
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const reloaded = TestBed.inject(ChatStore);
+    store = reloaded;
+
+    expect(reloaded.conversations().length).toBe(CHAT_SEED.length);
+  });
+
+  it('reset clears the persisted snapshot', () => {
+    store.sendMessage(THREADED_CONTACT_ID, 'gonna-clear');
+    store.reset();
+    expect(window.localStorage.getItem(PERSISTENCE_KEY)).toBeNull();
   });
 });
