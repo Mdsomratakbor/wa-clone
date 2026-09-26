@@ -43,3 +43,11 @@ export const CHATS_SETTINGS_ROWS: readonly SettingsRowSeed[] = [
   { id: 'chats-enter-sends', label: 'Enter key sends' },
   { id: 'chats-media-visibility', label: 'Media visibility' },
 ];
+
+export const NOTIFICATIONS_ROWS: readonly SettingsRowSeed[] = [
+  { id: 'notifications-sound', label: 'Sound' },
+  { id: 'notifications-vibrate', label: 'Vibrate' },
+  { id: 'notifications-popup', label: 'Popup notification' },
+  { id: 'notifications-light', label: 'Light' },
+  { id: 'notifications-previews', label: 'Show previews' },
+];

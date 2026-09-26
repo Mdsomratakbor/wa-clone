@@ -1,0 +1,26 @@
+<app-navigation-bar
+  title="Notifications"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="notifications" data-testid="notifications-page">
+  <ul class="notifications__list" data-testid="notifications-list">
+    @for (row of rows; track row.id) {
+      <li class="notifications__row">
+        <button
+          type="button"
+          class="notifications__row-button"
+          data-testid="notifications-row"
+          [attr.aria-label]="row.label"
+          (click)="onRowActivate(row)"
+        >
+          <span class="notifications__row-label">{{ row.label }}</span>
+          <svg class="notifications__chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+            <path d="M1.5 1 6.5 6.5 1.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </li>
+    }
+  </ul>
+</main>

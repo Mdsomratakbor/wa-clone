@@ -48,6 +48,11 @@ export const routes: Routes = [
       import('./features/settings/chats-settings-page').then((m) => m.ChatsSettingsPage),
   },
   {
+    path: 'settings/notifications',
+    loadComponent: () =>
+      import('./features/settings/notifications-page').then((m) => m.NotificationsPage),
+  },
+  {
     path: 'contact/:id',
     loadComponent: () =>
       import('./features/contact-info/contact-page').then((m) => m.ContactPage),
