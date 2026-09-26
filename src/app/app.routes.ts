@@ -71,5 +71,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/contact-info/edit-contact-page').then((m) => m.EditContactPage),
   },
+  {
+    path: 'auth',
+    loadComponent: () => import('./features/auth/auth-page').then((m) => m.AuthPage),
+  },
   { path: '**', redirectTo: 'chats' },
 ];

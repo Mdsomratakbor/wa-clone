@@ -1,0 +1,121 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--wa-surface);
+}
+
+.auth {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 56px 24px 32px;
+  box-sizing: border-box;
+}
+
+.auth__header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth__title {
+  margin: 0;
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-nav-title);
+  font-weight: var(--wa-fw-semibold);
+  letter-spacing: var(--wa-ls-title);
+  color: var(--wa-text-primary);
+}
+
+.auth__tagline {
+  margin: 8px 0 0;
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-preview);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-text-secondary);
+}
+
+.auth__number {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  max-width: 320px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: var(--wa-surface-variant);
+}
+
+.auth__country {
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-preview);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-text-secondary);
+}
+
+.auth__phone {
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-chat-title);
+  font-weight: var(--wa-fw-medium);
+  color: var(--wa-text-primary);
+}
+
+.auth__keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.auth__key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--wa-accent);
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-chat-title);
+  font-weight: var(--wa-fw-regular);
+  cursor: pointer;
+  appearance: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--wa-accent);
+    outline-offset: 2px;
+  }
+}
+
+.auth__key--delete {
+  color: var(--wa-text-secondary);
+}
+
+.auth__key-spacer {
+  display: block;
+}
+
+.auth__continue {
+  margin-top: 32px;
+  min-width: 160px;
+  height: 44px;
+  border: 0;
+  border-radius: 22px;
+  background: var(--wa-accent);
+  color: var(--wa-surface-variant);
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-preview);
+  font-weight: var(--wa-fw-medium);
+  cursor: pointer;
+  appearance: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--wa-accent);
+    outline-offset: 2px;
+  }
+}

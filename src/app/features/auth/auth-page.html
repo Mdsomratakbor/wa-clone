@@ -1,0 +1,36 @@
+<main class="auth" data-testid="auth-page">
+  <header class="auth__header">
+    <h1 class="auth__title" data-testid="auth-title">WhatsApp</h1>
+    <p class="auth__tagline">Enter your phone number to get started</p>
+  </header>
+
+  <section class="auth__number" aria-label="Phone number">
+    <span class="auth__country" data-testid="auth-country">No country selected</span>
+    <span class="auth__phone" data-testid="auth-phone" aria-label="Phone number"></span>
+  </section>
+
+  <section class="auth__keypad" aria-label="Numeric keypad">
+    @for (digit of digits; track digit) {
+      <button type="button" class="auth__key" data-testid="auth-key" [attr.aria-label]="digit" (click)="onKey(digit)">
+        {{ digit }}
+      </button>
+    }
+    <span class="auth__key-spacer"></span>
+    <button type="button" class="auth__key auth__key--delete" data-testid="auth-key-delete" aria-label="Delete digit" (click)="onDelete()">
+      <svg width="22" height="15" viewBox="0 0 22 15" fill="none" aria-hidden="true">
+        <path
+          d="M6 1.5 1 7.5 6 13.5"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path d="M4 7.5h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+      </svg>
+    </button>
+  </section>
+
+  <button type="button" class="auth__continue" data-testid="auth-continue" (click)="onContinue()">
+    Continue
+  </button>
+</main>

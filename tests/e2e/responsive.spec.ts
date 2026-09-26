@@ -260,4 +260,16 @@ test.describe('Responsive adaptation (owner-approved drift)', () => {
       expect(overflow, `${vp.name} edit profile screen should not overflow`).toBe(false);
     }
   });
+
+  test('authorization screen never overflows horizontally at any breakpoint', async ({ page }) => {
+    for (const vp of BREAKPOINTS) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto('/auth');
+      await page.getByTestId('auth-page').waitFor();
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      );
+      expect(overflow, `${vp.name} authorization screen should not overflow`).toBe(false);
+    }
+  });
 });
