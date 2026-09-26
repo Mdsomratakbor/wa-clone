@@ -2,15 +2,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { NotificationsPage } from './notifications-page';
 import { NOTIFICATIONS_ROWS } from './settings.seed';
+import { PrefsStore } from '../../core/prefs.store';
 
 describe('NotificationsPage', () => {
   let fixture: ComponentFixture<NotificationsPage>;
 
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [NotificationsPage],
       providers: [provideRouter([])],
     }).compileComponents();
+    TestBed.inject(PrefsStore).reset();
   });
 
   function render(): HTMLElement {
@@ -57,5 +60,22 @@ describe('NotificationsPage', () => {
     el.querySelectorAll<HTMLButtonElement>('[data-testid="notifications-row"]')[0]?.click();
     fixture.detectChanges();
     expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('renders every row as a switch bound to the store', () => {
+    const el = render();
+    const rows = el.querySelectorAll<HTMLElement>('[data-testid="notifications-row"]');
+    expect(rows.length).toBe(NOTIFICATIONS_ROWS.length);
+    expect(rows[0]?.querySelector('button[role="switch"]')).not.toBeNull();
+    expect(el.querySelectorAll('button[role="switch"]').length).toBe(NOTIFICATIONS_ROWS.length);
+    expect(el.querySelector('button[role="switch"]')?.getAttribute('aria-checked')).toBe('true');
+  });
+
+  it('toggling Show previews persists the change', () => {
+    const el = render();
+    const switches = el.querySelectorAll<HTMLButtonElement>('button[role="switch"]');
+    switches[4]?.click();
+    fixture.detectChanges();
+    expect(TestBed.inject(PrefsStore).prefs().showPreviews).toBe(false);
   });
 });

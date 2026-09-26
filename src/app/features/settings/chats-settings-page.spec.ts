@@ -3,15 +3,18 @@ import { Router } from '@angular/router';
 import { provideRouter } from '@angular/router';
 import { ChatsSettingsPage } from './chats-settings-page';
 import { CHATS_SETTINGS_ROWS } from './settings.seed';
+import { PrefsStore } from '../../core/prefs.store';
 
 describe('ChatsSettingsPage', () => {
   let fixture: ComponentFixture<ChatsSettingsPage>;
 
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [ChatsSettingsPage],
       providers: [provideRouter([])],
     }).compileComponents();
+    TestBed.inject(PrefsStore).reset();
   });
 
   function render(): HTMLElement {
@@ -58,5 +61,39 @@ describe('ChatsSettingsPage', () => {
     el.querySelectorAll<HTMLButtonElement>('[data-testid="chats-settings-row"]')[0]?.click();
     fixture.detectChanges();
     expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('renders Enter key sends and Media visibility as switches bound to the store', () => {
+    const el = render();
+    const labelled = [
+      ...el.querySelectorAll<HTMLElement>('[data-testid="chats-settings-row"]'),
+    ];
+    const enter = labelled.find((r) => r.getAttribute('aria-label') === 'Enter key sends');
+    const media = labelled.find((r) => r.getAttribute('aria-label') === 'Media visibility');
+    expect(enter?.querySelector('button[role="switch"]')).not.toBeNull();
+    expect(media?.querySelector('button[role="switch"]')).not.toBeNull();
+
+    const switches = el.querySelectorAll<HTMLButtonElement>('button[role="switch"]');
+    expect(switches.length).toBe(2);
+    expect(switches[0]?.getAttribute('aria-checked')).toBe('true');
+    expect(switches[1]?.getAttribute('aria-checked')).toBe('true');
+  });
+
+  it('keeps Wallpaper/Font size/Keyboard as chevron rows', () => {
+    const el = render();
+    const buttons = el.querySelectorAll<HTMLButtonElement>(
+      'button[data-testid="chats-settings-row"]',
+    );
+    expect(buttons.length).toBe(3);
+    expect(buttons[0]?.querySelector('.chats-settings__chevron')).not.toBeNull();
+  });
+
+  it('toggling Enter key sends persists the change', () => {
+    const el = render();
+    const switches = el.querySelectorAll<HTMLButtonElement>('button[role="switch"]');
+    switches[0]?.click();
+    fixture.detectChanges();
+    expect(TestBed.inject(PrefsStore).prefs().enterKeySends).toBe(false);
+    expect(TestBed.inject(PrefsStore).prefs().mediaVisibility).toBe(true);
   });
 });

@@ -1,13 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Composer } from './composer';
+import { PrefsStore } from '../../../core/prefs.store';
 
 describe('Composer', () => {
   let fixture: ComponentFixture<Composer>;
 
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [Composer],
     }).compileComponents();
+    TestBed.inject(PrefsStore).reset();
   });
 
   it('renders the composer controls', () => {
@@ -113,6 +116,24 @@ describe('Composer', () => {
     fixture.detectChanges();
     expect(sent).toBe('go');
     expect(input!.value).toBe('');
+  });
+
+  it('keeps Enter inert when the Enter key sends toggle is off', () => {
+    TestBed.inject(PrefsStore).set('enterKeySends', false);
+    fixture = TestBed.createComponent(Composer);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    let sent: string | undefined;
+    fixture.componentInstance.send.subscribe((v: string) => (sent = v));
+
+    const input = el.querySelector<HTMLInputElement>('input.composer__input');
+    input!.value = 'go';
+    input!.dispatchEvent(new Event('input'));
+    input!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    fixture.detectChanges();
+    expect(sent).toBeUndefined();
+    expect(input!.value).toBe('go');
+    expect(el.querySelector('[aria-label="Send message"]')).not.toBeNull();
   });
 
   it('exposes an accessible toolbar role', () => {
