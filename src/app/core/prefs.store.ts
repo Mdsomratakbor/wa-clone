@@ -21,14 +21,19 @@ export const DEFAULT_PREFS: PrefsSnapshot = {
   showPreviews: true,
 };
 
+export type ChatSort = 'recent' | 'name' | 'unread';
+
+export const DEFAULT_CHAT_SORT: ChatSort = 'recent';
+
 export const PREFS_KEY = 'wa.prefs.v1';
 
 interface PrefsSnapshotEnvelope {
-  version: 1;
+  version: 2;
   prefs: PrefsSnapshot;
+  chatSort: ChatSort;
 }
 
-const PREFS_VERSION = 1;
+const PREFS_VERSION = 2;
 
 function readStorage(key: string): string | null {
   try {
@@ -57,6 +62,7 @@ function clearStorage(key: string): void {
 @Injectable({ providedIn: 'root' })
 export class PrefsStore {
   readonly prefs = signal<PrefsSnapshot>({ ...DEFAULT_PREFS });
+  readonly chatSort = signal<ChatSort>(DEFAULT_CHAT_SORT);
 
   constructor() {
     this.hydrate();
@@ -72,15 +78,22 @@ export class PrefsStore {
     this.persist();
   }
 
+  setChatSort(value: ChatSort): void {
+    this.chatSort.set(value);
+    this.persist();
+  }
+
   reset(): void {
     clearStorage(PREFS_KEY);
     this.prefs.set({ ...DEFAULT_PREFS });
+    this.chatSort.set(DEFAULT_CHAT_SORT);
   }
 
   private persist(): void {
     const envelope: PrefsSnapshotEnvelope = {
       version: PREFS_VERSION,
       prefs: this.prefs(),
+      chatSort: this.chatSort(),
     };
     writeStorage(PREFS_KEY, JSON.stringify(envelope));
   }
@@ -96,10 +109,11 @@ export class PrefsStore {
     } catch {
       return;
     }
-    const envelope = parsed as PrefsSnapshotEnvelope;
-    if (envelope?.version !== PREFS_VERSION) {
+    const envelope = parsed as { version: number; prefs: PrefsSnapshot; chatSort?: ChatSort };
+    if (envelope?.version !== 1 && envelope?.version !== PREFS_VERSION) {
       return;
     }
     this.prefs.set({ ...DEFAULT_PREFS, ...envelope.prefs });
+    this.chatSort.set(envelope.chatSort ?? DEFAULT_CHAT_SORT);
   }
 }

@@ -10,6 +10,7 @@ import {
 import { Router } from '@angular/router';
 import { AddModal } from '../new-chat-modal/add-modal';
 import { ChatStore } from '../../core/chat.store';
+import { ChatSort, PrefsStore } from '../../core/prefs.store';
 import { Action } from '../../shared/components/action-sheet/action-sheet.model';
 import { ChatActionsBar } from '../../shared/components/chat-actions-bar/chat-actions-bar';
 import { ChatListItem } from '../../shared/components/chat-list-item/chat-list-item';
@@ -28,6 +29,12 @@ const TAB_LABELS: Record<TabKey, string> = {
   status: 'Status',
 };
 
+const SORT_OPTIONS: readonly { value: ChatSort; label: string }[] = [
+  { value: 'recent', label: 'Recent' },
+  { value: 'name', label: 'Name' },
+  { value: 'unread', label: 'Unread' },
+];
+
 @Component({
   selector: 'app-chats-page',
   imports: [NavigationBar, ChatListItem, Fab, TabBar, ChatActionsBar, AddModal],
@@ -38,6 +45,7 @@ const TAB_LABELS: Record<TabKey, string> = {
 export class ChatsPage {
   private readonly router = inject(Router);
   private readonly store = inject(ChatStore);
+  private readonly prefs = inject(PrefsStore);
   private readonly fabRef = viewChild(Fab);
 
   protected readonly conversations = computed(() => this.store.conversations());
@@ -46,8 +54,40 @@ export class ChatsPage {
   protected readonly editing = signal(false);
   protected readonly selectedIds = signal<ReadonlySet<string>>(new Set());
   protected readonly items = signal<ChatPreview[]>([]);
+  protected readonly searchQuery = signal('');
   protected readonly modalOpen = signal(false);
   protected readonly newChatActions: readonly Action[] = NEW_CHAT_ACTIONS;
+  protected readonly sortOptions: readonly { value: ChatSort; label: string }[] = SORT_OPTIONS;
+
+  protected readonly chatSort = this.prefs.chatSort;
+
+  protected readonly visibleItems = computed<readonly ChatPreview[]>(() => {
+    const list = this.items();
+    const query = this.searchQuery().trim().toLowerCase();
+    const filtered = query
+      ? list.filter(
+          (chat) =>
+            chat.contactName.toLowerCase().includes(query) ||
+            chat.preview.toLowerCase().includes(query),
+        )
+      : list;
+    const sort = this.prefs.chatSort();
+    const result = [...filtered];
+    if (sort === 'name') {
+      result.sort((a, b) =>
+        a.contactName.toLowerCase().localeCompare(b.contactName.toLowerCase()),
+      );
+    } else if (sort === 'unread') {
+      result.sort((a, b) => Number(a.read === true) - Number(b.read === true));
+    }
+    return result;
+  });
+
+  protected readonly searchActive = computed(() => this.searchQuery().trim().length > 0);
+
+  protected readonly searchEmpty = computed(
+    () => this.searchActive() && this.items().length > 0 && this.visibleItems().length === 0,
+  );
 
   constructor() {
     effect(() => {
@@ -120,6 +160,18 @@ export class ChatsPage {
 
   protected onFabPressed(): void {
     this.modalOpen.set(true);
+  }
+
+  protected onSearchInput(value: string): void {
+    this.searchQuery.set(value);
+  }
+
+  protected onClearSearch(): void {
+    this.searchQuery.set('');
+  }
+
+  protected onSort(value: ChatSort): void {
+    this.prefs.setChatSort(value);
   }
 
   protected onAddModalAction(id: string): void {
