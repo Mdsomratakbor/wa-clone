@@ -41,6 +41,11 @@ map-external; rows are no-ops here.
   `NOTIFICATIONS_ROWS` seed), no tab bar.
 - **FR-003**: Back returns to `/settings`.
 - **FR-004**: All rows are no-ops (later features / map-external).
+
+> **Drift note (F-027, 2026-09-26)**: Rows are no longer all no-ops. Sound/Vibrate/Popup
+> notification/Light/Show previews render as persisted switches (`PrefsStore`, `wa.prefs.v1`);
+> consumer effects remain later targets (state model landed). See
+> `specs/027-settings-toggles`.
 - **FR-005**: No horizontal overflow at any breakpoint.
 
 ## Non-Goals

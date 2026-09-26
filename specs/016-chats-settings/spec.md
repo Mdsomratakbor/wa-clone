@@ -40,6 +40,11 @@ selection are later features / map-external; rows are no-ops here.
   `CHATS_SETTINGS_ROWS` seed), no tab bar.
 - **FR-003**: Back returns to `/settings`.
 - **FR-004**: All rows are no-ops (later features / map-external).
+
+> **Drift note (F-027, 2026-09-26)**: Rows are no longer all no-ops. **Enter key sends** and
+> **Media visibility** render as persisted switches (`PrefsStore`, `wa.prefs.v1`); **Enter key
+> sends** now gates the composer's Enter handler (OFF ⇒ Enter inert). Wallpaper/Font size/
+> Keyboard remain chevron no-op rows. See `specs/027-settings-toggles`.
 - **FR-005**: No horizontal overflow at any breakpoint.
 
 ## Non-Goals
