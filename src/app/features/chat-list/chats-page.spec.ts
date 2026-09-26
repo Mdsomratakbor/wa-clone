@@ -327,5 +327,46 @@ describe('ChatsPage', () => {
       fixture.detectChanges();
       expect(el.querySelectorAll('[data-testid="action-sheet"]').length).toBe(1);
     });
+
+    it('New contact closes the sheet, creates a conversation and navigates to it', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+      const el = fixture.nativeElement as HTMLElement;
+      const store = TestBed.inject(ChatStore);
+      const before = store.conversations().length;
+      openModal(el);
+
+      const newContact = Array.from(
+        el.querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]'),
+      ).find((b) => b.textContent?.trim() === 'New contact');
+      newContact?.click();
+      fixture.detectChanges();
+
+      expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+      expect(store.conversations().length).toBe(before + 1);
+      expect(store.conversations()[store.conversations().length - 1].contactName).toBe(
+        'New contact',
+      );
+      expect(navSpy).toHaveBeenCalledWith(['/chat', 'chat-new-1']);
+    });
+
+    it('New group stays no-op: sheet open, no navigation', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+      const el = fixture.nativeElement as HTMLElement;
+      const store = TestBed.inject(ChatStore);
+      const before = store.conversations().length;
+      openModal(el);
+
+      const newGroup = Array.from(
+        el.querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]'),
+      ).find((b) => b.textContent?.trim() === 'New group');
+      newGroup?.click();
+      fixture.detectChanges();
+
+      expect(el.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
+      expect(store.conversations().length).toBe(before);
+      expect(navSpy).not.toHaveBeenCalled();
+    });
   });
 });

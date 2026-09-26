@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { ChatStore, THREADED_CONTACT_ID } from './chat.store';
+import { ChatStore, THREADED_CONTACT_ID, CONTACT_SUBTITLE } from './chat.store';
 import { ChatPreview } from '../features/chat-list/chat.model';
 import { CHAT_SEED } from '../features/chat-list/chat-list.seed';
 import { CHAT_SEED as THREAD_SEED } from '../features/chat-window/chat-window.seed';
@@ -73,6 +73,48 @@ describe('ChatStore', () => {
   it('setConversations overrides the list', () => {
     store.setConversations([]);
     expect(store.conversations().length).toBe(0);
+  });
+
+  it('createConversation appends an empty-thread conversation with a unique id', () => {
+    const id1 = store.createConversation();
+    const id2 = store.createConversation();
+    expect(id1).toBe('chat-new-1');
+    expect(id2).toBe('chat-new-2');
+
+    const conversations = store.conversations();
+    expect(conversations.length).toBe(CHAT_SEED.length + 2);
+    const created = conversations.find((c) => c.id === id2) as ChatPreview;
+    expect(created.contactName).toBe('New contact');
+    expect(created.preview).toBe('');
+    expect(created.read).toBe(true);
+    expect(store.conversationMessages(id2)).toEqual([]);
+  });
+
+  it('createConversation accepts a custom contact name', () => {
+    const id = store.createConversation('Sam');
+    expect(store.conversations().find((c) => c.id === id)?.contactName).toBe('Sam');
+  });
+
+  it('a created conversation supports sending and contact lookup', () => {
+    const id = store.createConversation();
+    store.sendMessage(id, 'hi!');
+
+    const thread = store.conversationMessages(id);
+    expect(thread.length).toBe(1);
+    expect(thread[0].sender).toBe('outgoing');
+    expect(store.conversations().find((c) => c.id === id)?.preview).toBe('hi!');
+
+    expect(store.contact(id)?.name).toBe('New contact');
+    expect(store.contact(id)?.subtitle).toBe(CONTACT_SUBTITLE);
+    expect(store.contact(THREADED_CONTACT_ID)?.name).toBe('Martha Craig');
+    expect(store.contact('chat-404')).toBeNull();
+  });
+
+  it('reset clears created conversations and the id counter', () => {
+    const id = store.createConversation();
+    store.reset();
+    expect(store.conversations().find((c) => c.id === id)).toBeUndefined();
+    expect(store.createConversation()).toBe('chat-new-1');
   });
 
   it('reset restores the seeded state', () => {

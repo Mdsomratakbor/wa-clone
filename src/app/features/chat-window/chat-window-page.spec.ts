@@ -141,6 +141,25 @@ describe('ChatWindowPage', () => {
     expect(store.conversations().find((c) => c.id === 'chat-001')?.read).toBe(false);
   });
 
+  it('renders a created conversation with its name and an empty thread', async () => {
+    await TestBed.resetTestingModule();
+    await TestBed.configureTestingModule({
+      imports: [ChatWindowPage],
+      providers: [
+        { provide: ActivatedRoute, useValue: stubRoute('chat-new-1') },
+        { provide: Router, useValue: { navigate: navSpy } },
+      ],
+    }).compileComponents();
+    const store = TestBed.inject(ChatStore);
+    store.createConversation();
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.chat-header__name')?.textContent).toBe('New contact');
+    expect(el.querySelectorAll('app-message-bubble').length).toBe(0);
+  });
+
   it('does not render the chat actions sheet when closed', () => {
     fixture = TestBed.createComponent(ChatWindowPage);
     fixture.detectChanges();
