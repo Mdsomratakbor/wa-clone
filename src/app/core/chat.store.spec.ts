@@ -245,4 +245,32 @@ describe('ChatStore', () => {
     store.reset();
     expect(store.isStarred(THREADED_CONTACT_ID, 'msg-007')).toBe(false);
   });
+
+  it('updateContact sets name and phone, trims and persists', () => {
+    store.updateContact(THREADED_CONTACT_ID, '  Martha Craig II  ', '  +1 555-0100 ');
+
+    const chat = store.conversations().find((c) => c.id === THREADED_CONTACT_ID) as ChatPreview;
+    expect(chat.contactName).toBe('Martha Craig II');
+    expect(chat.phone).toBe('+1 555-0100');
+    expect(store.contactName(THREADED_CONTACT_ID)).toBe('Martha Craig II');
+    expect(store.contactPhone(THREADED_CONTACT_ID)).toBe('+1 555-0100');
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const reloaded = TestBed.inject(ChatStore);
+    store = reloaded;
+    expect(reloaded.contactName(THREADED_CONTACT_ID)).toBe('Martha Craig II');
+    expect(reloaded.contactPhone(THREADED_CONTACT_ID)).toBe('+1 555-0100');
+  });
+
+  it('updateContact keeps the existing name when the new name is blank', () => {
+    store.updateContact(THREADED_CONTACT_ID, '   ', '555');
+    expect(store.contactName(THREADED_CONTACT_ID)).toBe('Martha Craig');
+    expect(store.contactPhone(THREADED_CONTACT_ID)).toBe('555');
+  });
+
+  it('contactName and contactPhone fall back for unknown chats', () => {
+    expect(store.contactName('chat-404')).toBe('Contact');
+    expect(store.contactPhone('chat-404')).toBe('');
+  });
 });

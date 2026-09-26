@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { ContactPage } from './contact-page';
+import { ChatStore } from '../../core/chat.store';
 import { CONTACT_ROWS } from './contact-info.seed';
 
 describe('ContactPage', () => {
@@ -10,6 +11,7 @@ describe('ContactPage', () => {
       imports: [ContactPage],
       providers: [provideRouter([{ path: 'contact/:id', component: ContactPage }])],
     }).compileComponents();
+    TestBed.inject(ChatStore).reset();
   });
 
   async function render(id: string): Promise<{ el: HTMLElement; router: Router }> {
@@ -32,11 +34,22 @@ describe('ContactPage', () => {
     );
   });
 
-  it('renders the hero with the contact name from the chat seed', async () => {
+  it('renders the hero with the contact name from the store', async () => {
     const { el } = await render('chat-006');
     expect(el.querySelector('[data-testid="contact-hero"]')).not.toBeNull();
     expect(el.querySelector('[data-testid="contact-name"]')?.textContent?.trim()).toBe(
       'Martha Craig',
+    );
+  });
+
+  it('reflects a store-side rename on title and hero', async () => {
+    TestBed.inject(ChatStore).updateContact('chat-006', 'Martha Craig II', '+1 555');
+    const { el } = await render('chat-006');
+    expect(el.querySelector('.navigation-bar__title')?.textContent?.trim()).toBe(
+      'Martha Craig II',
+    );
+    expect(el.querySelector('[data-testid="contact-name"]')?.textContent?.trim()).toBe(
+      'Martha Craig II',
     );
   });
 
@@ -70,10 +83,31 @@ describe('ContactPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/contact', 'chat-006', 'edit']);
   });
 
-  it('row and Messages actions are no-ops', async () => {
-    const { el } = await render('chat-001');
-    el.querySelectorAll<HTMLButtonElement>('[data-testid="contact-row"]')[0]?.click();
+  it('Messages opens the chat and marks it read', async () => {
+    const { el, router } = await render('chat-001');
+    spyOn(router, 'navigate').and.resolveTo(true);
     el.querySelector<HTMLButtonElement>('[data-testid="contact-messages"]')?.click();
-    expect(el.querySelector('[data-testid="contact-page"]')).not.toBeNull();
+    expect(router.navigate).toHaveBeenCalledWith(['/chat', 'chat-001']);
+    expect(TestBed.inject(ChatStore).conversations().find((c) => c.id === 'chat-001')?.read).toBe(
+      true,
+    );
+  });
+
+  it('the Starred messages row routes to /starred-messages', async () => {
+    const { el, router } = await render('chat-001');
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const rows = [...el.querySelectorAll<HTMLButtonElement>('[data-testid="contact-row"]')];
+    const starred = rows.find((r) => r.getAttribute('aria-label') === 'Starred messages');
+    starred?.click();
+    expect(router.navigate).toHaveBeenCalledWith(['/starred-messages']);
+  });
+
+  it('Media/Groups rows remain no-ops', async () => {
+    const { el, router } = await render('chat-001');
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const rows = [...el.querySelectorAll<HTMLButtonElement>('[data-testid="contact-row"]')];
+    rows[0]?.click(); // Media, photos and links
+    rows[1]?.click(); // Groups
+    expect(router.navigate).not.toHaveBeenCalled();
   });
 });
