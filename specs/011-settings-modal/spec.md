@@ -66,6 +66,11 @@ To be filled from the `0:9778` payload (mirrors 008 research format):
 - **FR-003**: Dismissal via the design's affordances; focus returns to the trigger; no route
   change while opening/closing.
 - **FR-004**: Selecting a row emits its `id` (target flows are out of scope).
+
+> **Drift note (F-029, 2026-09-26)**: Selecting a row now also navigates where a target screen
+> exists: **Notifications** → `/settings/notifications` (F-017), **Storage** →
+> `/settings/data-storage` (F-018), both closing the sheet (focus returns to the trigger).
+> **More** remains an open-sheet no-op. See `specs/029-settings-overflow`.
 - **FR-005**: No horizontal overflow at any breakpoint (same responsive contract as 006-010).
 
 ## Non-Goals (later features)

@@ -56,6 +56,12 @@ To be filled from the `0:9198` payload:
   top-level screens.
 - **FR-003**: Back returns to `/starred-messages` (existing contract).
 - **FR-004**: Row activation is a no-op (sub-pages are later features).
+
+> **Drift note (F-029, 2026-09-26)**: The Settings overflow sheet rows are no longer all
+> no-ops — Notifications/Storage route to their existing screens (F-017/F-018). The main list
+> rows (Account/Chats Settings/Notifications/Data and Storage) and profile have routed since
+> F-014/016/017/018/020; only "Contacts" (row 21-adjacent) and the sheet's "More" stay no-ops.
+> See `specs/029-settings-overflow`.
 - **FR-005**: The 011 Settings Modal still opens from `settings-options` with backdrop/Escape
   dismiss + focus return (contract unchanged); modal state preserved 1:1.
 - **FR-006**: No horizontal overflow at any breakpoint.
