@@ -160,12 +160,40 @@ describe('SettingsPage', () => {
     expect(rows.map((r) => r.textContent?.trim())).toEqual(['Notifications', 'Storage', 'More']);
   });
 
-  it('keeps the sheet open when a row is activated (targets are later features)', () => {
+  it('routes to /settings/notifications from the overflow Notifications row and closes the sheet', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
     el.querySelector<HTMLButtonElement>('[data-testid="settings-options"]')?.click();
     fixture.detectChanges();
     el.querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[0]?.click();
     fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/settings/notifications']);
+    expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+    expect(document.activeElement).toBe(el.querySelector('[data-testid="settings-options"]'));
+  });
+
+  it('routes to /settings/data-storage from the overflow Storage row and closes the sheet', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+    el.querySelector<HTMLButtonElement>('[data-testid="settings-options"]')?.click();
+    fixture.detectChanges();
+    el.querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[1]?.click();
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/settings/data-storage']);
+    expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+  });
+
+  it('keeps the sheet open with no navigation for the More row', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+    el.querySelector<HTMLButtonElement>('[data-testid="settings-options"]')?.click();
+    fixture.detectChanges();
+    el.querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[2]?.click();
+    fixture.detectChanges();
+    expect(router.navigate).not.toHaveBeenCalled();
     expect(el.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
   });
 
