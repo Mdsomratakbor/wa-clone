@@ -45,13 +45,13 @@ test.describe('Settings screen (US1)', () => {
 });
 
 test.describe('Settings routing (US2)', () => {
-  test('Account, Chats Settings and Notifications rows navigate; a later row is a no-op; Back returns', async ({
+  test('Account, Chats Settings, Notifications and Data & Storage rows navigate; last row is a no-op; Back returns', async ({
     page,
   }) => {
     await page.goto('/settings');
     await page.getByTestId('settings-page').waitFor();
 
-    await page.getByTestId('settings-row').nth(3).click();
+    await page.getByTestId('settings-row').nth(4).click();
     await expect(page.getByTestId('settings-page')).toBeVisible();
 
     await page.getByTestId('settings-row').first().click();
@@ -73,6 +73,14 @@ test.describe('Settings routing (US2)', () => {
     await page.getByTestId('settings-row').nth(2).click();
     await expect(page).toHaveURL(/\/settings\/notifications$/);
     await page.getByTestId('notifications-page').waitFor();
+
+    await page.getByRole('button', { name: 'Back' }).click();
+    await expect(page).toHaveURL(/\/settings$/);
+    await page.getByTestId('settings-page').waitFor();
+
+    await page.getByTestId('settings-row').nth(3).click();
+    await expect(page).toHaveURL(/\/settings\/data-storage$/);
+    await page.getByTestId('data-storage-page').waitFor();
 
     await page.getByRole('button', { name: 'Back' }).click();
     await expect(page).toHaveURL(/\/settings$/);

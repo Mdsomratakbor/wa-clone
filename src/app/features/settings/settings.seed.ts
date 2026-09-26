@@ -51,3 +51,13 @@ export const NOTIFICATIONS_ROWS: readonly SettingsRowSeed[] = [
   { id: 'notifications-light', label: 'Light' },
   { id: 'notifications-previews', label: 'Show previews' },
 ];
+
+export const DATA_STORAGE_ROWS: readonly SettingsRowSeed[] = [
+  { id: 'ds-storage-usage', label: 'Storage usage' },
+  { id: 'ds-auto-download', label: 'Media auto-download' },
+  { id: 'ds-images', label: 'Images' },
+  { id: 'ds-audio', label: 'Audio' },
+  { id: 'ds-videos', label: 'Videos' },
+  { id: 'ds-documents', label: 'Documents' },
+  { id: 'ds-network-usage', label: 'Network usage' },
+];

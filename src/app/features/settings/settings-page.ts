@@ -91,7 +91,12 @@ export class SettingsPage {
       void this.router.navigate(['/settings/notifications']);
       return;
     }
-    // F-013: remaining row targets (rows 18-20) are later features.
+    if (row.id === 'data-storage') {
+      // F-018: Data & Storage screen (design-map row 18).
+      void this.router.navigate(['/settings/data-storage']);
+      return;
+    }
+    // F-013: remaining row target (Contacts, row 21-adjacent) is a later feature.
   }
 
   protected onSettingsOptions(): void {

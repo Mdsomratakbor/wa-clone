@@ -53,6 +53,11 @@ export const routes: Routes = [
       import('./features/settings/notifications-page').then((m) => m.NotificationsPage),
   },
   {
+    path: 'settings/data-storage',
+    loadComponent: () =>
+      import('./features/settings/data-storage-page').then((m) => m.DataStoragePage),
+  },
+  {
     path: 'contact/:id',
     loadComponent: () =>
       import('./features/contact-info/contact-page').then((m) => m.ContactPage),
