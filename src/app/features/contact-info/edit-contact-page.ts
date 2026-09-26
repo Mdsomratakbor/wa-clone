@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ChatStore } from '../../core/chat.store';
 import { NavAction } from '../chat-list/chat.model';
 import { NavigationBar } from '../../shared/components/navigation-bar/navigation-bar';
-import { CHAT_SEED } from '../chat-list/chat-list.seed';
 
 @Component({
   selector: 'app-edit-contact-page',
@@ -14,12 +14,12 @@ import { CHAT_SEED } from '../chat-list/chat-list.seed';
 export class EditContactPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly store = inject(ChatStore);
 
-  protected readonly chatId = computed(() => this.route.snapshot.paramMap.get('id') ?? '');
-  protected readonly name = computed(() => {
-    const chat = CHAT_SEED.find((c) => c.id === this.chatId());
-    return chat?.contactName ?? 'Contact';
-  });
+  private readonly chatId = this.route.snapshot.paramMap.get('id') ?? '';
+
+  protected readonly nameDraft = signal(this.store.contactName(this.chatId));
+  protected readonly phoneDraft = signal(this.store.contactPhone(this.chatId));
 
   protected readonly leadingActions: readonly NavAction[] = [
     { id: 'back', label: 'Back', icon: 'back' },
@@ -27,11 +27,12 @@ export class EditContactPage {
 
   protected onNavAction(id: string): void {
     if (id === 'back') {
-      void this.router.navigate(['/contact', this.chatId()]);
+      void this.router.navigate(['/contact', this.chatId]);
     }
   }
 
   protected onSave(): void {
-    // F-019: persistence is a later feature / map-external.
+    this.store.updateContact(this.chatId, this.nameDraft(), this.phoneDraft());
+    void this.router.navigate(['/contact', this.chatId]);
   }
 }

@@ -148,6 +148,28 @@ export class ChatStore {
     };
   }
 
+  contactName(chatId: string): string {
+    return this.conversations().find((c) => c.id === chatId)?.contactName ?? 'Contact';
+  }
+
+  contactPhone(chatId: string): string {
+    return this.conversations().find((c) => c.id === chatId)?.phone ?? '';
+  }
+
+  updateContact(chatId: string, name: string, phone?: string): void {
+    this.conversations.update((chats) =>
+      chats.map((chat) => {
+        if (chat.id !== chatId) {
+          return chat;
+        }
+        const trimmedName = name.trim() || chat.contactName;
+        const trimmedPhone = phone?.trim() ?? '';
+        return { ...chat, contactName: trimmedName, phone: trimmedPhone };
+      }),
+    );
+    this.persist();
+  }
+
   setConversations(list: readonly ChatPreview[]): void {
     this.conversations.set(list);
     this.persist();
