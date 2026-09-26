@@ -122,8 +122,13 @@ export class ChatsPage {
     this.modalOpen.set(true);
   }
 
-  protected onAddModalAction(_id: string): void {
-    // Row targets (new group / contact / community) are later features (spec Non-Goals).
+  protected onAddModalAction(id: string): void {
+    // F-009 targets (new group / community) are later features (spec Non-Goals).
+    if (id === 'new-contact') {
+      this.onDismissModal();
+      const chatId = this.store.createConversation();
+      void this.router.navigate(['/chat', chatId]);
+    }
   }
 
   protected onDismissModal(): void {

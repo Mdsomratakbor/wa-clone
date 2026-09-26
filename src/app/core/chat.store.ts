@@ -2,9 +2,10 @@ import { Injectable, signal } from '@angular/core';
 import { ChatPreview } from '../features/chat-list/chat.model';
 import { CHAT_SEED } from '../features/chat-list/chat-list.seed';
 import { CHAT_SEED as THREAD_SEED } from '../features/chat-window/chat-window.seed';
-import { Message } from '../features/chat-window/chat-window.model';
+import { ContactHeader, Message } from '../features/chat-window/chat-window.model';
 
 export const THREADED_CONTACT_ID = 'chat-006';
+export const CONTACT_SUBTITLE = 'tap here for contact info';
 
 let messageSequence = 1000;
 
@@ -26,6 +27,8 @@ function normalizeChats(seed: readonly ChatPreview[]): readonly ChatPreview[] {
 
 @Injectable({ providedIn: 'root' })
 export class ChatStore {
+  private newChatCounter = 0;
+
   readonly conversations = signal<readonly ChatPreview[]>(normalizeChats(CHAT_SEED));
 
   readonly threads = signal<Readonly<Record<string, readonly Message[]>>>({
@@ -34,6 +37,34 @@ export class ChatStore {
 
   conversationMessages(chatId: string): readonly Message[] {
     return this.threads()[chatId] ?? [];
+  }
+
+  createConversation(name = 'New contact'): string {
+    this.newChatCounter += 1;
+    const id = `chat-new-${this.newChatCounter}`;
+    const chat: ChatPreview = {
+      id,
+      contactName: name,
+      preview: '',
+      timestamp: nowTime(),
+      avatarRef: null,
+      read: true,
+    };
+    this.conversations.update((chats) => [...chats, chat]);
+    this.threads.update((threads) => ({ ...threads, [id]: [] }));
+    return id;
+  }
+
+  contact(chatId: string): ContactHeader | null {
+    const chat = this.conversations().find((c) => c.id === chatId);
+    if (!chat) {
+      return null;
+    }
+    return {
+      name: chat.contactName,
+      subtitle: CONTACT_SUBTITLE,
+      avatarRef: chat.avatarRef,
+    };
   }
 
   setConversations(list: readonly ChatPreview[]): void {
@@ -76,6 +107,7 @@ export class ChatStore {
   }
 
   reset(): void {
+    this.newChatCounter = 0;
     this.conversations.set(normalizeChats(CHAT_SEED));
     this.threads.set({ [THREADED_CONTACT_ID]: THREAD_SEED });
   }

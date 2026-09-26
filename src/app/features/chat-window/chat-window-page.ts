@@ -15,6 +15,7 @@ import { Composer } from '../../shared/components/composer/composer';
 import { MessageBubble } from '../../shared/components/message-bubble/message-bubble';
 import { ChatActionsModal } from './chat-actions-modal';
 import { CHAT_CONTACT, DATE_CHIP_LABEL } from './chat-window.seed';
+import { ContactHeader } from './chat-window.model';
 
 @Component({
   selector: 'app-chat-window-page',
@@ -30,7 +31,9 @@ export class ChatWindowPage {
   private readonly header = viewChild(ChatHeader);
   private readonly thread = viewChild<ElementRef<HTMLDivElement>>('thread');
 
-  protected readonly contact = CHAT_CONTACT;
+  protected readonly contact = computed<ContactHeader>(() =>
+    this.store.contact(this.chatId()) ?? CHAT_CONTACT,
+  );
   protected readonly dateChip = DATE_CHIP_LABEL;
   protected readonly chatActionsOpen = signal(false);
 
