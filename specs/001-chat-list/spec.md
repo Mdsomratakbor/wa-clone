@@ -98,6 +98,13 @@ As a user I can reach the `Edit`, `Broadcast Lists`, and `New Group` actions fro
 - **FR-007**: Data MUST be static seed data (no backend). The 9 seeded conversations MUST replicate the Figma contact names/previews/timestamps exactly (owner-approved 2026-09-23).
 - **FR-008**: Chats screen MUST be the default route (`/` → chats).
 - **FR-009**: When the conversation list is empty, the app MUST display a centered "No chats" empty placeholder.
+
+> **Drift note (F-028, 2026-09-26)**: The Chats tab now hosts a **search bar** (`data-testid="chat-search"`,
+> filters by contact name/preview, case-insensitive) and a **sort segment** (Recent/Name/Unread,
+> chosen option persisted via `PrefsStore`, `wa.prefs.v1` v2). A no-match query shows a distinct
+> "No chats found" placeholder; search/sort are hidden in edit mode and on other tabs. See
+> `specs/028-chats-search-sort`. G1: the new chrome means the `0-8855` golden needs re-capture
+> when Figma/playwright unblock (coarse `0.3` ratio guard may absorb it in the interim).
 - **FR-010**: The tab bar MUST expose active-state toggling only in 001; selecting a non-chats tab MUST show a "coming soon" stub. Full routing is a later feature.
 - **FR-011**: The UI MUST adapt responsively to viewports wider than 375px per breakpoints defined in `plan.md` (owner-approved adaptation; overrides design-map mobile-only assumption).
 
