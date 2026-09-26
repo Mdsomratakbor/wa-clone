@@ -12,7 +12,7 @@ test.describe('Contact info entry (US1)', () => {
 });
 
 test.describe('Contact info screen (US2)', () => {
-  test('renders chrome: Back leading, contact name title, no tab bar', async ({ page }) => {
+  test('renders chrome: Back leading, Edit trailing, contact name title, no tab bar', async ({ page }) => {
     await page.goto('/contact/chat-006');
     await page.getByTestId('contact-page').waitFor();
     await expect(page.getByRole('button', { name: 'Back' })).toBeVisible();
@@ -20,6 +20,9 @@ test.describe('Contact info screen (US2)', () => {
       page
         .getByTestId('navigation-bar')
         .getByRole('heading', { name: 'Martha Craig' }),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId('navigation-bar').getByRole('button', { name: 'Edit' }),
     ).toBeVisible();
     await expect(page.getByTestId('tab-bar')).toHaveCount(0);
   });

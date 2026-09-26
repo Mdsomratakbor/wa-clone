@@ -236,4 +236,16 @@ test.describe('Responsive adaptation (owner-approved drift)', () => {
       expect(overflow, `${vp.name} data storage screen should not overflow`).toBe(false);
     }
   });
+
+  test('edit contact screen never overflows horizontally at any breakpoint', async ({ page }) => {
+    for (const vp of BREAKPOINTS) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto('/contact/chat-001/edit');
+      await page.getByTestId('edit-contact-page').waitFor();
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      );
+      expect(overflow, `${vp.name} edit contact screen should not overflow`).toBe(false);
+    }
+  });
 });

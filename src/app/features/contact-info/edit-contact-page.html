@@ -1,0 +1,35 @@
+<app-navigation-bar
+  title="Edit Contact"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="edit-contact" data-testid="edit-contact-page">
+  <div class="edit-contact__form">
+    <label class="edit-contact__field">
+      <span class="edit-contact__label">Name</span>
+      <input
+        class="edit-contact__input"
+        data-testid="edit-contact-name"
+        type="text"
+        [value]="name()"
+        aria-label="Name"
+      />
+    </label>
+
+    <label class="edit-contact__field">
+      <span class="edit-contact__label">Phone</span>
+      <input
+        class="edit-contact__input"
+        data-testid="edit-contact-phone"
+        type="tel"
+        placeholder="Phone number"
+        aria-label="Phone"
+      />
+    </label>
+
+    <button type="button" class="edit-contact__save" data-testid="edit-contact-save" (click)="onSave()">
+      Save
+    </button>
+  </div>
+</main>

@@ -21,11 +21,12 @@ describe('ContactPage', () => {
     };
   }
 
-  it('renders the header: Back leading, contact name title', async () => {
+  it('renders the header: Back leading, Edit trailing, contact name title', async () => {
     const { el } = await render('chat-001');
     const actions = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')];
-    expect(actions.length).toBe(1);
+    expect(actions.length).toBe(2);
     expect(actions[0]?.textContent?.trim()).toBe('Back');
+    expect(actions[1]?.textContent?.trim()).toBe('Edit');
     expect(el.querySelector('.navigation-bar__title')?.textContent?.trim()).toBe(
       'Maximillian Jacobson',
     );
@@ -59,6 +60,14 @@ describe('ContactPage', () => {
     spyOn(router, 'navigate').and.resolveTo(true);
     (el.querySelector('.navigation-bar__action') as HTMLButtonElement).click();
     expect(router.navigate).toHaveBeenCalledWith(['/chat', 'chat-006']);
+  });
+
+  it('navigates to /contact/:id/edit when Edit is activated (feature 019)', async () => {
+    const { el, router } = await render('chat-006');
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const actions = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')];
+    actions[1]?.click();
+    expect(router.navigate).toHaveBeenCalledWith(['/contact', 'chat-006', 'edit']);
   });
 
   it('row and Messages actions are no-ops', async () => {

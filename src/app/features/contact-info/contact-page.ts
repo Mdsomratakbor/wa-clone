@@ -29,9 +29,18 @@ export class ContactPage {
     { id: 'back', label: 'Back', icon: 'back' },
   ];
 
+  protected readonly trailingActions: readonly NavAction[] = [
+    { id: 'edit', label: 'Edit' },
+  ];
+
   protected onNavAction(id: string): void {
     if (id === 'back') {
       void this.router.navigate(['/chat', this.chatId()]);
+      return;
+    }
+    if (id === 'edit') {
+      // F-019: Edit Contact screen (design-map row 19; entry is a declared hypothesis).
+      void this.router.navigate(['/contact', this.chatId(), 'edit']);
     }
   }
 
