@@ -113,6 +113,15 @@ describe('SettingsPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/settings/data-storage']);
   });
 
+  it('routes to /settings/profile from the profile header tap (feature 020)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+    el.querySelector<HTMLButtonElement>('[data-testid="settings-profile"]')?.click();
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/settings/profile']);
+  });
+
   it('other row activation is a no-op (sub-pages are later features)', () => {
     const el = render();
     el.querySelectorAll<HTMLButtonElement>('[data-testid="settings-row"]')[4]?.click();

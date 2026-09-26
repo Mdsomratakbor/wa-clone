@@ -103,6 +103,11 @@ export class SettingsPage {
     this.settingsModalOpen.set(true);
   }
 
+  protected onProfileTap(): void {
+    // F-020: Edit Profile screen (design-map row 20).
+    void this.router.navigate(['/settings/profile']);
+  }
+
   protected onSettingsAction(_id: string): void {
     // F-011: row targets (notifications / storage / more) are later features.
   }

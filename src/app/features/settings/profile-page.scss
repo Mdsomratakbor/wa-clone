@@ -1,0 +1,68 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.profile {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--wa-surface);
+}
+
+.profile__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 16px;
+}
+
+.profile__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.profile__label {
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-preview);
+  font-weight: var(--wa-fw-medium);
+  color: var(--wa-text-secondary);
+}
+
+.profile__input {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--wa-border);
+  border-radius: 6px;
+  background: var(--wa-surface-variant);
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-preview);
+  color: var(--wa-text-primary);
+
+  &:focus-visible {
+    outline: 2px solid var(--wa-accent);
+    outline-offset: 1px;
+  }
+}
+
+.profile__save {
+  align-self: flex-start;
+  min-width: 120px;
+  height: 44px;
+  border: 0;
+  border-radius: 22px;
+  background: var(--wa-accent);
+  color: var(--wa-surface-variant);
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-preview);
+  font-weight: var(--wa-fw-medium);
+  cursor: pointer;
+  appearance: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--wa-accent);
+    outline-offset: 2px;
+  }
+}

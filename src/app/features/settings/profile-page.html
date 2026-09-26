@@ -1,0 +1,35 @@
+<app-navigation-bar
+  title="Edit Profile"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="profile" data-testid="profile-page">
+  <div class="profile__form">
+    <label class="profile__field">
+      <span class="profile__label">Name</span>
+      <input
+        class="profile__input"
+        data-testid="profile-name"
+        type="text"
+        [value]="profile.name"
+        aria-label="Name"
+      />
+    </label>
+
+    <label class="profile__field">
+      <span class="profile__label">About</span>
+      <input
+        class="profile__input"
+        data-testid="profile-about"
+        type="text"
+        placeholder="About"
+        aria-label="About"
+      />
+    </label>
+
+    <button type="button" class="profile__save" data-testid="profile-save" (click)="onSave()">
+      Save
+    </button>
+  </div>
+</main>

@@ -14,7 +14,10 @@ test.describe('Settings screen (US1)', () => {
   test('renders profile header and the settings rows', async ({ page }) => {
     await page.goto('/settings');
     await page.getByTestId('settings-page').waitFor();
-    await expect(page.getByTestId('settings-profile')).toBeVisible();
+    await expect(page.getByTestId('settings-profile')).toHaveAttribute(
+      'aria-label',
+      'Edit profile',
+    );
     await expect(page.getByTestId('settings-name')).toContainText('Ani');
 
     const rows = page.getByTestId('settings-row');

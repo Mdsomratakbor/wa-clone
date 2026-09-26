@@ -248,4 +248,16 @@ test.describe('Responsive adaptation (owner-approved drift)', () => {
       expect(overflow, `${vp.name} edit contact screen should not overflow`).toBe(false);
     }
   });
+
+  test('edit profile screen never overflows horizontally at any breakpoint', async ({ page }) => {
+    for (const vp of BREAKPOINTS) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto('/settings/profile');
+      await page.getByTestId('profile-page').waitFor();
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      );
+      expect(overflow, `${vp.name} edit profile screen should not overflow`).toBe(false);
+    }
+  });
 });

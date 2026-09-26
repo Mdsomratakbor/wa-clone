@@ -58,6 +58,10 @@ export const routes: Routes = [
       import('./features/settings/data-storage-page').then((m) => m.DataStoragePage),
   },
   {
+    path: 'settings/profile',
+    loadComponent: () => import('./features/settings/profile-page').then((m) => m.ProfilePage),
+  },
+  {
     path: 'contact/:id',
     loadComponent: () =>
       import('./features/contact-info/contact-page').then((m) => m.ContactPage),
