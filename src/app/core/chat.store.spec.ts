@@ -195,4 +195,54 @@ describe('ChatStore', () => {
     store.reset();
     expect(window.localStorage.getItem(PERSISTENCE_KEY)).toBeNull();
   });
+
+  it('toggleStarred adds, queries and removes star keys', () => {
+    expect(store.isStarred(THREADED_CONTACT_ID, 'msg-007')).toBe(false);
+    store.toggleStarred(THREADED_CONTACT_ID, 'msg-007');
+    expect(store.isStarred(THREADED_CONTACT_ID, 'msg-007')).toBe(true);
+    store.toggleStarred(THREADED_CONTACT_ID, 'msg-007');
+    expect(store.isStarred(THREADED_CONTACT_ID, 'msg-007')).toBe(false);
+  });
+
+  it('derives starred entries with contact, text and time', () => {
+    store.toggleStarred(THREADED_CONTACT_ID, 'msg-007');
+    store.toggleStarred(THREADED_CONTACT_ID, 'msg-001');
+
+    const entries = store.starredEntries();
+    expect(entries.length).toBe(2);
+    expect(entries[0]).toEqual({
+      chatId: THREADED_CONTACT_ID,
+      messageId: 'msg-007',
+      contactName: 'Martha Craig',
+      text: 'Do you know what time is it?',
+      time: '11:40',
+    });
+    expect(entries[1].messageId).toBe('msg-001');
+  });
+
+  it('drops starred entries whose message no longer exists', () => {
+    store.toggleStarred(THREADED_CONTACT_ID, 'msg-013');
+    store.toggleStarred(THREADED_CONTACT_ID, 'ghost-404');
+    const entries = store.starredEntries();
+    expect(entries.length).toBe(1);
+    expect(entries[0].messageId).toBe('msg-013');
+  });
+
+  it('persists starred state across a reload', () => {
+    store.toggleStarred(THREADED_CONTACT_ID, 'msg-007');
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const reloaded = TestBed.inject(ChatStore);
+    store = reloaded;
+
+    expect(reloaded.isStarred(THREADED_CONTACT_ID, 'msg-007')).toBe(true);
+    expect(reloaded.starredEntries().length).toBe(1);
+  });
+
+  it('reset clears starred state', () => {
+    store.toggleStarred(THREADED_CONTACT_ID, 'msg-007');
+    store.reset();
+    expect(store.isStarred(THREADED_CONTACT_ID, 'msg-007')).toBe(false);
+  });
 });

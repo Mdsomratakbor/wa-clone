@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { StarredPage } from './starred-page';
+import { ChatStore } from '../../core/chat.store';
 
 describe('StarredPage', () => {
   let fixture: ComponentFixture<StarredPage>;
@@ -10,6 +11,7 @@ describe('StarredPage', () => {
       imports: [StarredPage],
       providers: [provideRouter([])],
     }).compileComponents();
+    TestBed.inject(ChatStore).reset();
   });
 
   function render(): HTMLElement {
@@ -51,5 +53,34 @@ describe('StarredPage', () => {
     (el.querySelector('.navigation-bar__action') as HTMLButtonElement).click();
     fixture.detectChanges();
     expect(router.navigate).toHaveBeenCalledWith(['/settings']);
+  });
+
+  it('replaces the tip with starred rows and navigates to the chat on tap', () => {
+    const store = TestBed.inject(ChatStore);
+    store.toggleStarred('chat-006', 'msg-007');
+    store.toggleStarred('chat-006', 'msg-001');
+    const router = TestBed.inject(Router);
+    const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+
+    const el = render();
+    expect(el.querySelector('[data-testid="starred-tip"]')).toBeNull();
+    const rows = el.querySelectorAll('[data-testid="starred-row"]');
+    expect(rows.length).toBe(2);
+    expect(el.querySelector('.starred__name')?.textContent).toBe('Martha Craig');
+    expect(el.querySelector('.starred__text')?.textContent).toBe(
+      'Do you know what time is it?',
+    );
+    expect(el.querySelector('.starred__time')?.textContent).toBe('11:40');
+    expect(el.querySelector('.starred__star')).not.toBeNull();
+
+    (rows[0] as HTMLElement).click();
+    fixture.detectChanges();
+    expect(navSpy).toHaveBeenCalledWith(['/chat', 'chat-006']);
+  });
+
+  it('keeps the empty-state tip when nothing is starred', () => {
+    const el = render();
+    expect(el.querySelector('[data-testid="starred-tip"]')).not.toBeNull();
+    expect(el.querySelector('[data-testid="starred-list"]')).toBeNull();
   });
 });

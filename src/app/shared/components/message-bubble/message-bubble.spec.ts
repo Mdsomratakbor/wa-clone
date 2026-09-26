@@ -74,4 +74,62 @@ describe('MessageBubble', () => {
     expect(el.querySelector('.message-bubble__file-ext')?.textContent).toBe('png');
     expect(el.querySelector('.message-bubble__text')).toBeNull();
   });
+
+  it('shows the star badge only when starred', () => {
+    fixture = TestBed.createComponent(MessageBubble);
+    fixture.componentRef.setInput('message', OUTGOING);
+    fixture.componentRef.setInput('starred', true);
+    fixture.detectChanges();
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('[data-testid="star-badge"]'),
+    ).not.toBeNull();
+
+    fixture.componentRef.setInput('starred', false);
+    fixture.detectChanges();
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('[data-testid="star-badge"]'),
+    ).toBeNull();
+  });
+
+  it('emits the message id on hold after the hold duration and not for quick taps', () => {
+    jasmine.clock().install();
+    try {
+      fixture = TestBed.createComponent(MessageBubble);
+      fixture.componentRef.setInput('message', OUTGOING);
+      fixture.detectChanges();
+      const bubble = (fixture.nativeElement as HTMLElement).querySelector('.message-bubble')!;
+      let emitted: string | undefined;
+      fixture.componentInstance.star.subscribe((id: string) => (emitted = id));
+
+      bubble.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      jasmine.clock().tick(549);
+      expect(emitted).toBeUndefined();
+      jasmine.clock().tick(2);
+      expect(emitted).toBe('msg-001');
+
+      // quick tap: start + release before the hold duration
+      emitted = undefined;
+      bubble.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      bubble.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+      jasmine.clock().tick(600);
+      expect(emitted).toBeUndefined();
+    } finally {
+      jasmine.clock().uninstall();
+    }
+  });
+
+  it('emits the message id on right-click and prevents the context menu', () => {
+    fixture = TestBed.createComponent(MessageBubble);
+    fixture.componentRef.setInput('message', INCOMING);
+    fixture.detectChanges();
+    const bubble = (fixture.nativeElement as HTMLElement).querySelector('.message-bubble')!;
+    let emitted: string | undefined;
+    fixture.componentInstance.star.subscribe((id: string) => (emitted = id));
+
+    const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+    bubble.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(emitted).toBe('msg-002');
+  });
 });

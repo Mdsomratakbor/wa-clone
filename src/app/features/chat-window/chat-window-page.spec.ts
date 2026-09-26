@@ -141,6 +141,35 @@ describe('ChatWindowPage', () => {
     expect(store.conversations().find((c) => c.id === 'chat-001')?.read).toBe(false);
   });
 
+  it('stars and unstars a message via a long-press on its bubble', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const store = TestBed.inject(ChatStore);
+    const bubble = el.querySelector('[data-testid="bubble-msg-007"]') as HTMLElement;
+
+    jasmine.clock().install();
+    try {
+      bubble.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      jasmine.clock().tick(600);
+      fixture.detectChanges();
+      expect(store.isStarred('chat-006', 'msg-007')).toBe(true);
+      expect(
+        el.querySelector('[data-testid="bubble-msg-007"] [data-testid="star-badge"]'),
+      ).not.toBeNull();
+
+      bubble.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      jasmine.clock().tick(600);
+      fixture.detectChanges();
+      expect(store.isStarred('chat-006', 'msg-007')).toBe(false);
+      expect(
+        el.querySelector('[data-testid="bubble-msg-007"] [data-testid="star-badge"]'),
+      ).toBeNull();
+    } finally {
+      jasmine.clock().uninstall();
+    }
+  });
+
   it('renders a created conversation with its name and an empty thread', async () => {
     await TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
