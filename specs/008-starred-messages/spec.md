@@ -9,6 +9,12 @@
 Clarifications 1-5 approved; deviations: tip avatar is a plain decorative `<img>` (not
 `app-user-avatar`); chevron uses a temporary SVG path until `T002`.
 
+> **Drift note (F-025, 2026-09-26)**: the 008 non-goals "populated list" and "starring /
+> unstarring interactions" are COMPLETED by feature 025 (`specs/025-starred-flow`): messages
+> star via long-press/right-click into `ChatStore`, and Starred Messages renders live rows
+> (empty tip preserved exactly). Populated-list layout is map-external (no Figma frame); the
+> deferred golden still targets the empty state.
+
 **Input**: Figma design analysis -> design-map row 8, node `0:8820`
 
 ---
