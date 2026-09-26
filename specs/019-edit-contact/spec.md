@@ -11,6 +11,12 @@ structural name/phone form + Save, no tab bar). Save is a no-op this feature. Ex
 labels, glyphs and golden remain PENDING the Figma capture (~2026-09-28) and are gated at G1;
 provisional/hypothesis values in place.
 
+> **Drift note (F-026, 2026-09-26)**: **Save is now functional.** It calls
+> `ChatStore.updateContact(chatId, name, phone)` (persisted), prefilled from the store, and
+> navigates back to `/contact/:id`; the rename reflects in the contact screen, chats list, chat
+> window header and starred entries. F-019's "persistence is later" non-goal is completed by the
+> F-024 store persistence (see `specs/026-contact-info`).
+
 **Input**: `figma/design-map.md` row 19 (`0:10334`) + `specs/019-edit-contact/research.md`
 
 ---

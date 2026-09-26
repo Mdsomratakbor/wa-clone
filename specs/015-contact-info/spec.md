@@ -46,6 +46,11 @@ action targets are later features (messaging, calling, media/groups screens not 
   from seed) for the chat's contact.
 - **FR-003**: Back returns to `/chat/:id`.
 - **FR-004**: All Contact Info actions are no-ops (later features / map-external).
+
+> **Drift note (F-026, 2026-09-26)**: Actions are no longer all no-ops. **Messages** opens the
+> thread (`openConversation` + route), the **Starred messages** row routes to
+> `/starred-messages`, and the identity comes from `ChatStore` (renames reflect instantly and
+> persist). Media/Groups rows remain no-ops (spec Non-Goals).
 - **FR-005**: No horizontal overflow at any breakpoint.
 
 ## Non-Goals
