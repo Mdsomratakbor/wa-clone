@@ -1,0 +1,12 @@
+<button
+  type="button"
+  class="toggle"
+  role="switch"
+  [attr.aria-checked]="checked()"
+  [attr.aria-label]="label()"
+  (click)="onActivate()"
+>
+  <span class="toggle__track" [class.toggle__track--on]="checked()">
+    <span class="toggle__knob"></span>
+  </span>
+</button>

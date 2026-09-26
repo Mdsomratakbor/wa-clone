@@ -1,0 +1,38 @@
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.toggle__track {
+  position: relative;
+  display: block;
+  width: 47px;
+  height: 28px;
+  border-radius: 14px;
+  background: #e9e9eb;
+  transition: background-color 120ms ease;
+}
+
+.toggle__track--on {
+  background: #34c759;
+}
+
+.toggle__knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 120ms ease;
+}
+
+.toggle__track--on .toggle__knob {
+  transform: translateX(19px);
+}

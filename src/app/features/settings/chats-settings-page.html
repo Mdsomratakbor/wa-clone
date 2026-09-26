@@ -8,18 +8,34 @@
   <ul class="chats-settings__list" data-testid="chats-settings-list">
     @for (row of rows; track row.id) {
       <li class="chats-settings__row">
-        <button
-          type="button"
-          class="chats-settings__row-button"
-          data-testid="chats-settings-row"
-          [attr.aria-label]="row.label"
-          (click)="onRowActivate(row)"
-        >
-          <span class="chats-settings__row-label">{{ row.label }}</span>
-          <svg class="chats-settings__chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
-            <path d="M1.5 1 6.5 6.5 1.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
+        @let prefsKey = toggleKey(row.id);
+        @if (prefsKey) {
+          <div
+            class="chats-settings__switch-row"
+            data-testid="chats-settings-row"
+            [attr.aria-label]="row.label"
+          >
+            <span class="chats-settings__row-label">{{ row.label }}</span>
+            <app-toggle
+              [checked]="prefs()[prefsKey]"
+              [label]="row.label"
+              (checkedChange)="onToggle(prefsKey, $event)"
+            />
+          </div>
+        } @else {
+          <button
+            type="button"
+            class="chats-settings__row-button"
+            data-testid="chats-settings-row"
+            [attr.aria-label]="row.label"
+            (click)="onRowActivate(row)"
+          >
+            <span class="chats-settings__row-label">{{ row.label }}</span>
+            <svg class="chats-settings__chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+              <path d="M1.5 1 6.5 6.5 1.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        }
       </li>
     }
   </ul>

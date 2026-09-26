@@ -21,6 +21,25 @@
   display: block;
 }
 
+.chats-settings__switch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.chats-settings__row-label {
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-preview);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-text-primary);
+}
+
+.chats-settings__switch-row app-toggle {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
 .chats-settings__row-button {
   display: flex;
   align-items: center;
