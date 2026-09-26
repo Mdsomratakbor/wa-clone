@@ -108,8 +108,20 @@ export class SettingsPage {
     void this.router.navigate(['/settings/profile']);
   }
 
-  protected onSettingsAction(_id: string): void {
-    // F-011: row targets (notifications / storage / more) are later features.
+  protected onSettingsAction(id: string): void {
+    if (id === 'settings-notifications') {
+      // F-029: route to the existing Notifications screen (F-017).
+      this.onDismissSettings();
+      void this.router.navigate(['/settings/notifications']);
+      return;
+    }
+    if (id === 'settings-storage') {
+      // F-029: route to the existing Data and Storage screen (F-018).
+      this.onDismissSettings();
+      void this.router.navigate(['/settings/data-storage']);
+      return;
+    }
+    // F-011: the remaining target (More) is a later feature.
   }
 
   protected onDismissSettings(): void {
