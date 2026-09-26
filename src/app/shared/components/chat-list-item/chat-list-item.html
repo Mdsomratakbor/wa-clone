@@ -48,6 +48,33 @@
       <span class="chat-list-item__name">{{ chat().contactName }}</span>
       <time class="chat-list-item__timestamp">{{ chat().timestamp }}</time>
     </div>
-    <p class="chat-list-item__preview">{{ chat().preview }}</p>
+    <p class="chat-list-item__preview">
+      <svg
+        class="chat-list-item__ticks"
+        [class.chat-list-item__ticks--read]="chat().read"
+        [attr.data-testid]="chat().read ? 'read-tick-' + chat().id : null"
+        width="16"
+        height="11"
+        viewBox="0 0 16 11"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M1 6l3.2 3.2L10 2.6"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M6.4 6.8l1.1 1.1L13.4 3.2"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <span class="chat-list-item__preview-text">{{ chat().preview }}</span>
+    </p>
   </div>
 </div>

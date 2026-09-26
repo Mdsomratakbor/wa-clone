@@ -76,12 +76,29 @@
 
   &__preview {
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 3px;
     font-family: var(--wa-font-family);
     font-size: var(--wa-fs-preview);
     font-weight: var(--wa-fw-regular);
     line-height: var(--wa-lh-preview);
     letter-spacing: var(--wa-ls-forward);
     color: var(--wa-text-secondary);
+    min-width: 0;
+  }
+
+  &__ticks {
+    display: block;
+    flex: none;
+    color: var(--wa-text-secondary);
+
+    &--read {
+      color: var(--wa-accent);
+    }
+  }
+
+  &__preview-text {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

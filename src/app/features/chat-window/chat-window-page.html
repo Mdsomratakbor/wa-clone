@@ -6,7 +6,7 @@
     (actions)="onChatActions()"
   />
 
-  <div class="chat-window__thread" data-testid="message-thread" role="list" [attr.aria-label]="'Conversation with ' + contact.name">
+  <div class="chat-window__thread" #thread data-testid="message-thread" role="list" [attr.aria-label]="'Conversation with ' + contact.name">
     @if (!listEmpty()) {
       <ol class="chat-window__list">
         @for (message of messages(); track message.id; let index = $index) {
@@ -25,7 +25,7 @@
     }
   </div>
 
-  <app-composer />
+  <app-composer (send)="onSend($event)" />
 
   @if (chatActionsOpen()) {
     <app-chat-actions-modal (action)="onChatAction($event)" (dismiss)="onDismissChatActions()" />

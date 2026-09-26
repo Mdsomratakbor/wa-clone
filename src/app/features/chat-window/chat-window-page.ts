@@ -1,12 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import type { ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ChatStore } from '../../core/chat.store';
 import { ChatHeader } from '../../shared/components/chat-header/chat-header';
 import { Composer } from '../../shared/components/composer/composer';
 import { MessageBubble } from '../../shared/components/message-bubble/message-bubble';
 import { ChatActionsModal } from './chat-actions-modal';
-import { CHAT_CONTACT, CHAT_SEED, DATE_CHIP_LABEL } from './chat-window.seed';
-
-const THREADED_CONTACT_ID = 'chat-006';
+import { CHAT_CONTACT, DATE_CHIP_LABEL } from './chat-window.seed';
 
 @Component({
   selector: 'app-chat-window-page',
@@ -18,19 +26,40 @@ const THREADED_CONTACT_ID = 'chat-006';
 export class ChatWindowPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly store = inject(ChatStore);
   private readonly header = viewChild(ChatHeader);
+  private readonly thread = viewChild<ElementRef<HTMLDivElement>>('thread');
 
   protected readonly contact = CHAT_CONTACT;
   protected readonly dateChip = DATE_CHIP_LABEL;
   protected readonly chatActionsOpen = signal(false);
 
-  protected readonly messages = computed(() =>
-    this.route.snapshot.paramMap.get('id') === THREADED_CONTACT_ID ? CHAT_SEED : [],
-  );
-
   protected readonly chatId = computed(() => this.route.snapshot.paramMap.get('id') ?? '');
 
+  protected readonly messages = computed(() =>
+    this.store.conversationMessages(this.chatId()),
+  );
+
   protected readonly listEmpty = computed(() => this.messages().length === 0);
+
+  constructor() {
+    effect(() => {
+      this.store.openConversation(this.chatId());
+    });
+    effect(() => {
+      this.messages();
+      const el = this.thread()?.nativeElement;
+      if (el) {
+        requestAnimationFrame(() => {
+          el.scrollTop = el.scrollHeight;
+        });
+      }
+    });
+  }
+
+  protected onSend(text: string): void {
+    this.store.sendMessage(this.chatId(), text);
+  }
 
   protected onBack(): void {
     void this.router.navigate(['/chats']);

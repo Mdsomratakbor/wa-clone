@@ -4,19 +4,18 @@ import {
   computed,
   effect,
   inject,
-  input,
   signal,
   viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { AddModal } from '../new-chat-modal/add-modal';
+import { ChatStore } from '../../core/chat.store';
 import { Action } from '../../shared/components/action-sheet/action-sheet.model';
 import { ChatActionsBar } from '../../shared/components/chat-actions-bar/chat-actions-bar';
 import { ChatListItem } from '../../shared/components/chat-list-item/chat-list-item';
 import { Fab } from '../../shared/components/fab/fab';
 import { NavigationBar } from '../../shared/components/navigation-bar/navigation-bar';
 import { TabBar } from '../../shared/components/tab-bar/tab-bar';
-import { CHAT_SEED } from './chat-list.seed';
 import { ChatPreview, NavAction, TabItem, TabKey } from './chat.model';
 import { NEW_CHAT_ACTIONS } from '../new-chat-modal/new-chat-modal.seed';
 
@@ -38,9 +37,10 @@ const TAB_LABELS: Record<TabKey, string> = {
 })
 export class ChatsPage {
   private readonly router = inject(Router);
+  private readonly store = inject(ChatStore);
   private readonly fabRef = viewChild(Fab);
 
-  readonly conversations = input<ChatPreview[]>(CHAT_SEED as ChatPreview[]);
+  protected readonly conversations = computed(() => this.store.conversations());
 
   protected readonly activeTab = signal<TabKey>('chats');
   protected readonly editing = signal(false);
@@ -100,6 +100,7 @@ export class ChatsPage {
       this.toggleSelection(chat.id);
       return;
     }
+    this.store.openConversation(chat.id);
     void this.router.navigate(['/chat', chat.id]);
   }
 
@@ -143,7 +144,7 @@ export class ChatsPage {
   }
 
   protected onReadAll(): void {
-    // F-003: control-only no-op (no read/unread state exists in feature 001).
+    this.store.markAllRead();
   }
 
   private toggleSelection(id: string): void {

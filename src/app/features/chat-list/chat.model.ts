@@ -6,6 +6,7 @@ export interface ChatPreview {
   preview: string;
   timestamp: string;
   avatarRef: string | null;
+  read?: boolean;
 }
 
 export interface TabItem {

@@ -72,4 +72,23 @@
   &__mic {
     margin-left: 24px;
   }
+
+  &__send {
+    margin-left: 24px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--wa-accent);
+    color: var(--wa-surface-variant);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+
+  &__send-icon {
+    display: block;
+  }
 }
