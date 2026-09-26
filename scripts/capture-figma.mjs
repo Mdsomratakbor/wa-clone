@@ -9,7 +9,7 @@
 //
 // It shells out to `figma-developer-mcp fetch` (Figma REST data endpoint), using the
 // same OAuth credentials available on this machine.
-import { execFileSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -64,9 +64,9 @@ function fetchRow(row) {
   mkdirSync(dirname(out), { recursive: true });
   console.log(`[data] ${row.nodeId} ${row.name} -> ${out}`);
   try {
-    const stdout = execFileSync('npx', ['-y', 'figma-developer-mcp', 'fetch', '--file-key', FILE_KEY, '--node-id', row.nodeId, '--depth', String(DEPTH), '--format', 'json'], {
+    const stdout = execSync('npx -y figma-developer-mcp fetch --file-key ' + FILE_KEY + ' --node-id ' + row.nodeId + ' --depth ' + DEPTH + ' --format json', {
       cwd: ROOT,
-      stdio: ['ignore', 'pipe', 'inherit'],
+      encoding: 'utf8',
       maxBuffer: 256 * 1024 * 1024,
     });
     writeFileSync(out, stdout);
