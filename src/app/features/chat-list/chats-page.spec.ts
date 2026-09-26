@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { ChatsPage } from './chats-page';
 import { ChatStore } from '../../core/chat.store';
+import { PrefsStore } from '../../core/prefs.store';
 import { CHAT_SEED } from './chat-list.seed';
 import { NEW_CHAT_ACTIONS } from '../new-chat-modal/new-chat-modal.seed';
 
@@ -9,11 +10,13 @@ describe('ChatsPage', () => {
   let fixture: ComponentFixture<ChatsPage>;
 
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [ChatsPage],
       providers: [provideRouter([])],
     }).compileComponents();
     TestBed.inject(ChatStore).reset();
+    TestBed.inject(PrefsStore).reset();
   });
 
   it('renders one row per seeded conversation', () => {
@@ -90,6 +93,113 @@ describe('ChatsPage', () => {
     fixture.detectChanges();
     expect(router.navigate).toHaveBeenCalledWith(['/status']);
     expect(fixture.nativeElement.querySelector('[data-testid="tab-stub"]')).toBeNull();
+  });
+
+  describe('search and sort', () => {
+    function names(): string[] {
+      const el = fixture.nativeElement as HTMLElement;
+      return [...el.querySelectorAll('.chat-list-item')].map(
+        (row) => row.getAttribute('aria-label') ?? '',
+      );
+    }
+
+    function typeSearch(query: string): void {
+      const el = fixture.nativeElement as HTMLElement;
+      const input = el.querySelector<HTMLInputElement>('[data-testid="chat-search"]') as
+        HTMLInputElement | null;
+      input!.value = query;
+      input!.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+    }
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(ChatsPage);
+      fixture.detectChanges();
+    });
+
+    it('renders the search bar and the Recent/Name/Unread sort segment', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      expect(el.querySelector('[data-testid="chat-search"]')).not.toBeNull();
+      const options = [
+        ...(fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+          '[data-testid="chat-sort-option"]',
+        ),
+      ];
+      expect(options.map((o) => o.textContent?.trim())).toEqual([
+        'Recent',
+        'Name',
+        'Unread',
+      ]);
+      expect(options[0]?.getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('filters the list by name as you type', () => {
+      typeSearch('maximillian');
+      expect(names().length).toBe(1);
+      expect(names()[0]).toBe('Maximillian Jacobson');
+    });
+
+    it('filters the list by preview text as you type', () => {
+      typeSearch('good idea');
+      expect(names().length).toBe(1);
+      expect(names()[0]).toBe('Maximillian Jacobson');
+    });
+
+    it('clears the search and restores every conversation', () => {
+      typeSearch('no such contact');
+      expect(fixture.nativeElement.querySelector('[data-testid="search-empty"]')).not.toBeNull();
+      (fixture.nativeElement.querySelector('[data-testid="chat-search-clear"]') as HTMLButtonElement).click();
+      fixture.detectChanges();
+      expect(names().length).toBe(CHAT_SEED.length);
+      expect(fixture.nativeElement.querySelector('[data-testid="search-empty"]')).toBeNull();
+    });
+
+    it('orders by name when the Name sort is selected', () => {
+const options = [
+      ...(fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+        '[data-testid="chat-sort-option"]',
+      ),
+    ];
+    options[1]?.click(); // Name
+      fixture.detectChanges();
+      const expected = [...CHAT_SEED]
+        .map((c) => c.contactName)
+        .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+      expect(names()).toEqual(expected);
+    });
+
+    it('orders unread first when the Unread sort is selected', () => {
+      TestBed.inject(ChatStore).openConversation('chat-001');
+      fixture.detectChanges();
+const options = [
+      ...(fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+        '[data-testid="chat-sort-option"]',
+      ),
+    ];
+    options[2]?.click(); // Unread
+      fixture.detectChanges();
+      expect(names()[names().length - 1]).toBe('Maximillian Jacobson');
+    });
+
+    it('reflects a persisted sort preference on render', () => {
+      TestBed.inject(PrefsStore).setChatSort('name');
+      fixture = TestBed.createComponent(ChatsPage);
+      fixture.detectChanges();
+      const expected = [...CHAT_SEED]
+        .map((c) => c.contactName)
+        .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+      expect(names()).toEqual(expected);
+    });
+
+    it('hides search and sort while editing', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      (Array.from(el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')).find(
+        (b) => b.textContent?.trim() === 'Edit',
+      ) as HTMLButtonElement).click();
+      fixture.detectChanges();
+      expect(el.querySelector('[data-testid="chat-search"]')).toBeNull();
+      expect(el.querySelector('[data-testid="chat-sort"]')).toBeNull();
+    });
   });
 
   describe('edit mode', () => {
