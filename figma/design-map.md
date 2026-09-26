@@ -27,7 +27,7 @@ Node IDs below are taken directly from Figma via the Figma API. URLs use the hyp
 | 15 | Contact Info | WhatsApp Contact Info | `0:9486` | `feature/contact-info` — ✅ **implemented** (US1–US3 structure: chat header identity tap opens `/contact/:id`, pushed screen w/ hero + Messages + hypothesis rows, 2026-09-24; exact rows/hero/phone/glyphs/golden deferred to Figma capture ~09-28) | [`015`](../specs/015-contact-info) |
 | 16 | Chats Settings | WhatsApp Chats Settings | `0:9973` | `feature/settings` (chats-settings-page) — ✅ **implemented** (US1–US3 structure: Settings Chats Settings row navigates, pushed screen w/ hypothesis rows, 2026-09-24; exact rows/glyphs/golden deferred to Figma capture ~09-28) | [`016`](../specs/016-chats-settings) |
 | 17 | Notifications | WhatsApp Notifications | `0:10758` | `feature/settings` (notifications-page) — ✅ **implemented** (US1–US3 structure: Settings Notifications row navigates, pushed screen w/ hypothesis rows, 2026-09-24; exact rows/toggles/glyphs/golden deferred to Figma capture ~09-28) | [`017`](../specs/017-notifications) |
-| 18 | Data & Storage | WhatsApp Data and Storage Usage | `0:10894` | `feature/settings` | — |
+| 18 | Data & Storage | WhatsApp Data and Storage Usage | `0:10894` | `feature/settings` (data-storage-page) — ✅ **implemented** (US1–US3 structure: Settings Data and Storage row navigates, pushed screen w/ hypothesis rows, 2026-09-26; exact rows/glyphs/golden deferred to Figma capture ~09-28) | [`018`](../specs/018-data-storage) |
 | 19 | Edit Contact | WhatsApp Edit Contact | `0:10334` | `feature/contact-info` | — |
 | 20 | Edit Profile | WhatsApp Edit Profile | `0:10659` | `feature/settings/profile` | — |
 | 21 | Authorization | WhatsApp Authorization | `0:11030` | `feature/auth` | — |
