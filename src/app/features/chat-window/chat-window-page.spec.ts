@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatWindowPage } from './chat-window-page';
+import { ChatStore } from '../../core/chat.store';
 import { CHAT_CONTACT, CHAT_SEED } from './chat-window.seed';
 
 function stubRoute(id: string | null): ActivatedRoute {
@@ -22,6 +23,7 @@ describe('ChatWindowPage', () => {
         { provide: Router, useValue: { navigate: navSpy } },
       ],
     }).compileComponents();
+    TestBed.inject(ChatStore).reset();
   });
 
   it('renders the contact header from the seeded contact', () => {
@@ -77,6 +79,66 @@ describe('ChatWindowPage', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelectorAll('app-message-bubble').length).toBe(0);
     expect(fixture.nativeElement.querySelector('[data-testid="message-thread"]')).not.toBeNull();
+  });
+
+  it('sends a message via the Send button: bubble appended and input cleared', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const input = el.querySelector<HTMLInputElement>('input[aria-label="Message"]')!;
+
+    input.value = 'hello tokyo';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    expect(el.querySelector('[aria-label="Send message"]')).not.toBeNull();
+
+    (el.querySelector('[aria-label="Send message"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    const bubbles = el.querySelectorAll('app-message-bubble');
+    expect(bubbles.length).toBe(CHAT_SEED.length + 1);
+    expect(bubbles[bubbles.length - 1].textContent).toContain('hello tokyo');
+    expect(input.value).toBe('');
+    expect(el.querySelector('[aria-label="Send message"]')).toBeNull();
+  });
+
+  it('sends a message via Enter and drops blank drafts', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const input = el.querySelector<HTMLInputElement>('input[aria-label="Message"]')!;
+
+    input.value = '   ';
+    input.dispatchEvent(new Event('input'));
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    fixture.detectChanges();
+    expect(el.querySelectorAll('app-message-bubble').length).toBe(CHAT_SEED.length);
+
+    input.value = 'on my way';
+    input.dispatchEvent(new Event('input'));
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    fixture.detectChanges();
+
+    const bubbles = el.querySelectorAll('app-message-bubble');
+    expect(bubbles.length).toBe(CHAT_SEED.length + 1);
+    expect(bubbles[bubbles.length - 1].textContent).toContain('on my way');
+    expect(input.value).toBe('');
+  });
+
+  it('sends into the threaded conversation and keeps the seed thread intact', () => {
+    const store = TestBed.inject(ChatStore);
+    expect(store.conversationMessages('chat-006').length).toBe(CHAT_SEED.length);
+    store.sendMessage('chat-006', 'direct');
+    expect(store.conversationMessages('chat-006').length).toBe(CHAT_SEED.length + 1);
+    expect(store.conversations().find((c) => c.id === 'chat-006')?.preview).toBe('direct');
+  });
+
+  it('marks the opened conversation read and leaves the rest unread', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    const store = TestBed.inject(ChatStore);
+    expect(store.conversations().find((c) => c.id === 'chat-006')?.read).toBe(true);
+    expect(store.conversations().find((c) => c.id === 'chat-001')?.read).toBe(false);
   });
 
   it('does not render the chat actions sheet when closed', () => {

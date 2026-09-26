@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { ChatsPage } from './chats-page';
+import { ChatStore } from '../../core/chat.store';
 import { CHAT_SEED } from './chat-list.seed';
 import { NEW_CHAT_ACTIONS } from '../new-chat-modal/new-chat-modal.seed';
 
@@ -12,6 +13,7 @@ describe('ChatsPage', () => {
       imports: [ChatsPage],
       providers: [provideRouter([])],
     }).compileComponents();
+    TestBed.inject(ChatStore).reset();
   });
 
   it('renders one row per seeded conversation', () => {
@@ -28,9 +30,9 @@ describe('ChatsPage', () => {
     expect(title?.textContent).toBe('Chats');
   });
 
-  it('renders an empty placeholder when there are no conversations', () => {
+  it('renders an empty placeholder when the store has no conversations', () => {
+    TestBed.inject(ChatStore).setConversations([]);
     fixture = TestBed.createComponent(ChatsPage);
-    fixture.componentRef.setInput('conversations', []);
     fixture.detectChanges();
     const empty = fixture.nativeElement.querySelector('[data-testid="empty-state"]');
     expect(empty).not.toBeNull();
@@ -209,8 +211,9 @@ describe('ChatsPage', () => {
       expect(el.querySelectorAll('.chat-list-item').length).toBe(CHAT_SEED.length - 1);
     });
 
-    it('Read All is a no-op: list and selection unchanged', () => {
+    it('Read All marks every conversation read without touching the list', () => {
       const el = fixture.nativeElement as HTMLElement;
+      const store = TestBed.inject(ChatStore);
       clickAction(el, 'Edit');
       fixture.detectChanges();
 
@@ -224,6 +227,8 @@ describe('ChatsPage', () => {
 
       expect(el.querySelectorAll('.chat-list-item').length).toBe(CHAT_SEED.length);
       expect(el.querySelector('.chat-list-item')?.getAttribute('aria-checked')).toBe('true');
+      expect(store.conversations().every((c) => c.read === true)).toBe(true);
+      expect(el.querySelectorAll('[data-testid^="read-tick-"]').length).toBe(CHAT_SEED.length);
     });
 
     it('empties to the No chats placeholder while staying in edit mode', () => {

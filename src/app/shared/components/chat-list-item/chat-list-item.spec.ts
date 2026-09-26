@@ -83,4 +83,31 @@ describe('ChatListItem', () => {
     expect(row?.getAttribute('aria-checked')).toBeNull();
     expect((fixture.nativeElement as HTMLElement).querySelector('[data-testid="select-circle"]')).toBeNull();
   });
+
+  it('renders a read tick when read is true', () => {
+    fixture = TestBed.createComponent(ChatListItem);
+    fixture.componentRef.setInput('chat', { ...CHAT, read: true });
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const tick = el.querySelector<SVGElement>('[data-testid="read-tick-chat-001"]');
+    expect(tick).not.toBeNull();
+    expect(
+      el
+        .querySelector('.chat-list-item__ticks')
+        ?.classList.contains('chat-list-item__ticks--read'),
+    ).toBe(true);
+  });
+
+  it('hides the read tick when read is false or undefined', () => {
+    fixture = TestBed.createComponent(ChatListItem);
+    fixture.componentRef.setInput('chat', { ...CHAT, read: false });
+    fixture.detectChanges();
+    let el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('[data-testid^="read-tick-"]')).toBeNull();
+
+    fixture.componentRef.setInput('chat', { ...CHAT, read: undefined });
+    fixture.detectChanges();
+    el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('[data-testid^="read-tick-"]')).toBeNull();
+  });
 });
