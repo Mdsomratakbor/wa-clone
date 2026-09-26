@@ -8,10 +8,19 @@ export const THREADED_CONTACT_ID = 'chat-006';
 export const CONTACT_SUBTITLE = 'tap here for contact info';
 export const PERSISTENCE_KEY = 'wa.chat-store.v1';
 
+export interface StarredEntry {
+  chatId: string;
+  messageId: string;
+  contactName: string;
+  text: string;
+  time: string;
+}
+
 interface ChatStoreSnapshot {
   version: 1;
   conversations: ChatPreview[];
   threads: Record<string, Message[]>;
+  starred: string[];
   messageSequence: number;
   newChatCounter: number;
 }
@@ -64,6 +73,8 @@ export class ChatStore {
     [THREADED_CONTACT_ID]: THREAD_SEED,
   });
 
+  readonly starred = signal<string[]>([]);
+
   constructor() {
     this.hydrate();
   }
@@ -87,6 +98,42 @@ export class ChatStore {
     this.threads.update((threads) => ({ ...threads, [id]: [] }));
     this.persist();
     return id;
+  }
+
+  toggleStarred(chatId: string, messageId: string): void {
+    const key = `${chatId}:${messageId}`;
+    this.starred.update((list) =>
+      list.includes(key) ? list.filter((k) => k !== key) : [...list, key],
+    );
+    this.persist();
+  }
+
+  isStarred(chatId: string, messageId: string): boolean {
+    return this.starred().includes(`${chatId}:${messageId}`);
+  }
+
+  starredEntries(): StarredEntry[] {
+    const chats = this.conversations();
+    const threads = this.threads();
+    return this.starred()
+      .map((key) => {
+        const separator = key.indexOf(':');
+        const chatId = key.slice(0, separator);
+        const messageId = key.slice(separator + 1);
+        const message = threads[chatId]?.find((m) => m.id === messageId);
+        if (!message) {
+          return null;
+        }
+        const chat = chats.find((c) => c.id === chatId);
+        return {
+          chatId,
+          messageId,
+          contactName: chat?.contactName ?? 'Unknown',
+          text: message.text || message.file?.filename || 'image attachment',
+          time: message.time,
+        };
+      })
+      .filter((entry): entry is StarredEntry => entry !== null);
   }
 
   contact(chatId: string): ContactHeader | null {
@@ -148,6 +195,7 @@ export class ChatStore {
     clearStorage(PERSISTENCE_KEY);
     this.messageSequence = 1000;
     this.newChatCounter = 0;
+    this.starred.set([]);
     this.conversations.set(normalizeChats(CHAT_SEED));
     this.threads.set({ [THREADED_CONTACT_ID]: THREAD_SEED });
   }
@@ -162,6 +210,7 @@ export class ChatStore {
       version: STORE_VERSION,
       conversations: this.conversations() as ChatPreview[],
       threads: this.threads() as Record<string, Message[]>,
+      starred: this.starred(),
       messageSequence: this.messageSequence,
       newChatCounter: this.newChatCounter,
     };
@@ -185,6 +234,7 @@ export class ChatStore {
     }
     this.conversations.set(snapshot.conversations);
     this.threads.set(snapshot.threads);
+    this.starred.set(snapshot.starred ?? []);
     this.messageSequence = snapshot.messageSequence;
     this.newChatCounter = snapshot.newChatCounter;
   }

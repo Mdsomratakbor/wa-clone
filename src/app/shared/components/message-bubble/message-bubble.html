@@ -2,6 +2,11 @@
   class="message-bubble message-bubble--{{ message().sender }}"
   [attr.data-testid]="'bubble-' + message().id"
   [attr.aria-label]="ariaLabel()"
+  (pointerdown)="onHoldStart()"
+  (pointerup)="onHoldEnd()"
+  (pointercancel)="onHoldEnd()"
+  (pointerleave)="onHoldEnd()"
+  (contextmenu)="onContextMenu($event)"
 >
   @if (message().file; as file) {
     <div class="message-bubble__file">
@@ -28,6 +33,14 @@
   }
 
   <span class="message-bubble__meta">
+    @if (starred()) {
+      <svg class="message-bubble__star" data-testid="star-badge" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.3l6.5-.9Z"
+          fill="currentColor"
+        />
+      </svg>
+    }
     @if (message().sender === 'outgoing') {
       <svg class="message-bubble__ticks" width="15" height="9" viewBox="0 0 15 9" fill="none" aria-hidden="true">
         <path

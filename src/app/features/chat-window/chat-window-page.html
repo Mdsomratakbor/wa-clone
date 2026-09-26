@@ -18,7 +18,11 @@
             </li>
           }
           <li class="chat-window__row chat-window__row--{{ message.sender }}">
-            <app-message-bubble [message]="message" />
+            <app-message-bubble
+              [message]="message"
+              [starred]="isStarred(message.id)"
+              (star)="onStarMessage($event)"
+            />
           </li>
         }
       </ol>

@@ -64,6 +64,14 @@ export class ChatWindowPage {
     this.store.sendMessage(this.chatId(), text);
   }
 
+  protected isStarred(messageId: string): boolean {
+    return this.store.isStarred(this.chatId(), messageId);
+  }
+
+  protected onStarMessage(messageId: string): void {
+    this.store.toggleStarred(this.chatId(), messageId);
+  }
+
   protected onBack(): void {
     void this.router.navigate(['/chats']);
   }

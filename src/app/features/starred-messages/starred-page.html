@@ -3,21 +3,43 @@
   [leading]="leadingActions"
   (action)="onNavAction($event)"
 ></app-navigation-bar>
-
 <main class="starred" data-testid="starred-page">
-  <section class="starred__tip" data-testid="starred-tip">
-    <img
-      class="starred__tip-avatar"
-      data-testid="starred-tip-avatar"
-      src="/starred-messages-avatar.png"
-      alt=""
-      aria-hidden="true"
-      width="132"
-      height="132"
-    />
-    <h2 class="starred__tip-title" data-testid="starred-tip-title">No Starred Messages</h2>
-    <p class="starred__tip-body" data-testid="starred-tip-body">
-      Tap and hold on any message to star it, so you can easily find it later.
-    </p>
-  </section>
+  @if (entries().length === 0) {
+    <section class="starred__tip" data-testid="starred-tip">
+      <img
+        class="starred__tip-avatar"
+        data-testid="starred-tip-avatar"
+        src="/starred-messages-avatar.png"
+        alt=""
+        aria-hidden="true"
+        width="132"
+        height="132"
+      />
+      <h2 class="starred__tip-title" data-testid="starred-tip-title">No Starred Messages</h2>
+      <p class="starred__tip-body" data-testid="starred-tip-body">
+        Tap and hold on any message to star it, so you can easily find it later.
+      </p>
+    </section>
+  } @else {
+    <ul class="starred__list" data-testid="starred-list">
+      @for (entry of entries(); track entry.messageId) {
+        <li class="starred__row" data-testid="starred-row" role="button" tabindex="0" (click)="onOpenChat(entry.chatId)" (keydown.enter)="onOpenChat(entry.chatId)">
+          <app-user-avatar [src]="null" [name]="entry.contactName" [size]="40" />
+          <div class="starred__body">
+            <div class="starred__head">
+              <span class="starred__name">{{ entry.contactName }}</span>
+              <span class="starred__time">{{ entry.time }}</span>
+            </div>
+            <p class="starred__text">{{ entry.text }}</p>
+          </div>
+          <svg class="starred__star" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.3l6.5-.9Z"
+              fill="currentColor"
+            />
+          </svg>
+        </li>
+      }
+    </ul>
+  }
 </main>

@@ -51,6 +51,12 @@
     color: var(--wa-read-tick);
   }
 
+  &__star {
+    display: block;
+    flex: none;
+    color: var(--wa-accent);
+  }
+
   &__time {
     font-size: var(--wa-fs-bubble-time);
     font-weight: var(--wa-fw-regular);
