@@ -38,4 +38,12 @@
       (dismiss)="onDismissChatActions()"
     />
   }
+
+  @if (chatMoreOpen()) {
+    <app-action-sheet
+      [actions]="moreActions"
+      (action)="onMoreAction($event)"
+      (dismiss)="onDismissMore()"
+    />
+  }
 </div>

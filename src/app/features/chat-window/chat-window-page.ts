@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   effect,
+  HostListener,
   inject,
   signal,
   viewChild,
@@ -11,15 +12,17 @@ import type { ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatStore } from '../../core/chat.store';
 import { ChatHeader } from '../../shared/components/chat-header/chat-header';
+import { ActionSheet } from '../../shared/components/action-sheet/action-sheet';
 import { Composer } from '../../shared/components/composer/composer';
 import { MessageBubble } from '../../shared/components/message-bubble/message-bubble';
 import { ChatActionsModal } from './chat-actions-modal';
+import { CHAT_MORE_ACTIONS } from './chat-actions.seed';
 import { CHAT_CONTACT, DATE_CHIP_LABEL } from './chat-window.seed';
 import { ContactHeader } from './chat-window.model';
 
 @Component({
   selector: 'app-chat-window-page',
-  imports: [ChatHeader, MessageBubble, Composer, ChatActionsModal],
+  imports: [ChatHeader, MessageBubble, Composer, ChatActionsModal, ActionSheet],
   templateUrl: './chat-window-page.html',
   styleUrl: './chat-window-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +39,8 @@ export class ChatWindowPage {
   );
   protected readonly dateChip = DATE_CHIP_LABEL;
   protected readonly chatActionsOpen = signal(false);
+  protected readonly chatMoreOpen = signal(false);
+  protected readonly moreActions = CHAT_MORE_ACTIONS;
 
   protected readonly chatId = computed(() => this.route.snapshot.paramMap.get('id') ?? '');
 
@@ -90,6 +95,37 @@ export class ChatWindowPage {
   protected onChatAction(id: string): void {
     if (id === 'chat-mute') {
       this.store.toggleMuted(this.chatId());
+      return;
+    }
+    if (id === 'chat-more') {
+      this.chatActionsOpen.set(false);
+      this.chatMoreOpen.set(true);
+    }
+  }
+
+  protected onMoreAction(id: string): void {
+    if (id === 'chat-clear') {
+      this.store.clearMessages(this.chatId());
+      this.chatMoreOpen.set(false);
+      this.header()?.focus();
+      return;
+    }
+    if (id === 'chat-delete') {
+      this.store.deleteConversation(this.chatId());
+      this.chatMoreOpen.set(false);
+      void this.router.navigate(['/chats']);
+    }
+  }
+
+  protected onDismissMore(): void {
+    this.chatMoreOpen.set(false);
+    this.header()?.focus();
+  }
+
+  @HostListener('document:keydown.escape')
+  protected onEscape(): void {
+    if (this.chatMoreOpen()) {
+      this.onDismissMore();
     }
   }
 

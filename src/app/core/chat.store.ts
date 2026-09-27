@@ -184,6 +184,27 @@ export class ChatStore {
     this.persist();
   }
 
+  clearMessages(chatId: string): void {
+    this.threads.update((threads) => ({ ...threads, [chatId]: [] }));
+    this.conversations.update((chats) =>
+      chats.map((chat) => (chat.id === chatId ? { ...chat, preview: '', read: true } : chat)),
+    );
+    this.persist();
+  }
+
+  deleteConversation(chatId: string): void {
+    this.conversations.update((chats) => chats.filter((chat) => chat.id !== chatId));
+    this.threads.update((threads) => {
+      const next = { ...threads };
+      delete next[chatId];
+      return next;
+    });
+    this.starred.update((list) =>
+      list.filter((key) => !key.startsWith(`${chatId}:`)),
+    );
+    this.persist();
+  }
+
   setConversations(list: readonly ChatPreview[]): void {
     this.conversations.set(list);
     this.persist();
