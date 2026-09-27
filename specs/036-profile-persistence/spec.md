@@ -27,8 +27,9 @@ name (including the avatar initials) across reloads. No new surface, no design c
 - **FR-003** `/settings/profile` seeds `nameDraft`/`aboutDraft` from the stored profile and keeps
   both inputs editable (`(input)` → draft, matching `EditContactPage`).
 - **FR-004** `Save` calls `updateProfile(nameDraft, aboutDraft)` and navigates back to `/settings`.
-- **FR-005** The Settings profile header and avatar initials render the stored name; seeded renders
-  are unchanged because the default name is still `Ani`.
+- **FR-005** The Settings profile header renders the stored name; the avatar tile and the fixed
+  `Tap to edit profile` subtitle are unchanged, and seeded renders do not move because the default
+  name is still `Ani`.
 - **FR-006** An empty/whitespace-only name is rejected: `Save` keeps the previous name (no blank
   profile) and stays on the form.
 - **FR-007** `Back` and `Save` both discard uncommitted drafts (no autosave).
@@ -43,8 +44,7 @@ name (including the avatar initials) across reloads. No new surface, no design c
 
 ## User Stories
 
-- **US1**: I edit my name, Save, and Settings (plus the avatar initials) shows the new name after a
-  reload.
+- **US1**: I edit my name, Save, and Settings shows the new name after a reload.
 - **US2**: I clear the name and Save — my previous name is kept.
 
 ## Acceptance Criteria (validation targets)

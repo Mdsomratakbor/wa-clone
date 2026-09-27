@@ -16,9 +16,10 @@ nothing.
   the default. `reset()` must clear it too, otherwise tests that reset prefs would leak a profile.
 - `SettingsPage` reads `SETTINGS_PROFILE` (a seed constant). It becomes a computed: name from the
   store, subtitle still the design's `Tap to edit profile`. Because the default name is `Ani` — the
-  value the design itself shows — seeded/golden renders do not move.
-- Blank-name rejection: an avatar with no name renders empty initials, which is a visible
-  regression, so `Save` guards on a trimmed name and keeps the previous value.
+  value the design itself shows — seeded/golden renders do not move. The avatar tile stays as-is
+  (its glyph is pending capture, so no initials are invented).
+- Blank-name rejection: the avatar tile has no initials yet, but a blank name would erase the header
+  identity entirely, so `Save` guards on a trimmed name and keeps the previous value.
 
 ## Plan
 

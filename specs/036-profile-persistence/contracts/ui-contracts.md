@@ -8,7 +8,7 @@
 | form | `profile-name` / `profile-about` remain editable; drafts update on `input` |
 | save | `profile-save` → `updateProfile(draftName, draftAbout)` → `navigate(['/settings'])`; blank name ignored |
 | back | `profile-page` leading `Back` → `/settings`, drafts discarded |
-| settings | `settings-name` and the avatar initials render the stored name; subtitle stays `Tap to edit profile` |
+| settings | `settings-name` renders the stored name; subtitle stays `Tap to edit profile`; the avatar tile is untouched (its glyph is pending capture) |
 
 **Stability**: defaults unchanged ⇒ `0-9135-settings` / profile goldens unaffected.
 
