@@ -273,4 +273,29 @@ describe('ChatStore', () => {
     expect(store.contactName('chat-404')).toBe('Contact');
     expect(store.contactPhone('chat-404')).toBe('');
   });
+
+  it('seeds conversations unmuted', () => {
+    expect(store.isMuted(THREADED_CONTACT_ID)).toBe(false);
+    expect(store.contact(THREADED_CONTACT_ID)?.muted).toBe(false);
+  });
+
+  it('toggleMuted flips the muted state and surfaces it on the contact header', () => {
+    store.toggleMuted(THREADED_CONTACT_ID);
+    expect(store.isMuted(THREADED_CONTACT_ID)).toBe(true);
+    expect(store.contact(THREADED_CONTACT_ID)?.muted).toBe(true);
+    store.toggleMuted(THREADED_CONTACT_ID);
+    expect(store.isMuted(THREADED_CONTACT_ID)).toBe(false);
+  });
+
+  it('persists muted state across a reload and clears it on reset', () => {
+    store.toggleMuted(THREADED_CONTACT_ID);
+    const reloaded = new ChatStore();
+    expect(reloaded.isMuted(THREADED_CONTACT_ID)).toBe(true);
+    reloaded.reset();
+    expect(reloaded.isMuted(THREADED_CONTACT_ID)).toBe(false);
+  });
+
+  it('isMuted falls back to false for unknown chats', () => {
+    expect(store.isMuted('chat-404')).toBe(false);
+  });
 });

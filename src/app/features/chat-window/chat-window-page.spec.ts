@@ -10,6 +10,21 @@ function stubRoute(id: string | null): ActivatedRoute {
   } as unknown as ActivatedRoute;
 }
 
+function openSheet(fixture: ComponentFixture<ChatWindowPage>): void {
+  (fixture.nativeElement as HTMLElement)
+    .querySelector<HTMLButtonElement>('[data-testid="chat-header__more"]')
+    ?.click();
+  fixture.detectChanges();
+}
+
+function sheetRows(fixture: ComponentFixture<ChatWindowPage>): HTMLElement[] {
+  return Array.from(
+    (fixture.nativeElement as HTMLElement).querySelectorAll(
+      '[data-testid="action-sheet-row"]',
+    ) as NodeListOf<HTMLElement>,
+  );
+}
+
 describe('ChatWindowPage', () => {
   let fixture: ComponentFixture<ChatWindowPage>;
   let navSpy: jasmine.Spy;
@@ -231,7 +246,7 @@ describe('ChatWindowPage', () => {
       ?.click();
     fixture.detectChanges();
     (fixture.nativeElement as HTMLElement)
-      .querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[0]
+      .querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[1]
       ?.click();
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
@@ -267,5 +282,57 @@ describe('ChatWindowPage', () => {
     expect(
       document.activeElement,
     ).toBe(fixture.nativeElement.querySelector('[data-testid="chat-header__more"]'));
+  });
+
+  it('Mute mutes the conversation, flips the row label and shows the header bell', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    openSheet(fixture);
+    (fixture.nativeElement as HTMLElement)
+      .querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[0]
+      ?.click();
+    fixture.detectChanges();
+    const rows = sheetRows(fixture);
+    expect(TestBed.inject(ChatStore).isMuted('chat-006')).toBe(true);
+    expect(rows.map((r) => r.textContent?.trim())).toEqual(['Unmute', 'Wallpaper', 'More']);
+    expect(
+      fixture.nativeElement.querySelector('[data-testid="chat-header__muted-bell"]'),
+    ).not.toBeNull();
+  });
+
+  it('Unmute restores the unmuted label and hides the header bell', () => {
+    TestBed.inject(ChatStore).toggleMuted('chat-006');
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    openSheet(fixture);
+    (fixture.nativeElement as HTMLElement)
+      .querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[0]
+      ?.click();
+    fixture.detectChanges();
+    const rows = sheetRows(fixture);
+    expect(TestBed.inject(ChatStore).isMuted('chat-006')).toBe(false);
+    expect(rows.map((r) => r.textContent?.trim())).toEqual(['Mute', 'Wallpaper', 'More']);
+    expect(
+      fixture.nativeElement.querySelector('[data-testid="chat-header__muted-bell"]'),
+    ).toBeNull();
+  });
+
+  it('does not render the muted bell for an unmuted conversation', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    expect(
+      fixture.nativeElement.querySelector('[data-testid="chat-header__muted-bell"]'),
+    ).toBeNull();
+  });
+
+  it('reflects persisted muted state when the chat is reopened', () => {
+    TestBed.inject(ChatStore).toggleMuted('chat-006');
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    expect(
+      fixture.nativeElement.querySelector('[data-testid="chat-header__muted-bell"]'),
+    ).not.toBeNull();
+    openSheet(fixture);
+    expect(sheetRows(fixture)[0]?.textContent?.trim()).toBe('Unmute');
   });
 });

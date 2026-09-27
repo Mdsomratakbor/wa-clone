@@ -112,4 +112,24 @@ describe('ChatHeader', () => {
     );
     expect(document.activeElement).toBe(trigger);
   });
+
+  it('renders a masked bell when the contact is muted', () => {
+    fixture = TestBed.createComponent(ChatHeader);
+    fixture.componentRef.setInput('contact', { ...CONTACT, muted: true });
+    fixture.detectChanges();
+    const bell = (fixture.nativeElement as HTMLElement).querySelector(
+      '[data-testid="chat-header__muted-bell"]',
+    );
+    expect(bell).not.toBeNull();
+    expect(bell?.getAttribute('aria-label')).toBe('Muted');
+  });
+
+  it('hides the muted bell for a plain contact (default muted false)', () => {
+    fixture = TestBed.createComponent(ChatHeader);
+    fixture.componentRef.setInput('contact', CONTACT);
+    fixture.detectChanges();
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('[data-testid="chat-header__muted-bell"]'),
+    ).toBeNull();
+  });
 });
