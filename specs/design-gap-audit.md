@@ -17,13 +17,13 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 
 ## Tier A — target already exists, needs only wiring (no capture required)
 
-| # | Design row | Dead control | Should do | Notes |
-| - | ---------- | ------------ | ---------- | ----- |
-| A1 | 6 Status | `My Status` row ("Add to my status") | open `/status/compose` | target exists |
-| A2 | 6 Status | nav `Privacy` | open `/settings` | target exists |
-| A3 | 20 Edit profile | `Save` | persist Name/About, reflect on Settings | fields are prefilled "Ani" |
-| A4 | 21 Auth | keypad digits / backspace / `Continue` | fill phone field, verify, enter the app | screen is fully designed and inert |
-| A5 | 12 Camera | `Flip` | swap front/back camera state | shutter stays gated (needs getUserMedia) |
+| # | Design row | Dead control | Should do | Status |
+| - | ---------- | ------------ | ---------- | ------ |
+| A1 | 6 Status | `My Status` row ("Add to my status") | open `/status/compose` | **done (F-035)** |
+| A2 | 6 Status | nav `Privacy` | open `/settings` | **done (F-035)** |
+| A3 | 20 Edit profile | `Save` | persist Name/About, reflect on Settings | **done (F-036)** |
+| A4 | 21 Auth | keypad digits / backspace / `Continue` | fill phone region, verify, enter the app | **done (F-037)** |
+| A5 | 12 Camera | `Flip` | swap front/back camera state | moved to tier C (see below) |
 | A6 | 2 Chat window | `Video call`, `Call` | start a call | needs a call screen → tier B |
 
 ## Tier B — real design flow, needs one new (hypothesis) screen
@@ -47,24 +47,33 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 
 - **Publish a status** (row 7): Send / Send-alt need the captured keyboard chrome and the design's
   publish affordance; the compose screen is otherwise complete.
-- **Camera capture pipeline** (row 12): shutter needs `getUserMedia` + the captured preview
-  treatment; A5 (flip) is the capture-free part.
+- **Camera capture pipeline** (row 12): the shutter needs `getUserMedia` plus the captured preview
+  treatment. **`Flip` moved here from tier A** (2026-09-27): without a live preview a front/back
+  state has no observable effect, so shipping a state-only flip would be dead behaviour — it belongs
+  with the preview work.
 - **Exact content of every tier-B screen**: labels, row counts, ordering, section copy.
 - **14 goldens** for rows 8–21, and the F-028 search/sort chrome in `0-8855`.
 
 ## Also worth fixing (already-shipped specs that drifted from their spec)
 
-- Calls `Clear` (row 5) mutates a local list only — the F-032 bug class; it should be store-backed
-  so a reload does not resurrect the call log.
-- Calls rows are inert: no activation, no call info.
+- Calls `Clear` (row 5) mutated a local list only — the F-032 bug class. **Fixed (F-038)**: the log
+  lives in `CallStore` (`wa.call-store.v1`) and removals/clears persist.
+- Calls rows are inert: **fixed (F-038)** — a row opens the chat with the same `contactName`
+  (no match ⇒ stays put). `New call` and call info remain inert (B6).
 - 13 Settings: the last dead row is `Contacts` (B1).
 
 ## Suggested order
 
-1. **A1–A2** (Status wiring) — smallest visible win, no new surface.
-2. **A3** (profile persistence) — makes a designed form real, and Settings reflects it.
-3. **A4** (auth keypad + Continue) — revives a fully designed, currently inert screen.
-4. **Calls `Clear` store-backing** (the F-032 bug class) and calls row activation.
-5. **B1/B2** (Contacts, New Group) — the two most valuable new screens, both re-use the chat model.
+1. **A1–A2** (Status wiring) — done (F-035).
+2. **A3** (profile persistence) — done (F-036).
+3. **A4** (auth keypad + Continue) — done (F-037).
+4. **Calls store-backing + row activation** — done (F-038).
+5. **B1/B2** (Contacts, New Group) — next: the two most valuable new screens, both re-use the chat
+   model.
 6. **B4/B5** (Wallpaper, Font size) — visible, persisted, app-wide.
 7. Remaining tier B, then tier C at the quota reset.
+
+## Progress log
+
+- **2026-09-27** — Audit written; A1–A4 + the calls fixes landed as F-035…F-038 (331 → 357 unit
+  tests, build green). Tier A is now empty; the next work is tier B or the quota reset.
