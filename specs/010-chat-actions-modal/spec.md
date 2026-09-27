@@ -62,6 +62,10 @@ To be filled from the `0:10087` payload (mirrors 008 research format):
 - **FR-003**: Dismissal via the design's affordances; focus returns to the trigger; no route change
   while opening/closing.
 - **FR-004**: Selecting a row emits its `id` (target flows are out of scope).
+
+> **Drift note (F-030, 2026-09-26)**: **Mute** is now live: it toggles a persisted per-conversation
+> muted state, the row label flips Mute/Unmute, and the chat header shows a muted bell while
+> muted. Wallpaper and More remain no-ops. See `specs/030-chat-mute`.
 - **FR-005**: No horizontal overflow at any breakpoint (same responsive contract as 006/007/008/009).
 
 ## Non-Goals (later features)
