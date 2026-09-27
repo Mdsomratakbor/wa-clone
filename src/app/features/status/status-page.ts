@@ -54,12 +54,15 @@ export class StatusPage {
     this.activeTab.set(key);
   }
 
-  protected onNavAction(_id: string): void {
-    // F-006: Privacy (settings) is a later feature (design-map row 13).
+  protected onNavAction(id: string): void {
+    if (id === 'privacy') {
+      // F-035: the design has no Privacy screen; Settings is the privacy entry.
+      void this.router.navigate(['/settings']);
+    }
   }
 
   protected onRowActivate(): void {
-    // F-006: Status compose is a later feature (design-map row 7).
+    void this.router.navigate(['/status/compose']);
   }
 
   protected onCamera(): void {
