@@ -6,8 +6,14 @@
 
   <section class="auth__number" aria-label="Phone number">
     <span class="auth__country" data-testid="auth-country">No country selected</span>
-    <span class="auth__phone" data-testid="auth-phone" aria-label="Phone number"></span>
+    <span class="auth__phone" data-testid="auth-phone" aria-label="Phone number" aria-live="polite">{{
+      phone()
+    }}</span>
   </section>
+
+  @if (error()) {
+    <p class="auth__error" data-testid="auth-error" role="status">{{ errorText }}</p>
+  }
 
   <section class="auth__keypad" aria-label="Numeric keypad">
     @for (digit of digits; track digit) {

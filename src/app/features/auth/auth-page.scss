@@ -64,6 +64,14 @@
   color: var(--wa-text-primary);
 }
 
+.auth__error {
+  margin: 12px 0 0;
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-hint);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-error);
+}
+
 .auth__keypad {
   display: grid;
   grid-template-columns: repeat(3, 72px);
