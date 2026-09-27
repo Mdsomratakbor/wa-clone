@@ -265,6 +265,36 @@ const options = [
     });
   });
 
+  describe('nav actions', () => {
+    it('New Group opens the group creation screen (F-040)', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+      fixture = TestBed.createComponent(ChatsPage);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      const before = TestBed.inject(ChatStore).conversations().length;
+
+      clickNavAction(el, 'New Group');
+      fixture.detectChanges();
+
+      expect(navSpy).toHaveBeenCalledWith(['/new-group']);
+      expect(TestBed.inject(ChatStore).conversations().length).toBe(before);
+    });
+
+    it('Broadcast Lists stays a no-op (F-001/003)', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+      fixture = TestBed.createComponent(ChatsPage);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+
+      clickNavAction(el, 'Broadcast Lists');
+      fixture.detectChanges();
+
+      expect(navSpy).not.toHaveBeenCalled();
+    });
+  });
+
   describe('edit mode', () => {
     function clickAction(el: HTMLElement, label: string): void {
       const button = Array.from(
@@ -590,13 +620,19 @@ const options = [
       });
     });
 
-    it('keeps the sheet open when a row is activated (targets are later features)', () => {
+    it('keeps the sheet open when New community is activated (target is a later feature)', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
       const el = fixture.nativeElement as HTMLElement;
       openModal(el);
-      el.querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[0].click();
+      const newCommunity = Array.from(
+        el.querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]'),
+      ).find((b) => b.textContent?.trim() === 'New community');
+      newCommunity?.click();
       fixture.detectChanges();
       expect(el.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
       expect(el.querySelector('[data-testid="chat-list"]')).not.toBeNull();
+      expect(navSpy).not.toHaveBeenCalled();
     });
 
     it('dismisses on backdrop and restores focus to the FAB', () => {
@@ -647,8 +683,7 @@ const options = [
       expect(navSpy).toHaveBeenCalledWith(['/chat', 'chat-new-1']);
     });
 
-    it('New group stays no-op: sheet open, no navigation', () => {
-      const router = TestBed.inject(Router);
+    it('New group closes the sheet and opens the group creation screen (F-040)', () => {      const router = TestBed.inject(Router);
       const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
       const el = fixture.nativeElement as HTMLElement;
       const store = TestBed.inject(ChatStore);
@@ -661,9 +696,9 @@ const options = [
       newGroup?.click();
       fixture.detectChanges();
 
-      expect(el.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
+      expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
       expect(store.conversations().length).toBe(before);
-      expect(navSpy).not.toHaveBeenCalled();
+      expect(navSpy).toHaveBeenCalledWith(['/new-group']);
     });
   });
 });

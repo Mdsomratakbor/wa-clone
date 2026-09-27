@@ -445,4 +445,46 @@ describe('ChatStore', () => {
     }
     expect(store.contactConversations()).toEqual([]);
   });
+
+  it('createGroup makes a group conversation with participants and an empty thread (F-040)', () => {
+    const id = store.createGroup('Weekend plans', ['Kieron Dotson', 'Martha Craig']);
+    const group = store.conversations().find((chat) => chat.id === id);
+
+    expect(id).toMatch(/^group-\d+$/);
+    expect(group?.kind).toBe('group');
+    expect(group?.contactName).toBe('Weekend plans');
+    expect(group?.participants).toEqual(['Kieron Dotson', 'Martha Craig']);
+    expect(group?.read).toBe(true);
+    expect(group?.preview).toBe('');
+    expect(store.conversationMessages(id)).toEqual([]);
+  });
+
+  it('createGroup trims the name, allows no participants and cannot collide with direct ids (F-040)', () => {
+    const groupId = store.createGroup('  Trip  ');
+    const directId = store.createConversation();
+    expect(store.conversations().find((chat) => chat.id === groupId)?.contactName).toBe('Trip');
+    expect(store.conversations().find((chat) => chat.id === groupId)?.participants).toEqual([]);
+    expect(groupId).not.toBe(directId);
+  });
+
+  it('a created group persists across a reload (F-040)', () => {
+    const id = store.createGroup('Persisted group', ['Kieron Dotson']);
+    const reloaded = new ChatStore();
+    const group = reloaded.conversations().find((chat) => chat.id === id);
+    expect(group?.kind).toBe('group');
+    expect(group?.participants).toEqual(['Kieron Dotson']);
+  });
+
+  it('groups are excluded from contactConversations and reported with a group subtitle (F-040)', () => {
+    const id = store.createGroup('Hidden group', ['Kieron Dotson']);
+    const before = store.contactConversations().map((chat) => chat.contactName);
+
+    expect(before).not.toContain('Hidden group');
+    expect(store.contactConversations().some((chat) => chat.id === id)).toBe(false);
+
+    expect(store.contact(id)?.subtitle).toBe('1 participants');
+    const empty = store.createGroup('Nameless');
+    expect(store.contact(empty)?.subtitle).toBe('Group');
+    expect(store.contact('chat-006')?.subtitle).toBe(CONTACT_SUBTITLE);
+  });
 });
