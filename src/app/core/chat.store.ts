@@ -153,6 +153,10 @@ export class ChatStore {
     return this.conversations().find((c) => c.id === chatId)?.muted ?? false;
   }
 
+  chatIdForContactName(contactName: string): string | null {
+    return this.conversations().find((c) => c.contactName === contactName)?.id ?? null;
+  }
+
   toggleMuted(chatId: string): void {
     this.conversations.update((chats) =>
       chats.map((chat) =>

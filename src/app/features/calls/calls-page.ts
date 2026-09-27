@@ -2,9 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
-  input,
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
@@ -12,8 +10,9 @@ import { NavAction, TabItem, TabKey } from '../chat-list/chat.model';
 import { CallListItem } from '../../shared/components/call-list-item/call-list-item';
 import { NavigationBar } from '../../shared/components/navigation-bar/navigation-bar';
 import { TabBar } from '../../shared/components/tab-bar/tab-bar';
+import { CallStore } from '../../core/call.store';
+import { ChatStore } from '../../core/chat.store';
 import { CallEntry } from './calls.model';
-import { CALL_SEED } from './calls.seed';
 
 const TAB_KEYS: readonly TabKey[] = ['settings', 'chats', 'camera', 'calls', 'status'];
 const TAB_LABELS: Record<TabKey, string> = {
@@ -33,18 +32,12 @@ const TAB_LABELS: Record<TabKey, string> = {
 })
 export class CallsPage {
   private readonly router = inject(Router);
-
-  readonly calls = input<CallEntry[]>(CALL_SEED as CallEntry[]);
+  private readonly callStore = inject(CallStore);
+  private readonly chatStore = inject(ChatStore);
 
   protected readonly activeTab = signal<TabKey>('calls');
   protected readonly editing = signal(false);
-  protected readonly items = signal<CallEntry[]>([]);
-
-  constructor() {
-    effect(() => {
-      this.items.set([...this.calls()]);
-    });
-  }
+  protected readonly items = computed(() => this.callStore.calls());
 
   protected readonly tabs = computed<TabItem[]>(() =>
     TAB_KEYS.map((key) => ({ key, label: TAB_LABELS[key], active: key === this.activeTab() })),
@@ -98,26 +91,30 @@ export class CallsPage {
       return;
     }
     if (id === 'clear') {
-      this.items.set([]);
+      this.callStore.clearCalls();
       return;
     }
-    // F-004: new-call (calling flow) is a later feature.
+    // F-038: new-call (calling flow) stays inert - it needs a call surface (audit B6).
   }
 
   protected onCallSelected(call: CallEntry): void {
     if (this.editing()) {
       return;
     }
-    // F-004: row activation / info flows are later features.
+    const chatId = this.chatStore.chatIdForContactName(call.contactName);
+    if (chatId === null) {
+      return;
+    }
+    void this.router.navigate(['/chat', chatId]);
   }
 
-  protected onCallInfo(call: CallEntry): void {
-    // F-004: info flows are later features.
+  protected onCallInfo(_call: CallEntry): void {
+    // F-038: call info stays inert - it needs a call-info surface (audit B6).
   }
 
   protected onCallRemove(call: CallEntry): void {
     if (this.editing()) {
-      this.items.update((list) => list.filter((item) => item.id !== call.id));
+      this.callStore.removeCall(call.id);
     }
   }
 }
