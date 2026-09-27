@@ -92,6 +92,54 @@ test.describe('Chats edit mode (feature 003)', () => {
     await expect(page.locator('.chat-list-item')).toHaveCount(COUNT - 2);
   });
 
+  test('Archive keeps the chat hidden after a reload (feature 032)', async ({ page }) => {
+    await page.goto('/');
+    const archivedName = await page.locator('.chat-list-item').first().getAttribute('aria-label');
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.locator('.chat-list-item').first().click();
+
+    await page.getByRole('button', { name: 'Archive' }).click();
+    await expect(page.locator('.chat-list-item')).toHaveCount(COUNT - 1);
+
+    await page.reload();
+    await expect(page.locator('.chat-list-item')).toHaveCount(COUNT - 1);
+    if (archivedName) {
+      await expect(page.getByRole('button', { name: archivedName })).toHaveCount(0);
+    }
+  });
+
+  test('Delete keeps the chat deleted after a reload (feature 032)', async ({ page }) => {
+    await page.goto('/');
+    const deletedName = await page.locator('.chat-list-item').first().getAttribute('aria-label');
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.locator('.chat-list-item').first().click();
+
+    await page.getByRole('button', { name: 'Delete' }).click();
+    await expect(page.locator('.chat-list-item')).toHaveCount(COUNT - 1);
+
+    await page.reload();
+    await expect(page.locator('.chat-list-item')).toHaveCount(COUNT - 1);
+    if (deletedName) {
+      await expect(page.getByRole('button', { name: deletedName })).toHaveCount(0);
+    }
+  });
+
+  test('an archived chat cannot be found by search (feature 032)', async ({ page }) => {
+    await page.goto('/');
+    const archivedName = await page.locator('.chat-list-item').first().getAttribute('aria-label');
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.locator('.chat-list-item').first().click();
+    await page.getByRole('button', { name: 'Archive' }).click();
+    await expect(page.locator('.chat-list-item')).toHaveCount(COUNT - 1);
+
+    const contact = (archivedName ?? '').split(',')[0].trim();
+    if (contact) {
+      await page.getByTestId('chat-search').fill(contact);
+      await expect(page.locator('.chat-list-item')).toHaveCount(0);
+      await expect(page.getByTestId('search-empty')).toContainText('No chats found');
+    }
+  });
+
   test('Read All is a no-op: list and selection unchanged', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Edit' }).click();

@@ -343,4 +343,56 @@ describe('ChatStore', () => {
     expect(store.conversations().some((c) => c.id === THREADED_CONTACT_ID)).toBe(true);
     expect(store.conversationMessages(THREADED_CONTACT_ID).length).toBe(THREAD_SEED.length);
   });
+
+  it('archiveConversations flags exactly the given conversations', () => {
+    const [first, second] = CHAT_SEED;
+    store.archiveConversations([first.id]);
+    expect(store.conversations().find((c) => c.id === first.id)?.archived).toBe(true);
+    expect(store.conversations().find((c) => c.id === second.id)?.archived).toBe(false);
+    expect(store.archivedIds()).toEqual([first.id]);
+  });
+
+  it('archiveConversations keeps the thread and starred entries intact', () => {
+    store.toggleStarred(THREADED_CONTACT_ID, store.conversationMessages(THREADED_CONTACT_ID)[0].id);
+    store.archiveConversations([THREADED_CONTACT_ID]);
+    expect(store.conversationMessages(THREADED_CONTACT_ID).length).toBe(THREAD_SEED.length);
+    expect(store.starred().length).toBe(1);
+  });
+
+  it('archiveConversations persists across a reload and reset restores it', () => {
+    const [first] = CHAT_SEED;
+    store.archiveConversations([first.id]);
+    const reloaded = new ChatStore();
+    expect(reloaded.archivedIds()).toEqual([first.id]);
+    reloaded.reset();
+    expect(reloaded.archivedIds()).toEqual([]);
+  });
+
+  it('archiveConversations ignores an empty selection', () => {
+    const before = store.conversations();
+    store.archiveConversations([]);
+    expect(store.conversations()).toBe(before);
+  });
+
+  it('deleteConversations removes a bulk selection with threads and starred keys', () => {
+    const [first, second] = CHAT_SEED;
+    store.toggleStarred(THREADED_CONTACT_ID, store.conversationMessages(THREADED_CONTACT_ID)[0].id);
+    store.deleteConversations([first.id, second.id, 'chat-404']);
+    expect(store.conversations().some((c) => c.id === first.id)).toBe(false);
+    expect(store.conversations().some((c) => c.id === second.id)).toBe(false);
+    expect(store.starred().length).toBe(1);
+  });
+
+  it('deleteConversations persists across a reload', () => {
+    const [first] = CHAT_SEED;
+    store.deleteConversations([first.id]);
+    const reloaded = new ChatStore();
+    expect(reloaded.conversations().some((c) => c.id === first.id)).toBe(false);
+  });
+
+  it('deleteConversations ignores an empty selection', () => {
+    const before = store.conversations();
+    store.deleteConversations([]);
+    expect(store.conversations()).toBe(before);
+  });
 });

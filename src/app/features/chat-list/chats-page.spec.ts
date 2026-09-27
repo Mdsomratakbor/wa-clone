@@ -321,6 +321,78 @@ const options = [
       expect(el.querySelectorAll('.chat-list-item').length).toBe(CHAT_SEED.length - 1);
     });
 
+    it('Archive keeps the conversation in the store flagged as archived (F-032)', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      const store = TestBed.inject(ChatStore);
+      clickAction(el, 'Edit');
+      fixture.detectChanges();
+
+      (el.querySelector('.chat-list-item') as HTMLElement).click();
+      fixture.detectChanges();
+      const archiveBtn = Array.from(
+        el.querySelectorAll<HTMLButtonElement>('[data-testid="chat-actions"] button'),
+      ).find((b) => b.textContent?.trim() === 'Archive');
+      archiveBtn?.click();
+      fixture.detectChanges();
+
+      expect(store.conversations().length).toBe(CHAT_SEED.length);
+      expect(store.archivedIds()).toEqual([CHAT_SEED[0].id]);
+    });
+
+    it('archived chats stay hidden on a fresh page instance (F-032)', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      clickAction(el, 'Edit');
+      fixture.detectChanges();
+      (el.querySelector('.chat-list-item') as HTMLElement).click();
+      fixture.detectChanges();
+      const archiveBtn = Array.from(
+        el.querySelectorAll<HTMLButtonElement>('[data-testid="chat-actions"] button'),
+      ).find((b) => b.textContent?.trim() === 'Archive');
+      archiveBtn?.click();
+      fixture.detectChanges();
+
+      const reopened = TestBed.createComponent(ChatsPage);
+      reopened.detectChanges();
+      expect(
+        (reopened.nativeElement as HTMLElement).querySelectorAll('.chat-list-item').length,
+      ).toBe(CHAT_SEED.length - 1);
+    });
+
+    it('Delete survives a fresh page instance (F-032)', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      clickAction(el, 'Edit');
+      fixture.detectChanges();
+      (el.querySelector('.chat-list-item') as HTMLElement).click();
+      fixture.detectChanges();
+      const deleteBtn = Array.from(
+        el.querySelectorAll<HTMLButtonElement>('[data-testid="chat-actions"] button'),
+      ).find((b) => b.textContent?.trim() === 'Delete');
+      deleteBtn?.click();
+      fixture.detectChanges();
+
+      const reopened = TestBed.createComponent(ChatsPage);
+      reopened.detectChanges();
+      expect(
+        (reopened.nativeElement as HTMLElement).querySelectorAll('.chat-list-item').length,
+      ).toBe(CHAT_SEED.length - 1);
+    });
+
+    it('an archived chat is not matched by search (F-032)', () => {
+      const store = TestBed.inject(ChatStore);
+      store.archiveConversations([CHAT_SEED[0].id]);
+      fixture = TestBed.createComponent(ChatsPage);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      const search = el.querySelector<HTMLInputElement>('[data-testid="chat-search"]')!;
+      search.value = CHAT_SEED[0].contactName;
+      search.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      expect(el.querySelectorAll('.chat-list-item').length).toBe(0);
+      expect(el.querySelector('[data-testid="search-empty"]')?.textContent).toContain(
+        'No chats found',
+      );
+    });
+
     it('Read All marks every conversation read without touching the list', () => {
       const el = fixture.nativeElement as HTMLElement;
       const store = TestBed.inject(ChatStore);
