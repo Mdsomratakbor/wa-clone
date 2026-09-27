@@ -69,4 +69,34 @@ test.describe('Chat mute / unmute (feature 030)', () => {
     await expect(page.getByTestId('action-sheet')).toBeVisible();
     await expect(page.getByTestId('chat-header__muted-bell')).toHaveCount(0);
   });
+
+  test('the chat list row shows a mute badge and keeps it after a reload (feature 033)', async ({
+    page,
+  }) => {
+    await page.goto('/chat/chat-006');
+    await page.getByTestId('message-thread').waitFor();
+    await page.getByTestId('chat-header__more').click();
+    await page.getByTestId('action-sheet-row').first().click();
+    await expect(page.getByTestId('chat-header__muted-bell')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Back to chats' }).click();
+    await expect(page).toHaveURL(/\/chats$/);
+    await expect(page.getByTestId('chat-mute-badge-chat-006')).toBeVisible();
+    await expect(page.locator('[data-testid^="chat-mute-badge-"]')).toHaveCount(1);
+
+    await page.reload();
+    await expect(page.getByTestId('chat-mute-badge-chat-006')).toBeVisible();
+  });
+
+  test('unmuting clears the row badge (feature 033)', async ({ page }) => {
+    await page.goto('/chat/chat-006');
+    await page.getByTestId('message-thread').waitFor();
+    await page.getByTestId('chat-header__more').click();
+    await page.getByTestId('action-sheet-row').first().click();
+    await page.getByTestId('action-sheet-row').first().click();
+    await expect(page.getByTestId('chat-header__muted-bell')).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Back to chats' }).click();
+    await expect(page.locator('[data-testid^="chat-mute-badge-"]')).toHaveCount(0);
+  });
 });

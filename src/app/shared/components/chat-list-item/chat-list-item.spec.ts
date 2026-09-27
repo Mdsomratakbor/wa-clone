@@ -29,6 +29,39 @@ describe('ChatListItem', () => {
     expect(el.querySelector('.chat-list-item__timestamp')?.textContent).toBe('10/30/19');
   });
 
+    it('renders no mute badge for an unmuted chat', () => {
+    fixture = TestBed.createComponent(ChatListItem);
+    fixture.componentRef.setInput('chat', CHAT);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.chat-list-item__mute')).toBeNull();
+    expect(el.querySelector('[data-testid^="chat-mute-badge-"]')).toBeNull();
+  });
+
+  it('renders a labelled mute badge for a muted chat (feature 033)', () => {
+    fixture = TestBed.createComponent(ChatListItem);
+    fixture.componentRef.setInput('chat', { ...CHAT, muted: true });
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const badge = el.querySelector('[data-testid="chat-mute-badge-chat-001"]');
+    expect(badge).not.toBeNull();
+    expect(badge?.getAttribute('aria-label')).toBe('Muted');
+    expect(badge?.getAttribute('role')).toBe('img');
+  });
+
+  it('renders the badge in edit mode as well (feature 033)', () => {
+    fixture = TestBed.createComponent(ChatListItem);
+    fixture.componentRef.setInput('chat', { ...CHAT, muted: true });
+    fixture.componentRef.setInput('selectMode', true);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('[data-testid="select-circle"]')).not.toBeNull();
+    expect(el.querySelector('[data-testid="chat-mute-badge-chat-001"]')).not.toBeNull();
+    expect(el.querySelector('.chat-list-item')?.getAttribute('aria-label')).toBe(
+      'Maximillian Jacobson',
+    );
+  });
+
   it('emits selected when activated', () => {
     fixture = TestBed.createComponent(ChatListItem);
     fixture.componentRef.setInput('chat', CHAT);

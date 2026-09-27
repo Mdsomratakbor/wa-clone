@@ -393,6 +393,58 @@ const options = [
       );
     });
 
+    it('renders a mute badge only on the muted row (F-033)', () => {
+      const store = TestBed.inject(ChatStore);
+      store.toggleMuted(CHAT_SEED[0].id);
+      fixture = TestBed.createComponent(ChatsPage);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      const badges = el.querySelectorAll('[data-testid^="chat-mute-badge-"]');
+      expect(badges.length).toBe(1);
+      expect(badges[0].getAttribute('data-testid')).toBe(`chat-mute-badge-${CHAT_SEED[0].id}`);
+    });
+
+    it('removes the mute badge after unmuting and keeps it across a reload (F-033)', () => {
+      const store = TestBed.inject(ChatStore);
+      store.toggleMuted(CHAT_SEED[0].id);
+      fixture = TestBed.createComponent(ChatsPage);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      expect(el.querySelectorAll('[data-testid^="chat-mute-badge-"]').length).toBe(1);
+
+      const reloaded = TestBed.createComponent(ChatsPage);
+      reloaded.detectChanges();
+      expect(
+        (reloaded.nativeElement as HTMLElement).querySelectorAll(
+          '[data-testid^="chat-mute-badge-"]',
+        ).length,
+      ).toBe(1);
+
+      store.toggleMuted(CHAT_SEED[0].id);
+      fixture.detectChanges();
+      expect(el.querySelectorAll('[data-testid^="chat-mute-badge-"]').length).toBe(0);
+    });
+
+    it('keeps the mute badge in edit mode and drops it with a deleted row (F-033)', () => {
+      const store = TestBed.inject(ChatStore);
+      store.toggleMuted(CHAT_SEED[0].id);
+      fixture = TestBed.createComponent(ChatsPage);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      clickAction(el, 'Edit');
+      fixture.detectChanges();
+      expect(el.querySelectorAll('[data-testid^="chat-mute-badge-"]').length).toBe(1);
+
+      (el.querySelector('.chat-list-item') as HTMLElement).click();
+      fixture.detectChanges();
+      const deleteBtn = Array.from(
+        el.querySelectorAll<HTMLButtonElement>('[data-testid="chat-actions"] button'),
+      ).find((b) => b.textContent?.trim() === 'Delete');
+      deleteBtn?.click();
+      fixture.detectChanges();
+      expect(el.querySelectorAll('[data-testid^="chat-mute-badge-"]').length).toBe(0);
+    });
+
     it('Read All marks every conversation read without touching the list', () => {
       const el = fixture.nativeElement as HTMLElement;
       const store = TestBed.inject(ChatStore);
