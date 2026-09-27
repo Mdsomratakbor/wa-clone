@@ -91,6 +91,12 @@ As a user I can reach the `Edit`, `Broadcast Lists`, and `New Group` actions fro
 
 - **FR-001**: System MUST render a scrollable list of chat rows, one per conversation.
 - **FR-002**: Each chat row MUST display a contact avatar, contact name, message preview, and a timestamp, matching the Figma node values (name `16/600`, preview & time `14/400`, secondary color `#8E8E93`).
+
+> **Drift note (F-033, 2026-09-26)**: A row for a **muted** conversation additionally renders a
+> 14px masked bell before the timestamp (`data-testid="chat-mute-badge-{id}"`,
+> `aria-label="Muted"`). Off by default (no seed is muted), so the golden render is unchanged.
+> See `specs/033-chat-mute-badge`.
+
 - **FR-003**: System MUST include a navigation bar with title `Chats` (`17/600 #000000`), trailing `Edit` action, and leading `Broadcast Lists` / `New Group` actions (`17/400 #007AFF`).
 - **FR-004**: System MUST include a 5-item tab bar (Settings, Chats, Camera, Calls, Status) with the active tab in accent `#007AFF` and inactive tabs in `#545458`.
 - **FR-005**: System MUST include a floating `Actions` button matching the design.
