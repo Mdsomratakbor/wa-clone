@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatWindowPage } from './chat-window-page';
 import { ChatStore } from '../../core/chat.store';
+import { PrefsStore } from '../../core/prefs.store';
 import { CHAT_CONTACT, CHAT_SEED } from './chat-window.seed';
 
 function stubRoute(id: string | null): ActivatedRoute {
@@ -39,6 +40,7 @@ describe('ChatWindowPage', () => {
       ],
     }).compileComponents();
     TestBed.inject(ChatStore).reset();
+    TestBed.inject(PrefsStore).reset();
   });
 
   it('renders the contact header from the seeded contact', () => {
