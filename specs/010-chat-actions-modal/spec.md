@@ -66,6 +66,10 @@ To be filled from the `0:10087` payload (mirrors 008 research format):
 > **Drift note (F-030, 2026-09-26)**: **Mute** is now live: it toggles a persisted per-conversation
 > muted state, the row label flips Mute/Unmute, and the chat header shows a muted bell while
 > muted. Wallpaper and More remain no-ops. See `specs/030-chat-mute`.
+>
+> **Drift note (F-031, 2026-09-26)**: **More** now opens a second sheet (replacing this one) with
+> **Clear messages** / **Delete chat**, both store-backed and persisted. **Wallpaper** is the last
+> remaining no-op row. See `specs/031-chat-more-menu`.
 - **FR-005**: No horizontal overflow at any breakpoint (same responsive contract as 006/007/008/009).
 
 ## Non-Goals (later features)
