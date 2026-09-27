@@ -18,4 +18,5 @@ export interface ContactHeader {
   name: string;
   subtitle: string;
   avatarRef: string | null;
+  muted?: boolean;
 }

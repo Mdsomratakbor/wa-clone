@@ -45,6 +45,8 @@ export class ChatWindowPage {
 
   protected readonly listEmpty = computed(() => this.messages().length === 0);
 
+  protected readonly muted = computed(() => this.store.isMuted(this.chatId()));
+
   constructor() {
     effect(() => {
       this.store.openConversation(this.chatId());
@@ -85,8 +87,10 @@ export class ChatWindowPage {
     this.chatActionsOpen.set(true);
   }
 
-  protected onChatAction(_id: string): void {
-    // Row targets (mute / wallpaper / more) are later features (spec Non-Goals).
+  protected onChatAction(id: string): void {
+    if (id === 'chat-mute') {
+      this.store.toggleMuted(this.chatId());
+    }
   }
 
   protected onDismissChatActions(): void {

@@ -1,5 +1,5 @@
 <app-action-sheet
-  [actions]="actions"
+  [actions]="actions()"
   (action)="action.emit($event)"
   (dismiss)="dismiss.emit()"
 />

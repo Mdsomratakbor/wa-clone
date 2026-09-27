@@ -8,6 +8,7 @@ export interface ChatPreview {
   avatarRef: string | null;
   read?: boolean;
   phone?: string;
+  muted?: boolean;
 }
 
 export interface TabItem {

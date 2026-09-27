@@ -75,6 +75,18 @@
     text-overflow: ellipsis;
   }
 
+  &__name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  &__muted {
+    flex: none;
+    color: var(--wa-text-secondary);
+  }
+
   &__subtitle {
     margin: 0;
     font-family: var(--wa-font-family);

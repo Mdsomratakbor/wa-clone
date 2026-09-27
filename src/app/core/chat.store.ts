@@ -35,7 +35,7 @@ function nowTime(): string {
 }
 
 function normalizeChats(seed: readonly ChatPreview[]): readonly ChatPreview[] {
-  return seed.map((chat) => ({ ...chat, read: false }));
+  return seed.map((chat) => ({ ...chat, read: false, muted: false }));
 }
 
 function readStorage(key: string): string | null {
@@ -145,7 +145,21 @@ export class ChatStore {
       name: chat.contactName,
       subtitle: CONTACT_SUBTITLE,
       avatarRef: chat.avatarRef,
+      muted: chat.muted ?? false,
     };
+  }
+
+  isMuted(chatId: string): boolean {
+    return this.conversations().find((c) => c.id === chatId)?.muted ?? false;
+  }
+
+  toggleMuted(chatId: string): void {
+    this.conversations.update((chats) =>
+      chats.map((chat) =>
+        chat.id === chatId ? { ...chat, muted: !(chat.muted ?? false) } : chat,
+      ),
+    );
+    this.persist();
   }
 
   contactName(chatId: string): string {
