@@ -64,6 +64,15 @@ no-op.
 3. Responsive: no-overflow cases for `/settings/profile`.
 4. `figma/design-map.md` row 20 spec → `020` + implemented at closure.
 
+## Drift notes
+
+- **F-036 (2026-09-27)**: `Save` is no longer a no-op and persistence is no longer a non-goal. Name
+  and About are editable drafts seeded from `PrefsStore.profile()`; `Save` persists them and returns
+  to `/settings`, where the header renders the stored name. A blank name is rejected (the previous
+  name is kept). Defaults are unchanged (`Ani`, empty About), so the seeded render is identical.
+  Avatar/photo editing and About-on-header remain non-goals. See
+  `specs/036-profile-persistence/`.
+
 ## Closing note (deliberately incomplete)
 
 Until T001 lands, `profile-page` renders a structural form (stable testids/aria-labels) —

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { PrefsStore } from '../../core/prefs.store';
 import { SettingsPage } from './settings-page';
 import { SETTINGS_ROWS } from './settings.seed';
 
@@ -7,6 +8,7 @@ describe('SettingsPage', () => {
   let fixture: ComponentFixture<SettingsPage>;
 
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [SettingsPage],
       providers: [provideRouter([])],
@@ -33,6 +35,17 @@ describe('SettingsPage', () => {
     expect(el.querySelector('[data-testid="settings-profile"]')).not.toBeNull();
     expect(el.querySelector('[data-testid="settings-avatar"]')).not.toBeNull();
     expect(el.querySelector('[data-testid="settings-name"]')?.textContent?.trim()).toBe('Ani');
+  });
+
+  it('renders a stored profile name and updates reactively (F-036)', () => {
+    const prefs = TestBed.inject(PrefsStore);
+    const el = render();
+    expect(el.querySelector('[data-testid="settings-name"]')?.textContent?.trim()).toBe('Ani');
+
+    prefs.updateProfile('Anita', 'Building things');
+    fixture.detectChanges();
+    expect(el.querySelector('[data-testid="settings-name"]')?.textContent?.trim()).toBe('Anita');
+    expect(el.querySelector('.settings__subtitle')?.textContent?.trim()).toBe('Tap to edit profile');
   });
 
   it('renders one row per seeded setting', () => {

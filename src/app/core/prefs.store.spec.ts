@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import {
   DEFAULT_CHAT_SORT,
   DEFAULT_PREFS,
+  DEFAULT_PROFILE,
   PREFS_KEY,
   PrefsStore,
 } from './prefs.store';
@@ -67,5 +68,42 @@ describe('PrefsStore', () => {
     const reloaded = TestBed.inject(PrefsStore);
     expect(reloaded.prefs().sound).toBe(false);
     expect(reloaded.chatSort()).toBe(DEFAULT_CHAT_SORT);
+  });
+
+  it('starts with the default profile (F-036)', () => {
+    expect(store.profile()).toEqual(DEFAULT_PROFILE);
+    expect(store.profile().name).toBe('Ani');
+    expect(store.profile().about).toBe('');
+  });
+
+  it('updateProfile persists the name and about across reloads (F-036)', () => {
+    store.updateProfile('Anita', 'Building things');
+    expect(store.profile()).toEqual({ name: 'Anita', about: 'Building things' });
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    expect(TestBed.inject(PrefsStore).profile()).toEqual({
+      name: 'Anita',
+      about: 'Building things',
+    });
+  });
+
+  it('hydrates a v2 envelope without a profile using the default profile (F-036)', () => {
+    localStorage.setItem(
+      PREFS_KEY,
+      JSON.stringify({ version: 2, prefs: DEFAULT_PREFS, chatSort: 'name' }),
+    );
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const reloaded = TestBed.inject(PrefsStore);
+    expect(reloaded.chatSort()).toBe('name');
+    expect(reloaded.profile()).toEqual(DEFAULT_PROFILE);
+  });
+
+  it('reset restores the default profile and clears storage (F-036)', () => {
+    store.updateProfile('Someone', 'About me');
+    store.reset();
+    expect(store.profile()).toEqual(DEFAULT_PROFILE);
+    expect(localStorage.getItem(PREFS_KEY)).toBeNull();
   });
 });

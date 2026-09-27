@@ -33,15 +33,47 @@ test.describe('Edit profile screen (US2)', () => {
 });
 
 test.describe('Edit profile chroming + visual (US3)', () => {
-  test('Back returns to /settings; Save is a no-op', async ({ page }) => {
+  test('Back returns to /settings; Save returns to /settings', async ({ page }) => {
     await page.goto('/settings/profile');
     await page.getByTestId('profile-page').waitFor();
     await page.getByRole('button', { name: 'Save' }).click();
-    await expect(page).toHaveURL(/\/settings\/profile$/);
+    await expect(page).toHaveURL(/\/settings$/);
+    await page.getByTestId('settings-page').waitFor();
 
+    await page.goto('/settings/profile');
+    await page.getByTestId('profile-page').waitFor();
     await page.getByRole('button', { name: 'Back' }).click();
     await expect(page).toHaveURL(/\/settings$/);
     await page.getByTestId('settings-page').waitFor();
+  });
+
+  test('Save persists the name and About is kept on reload (F-036)', async ({ page }) => {
+    await page.goto('/settings/profile');
+    await page.getByTestId('profile-page').waitFor();
+
+    await page.getByTestId('profile-name').fill('Anita');
+    await page.getByTestId('profile-about').fill('Building things');
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect(page).toHaveURL(/\/settings$/);
+    await expect(page.getByTestId('settings-name')).toHaveText('Anita');
+
+    await page.reload();
+    await page.getByTestId('settings-name').waitFor();
+    await expect(page.getByTestId('settings-name')).toHaveText('Anita');
+
+    await page.goto('/settings/profile');
+    await expect(page.getByTestId('profile-name')).toHaveValue('Anita');
+    await expect(page.getByTestId('profile-about')).toHaveValue('Building things');
+  });
+
+  test('a blank name keeps the stored name (F-036)', async ({ page }) => {
+    await page.goto('/settings/profile');
+    await page.getByTestId('profile-page').waitFor();
+    await page.getByTestId('profile-name').fill('   ');
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect(page).toHaveURL(/\/settings\/profile$/);
+    await page.goto('/settings');
+    await expect(page.getByTestId('settings-name')).toHaveText('Ani');
   });
 
   test.skip(
