@@ -54,6 +54,42 @@
       </div>
     }
 
+    @if (!editing() && !searchActive() && archivedCount() > 0) {
+      <div class="chats-page__archived">
+        <button
+          class="chats-page__archived-row"
+          type="button"
+          data-testid="archived-row"
+          aria-label="Archived"
+          (click)="onOpenArchived()"
+        >
+          <svg
+            class="chats-page__archived-icon"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M3 5.5h18v3.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5.5Z"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M5 10v8.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+            <path d="M10 14h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+          <span class="chats-page__archived-label">Archived</span>
+        </button>
+      </div>
+    }
+
     @if (items().length === 0) {
       <div class="chats-page__empty" role="status" data-testid="empty-state">
         <p class="chats-page__empty-text">No chats</p>

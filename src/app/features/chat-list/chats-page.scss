@@ -13,6 +13,41 @@
     background: var(--wa-surface);
   }
 
+  &__archived {
+    margin: 8px 0 0;
+    border-bottom: 0.5px solid color-mix(in srgb, var(--wa-border) 45%, transparent);
+  }
+
+  &__archived-row {
+    appearance: none;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 11px 16px;
+    border: 0;
+    background: transparent;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-preview);
+    color: var(--wa-accent);
+    text-align: left;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--wa-accent);
+    }
+  }
+
+  &__archived-icon {
+    flex: none;
+    color: var(--wa-accent);
+  }
+
+  &__archived-label {
+    font-weight: var(--wa-fw-semibold);
+  }
+
   &__search {
     display: flex;
     align-items: center;

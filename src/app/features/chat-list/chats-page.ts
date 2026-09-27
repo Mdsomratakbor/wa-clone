@@ -89,6 +89,12 @@ export class ChatsPage {
     () => this.searchActive() && this.items().length > 0 && this.visibleItems().length === 0,
   );
 
+  protected readonly archivedCount = computed(() => this.store.archivedIds().length);
+
+  protected onOpenArchived(): void {
+    void this.router.navigate(['/archived']);
+  }
+
   constructor() {
     effect(() => {
       this.items.set(this.conversations().filter((chat) => !chat.archived));

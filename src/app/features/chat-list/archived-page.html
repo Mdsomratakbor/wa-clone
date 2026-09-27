@@ -1,0 +1,21 @@
+<app-navigation-bar
+  title="Archived"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="archived" data-testid="archived-page">
+  @if (chats().length === 0) {
+    <div class="archived__empty" role="status" data-testid="archived-empty">
+      <p class="archived__empty-text">No archived chats</p>
+    </div>
+  } @else {
+    <ul class="archived__list" data-testid="archived-list">
+      @for (chat of chats(); track chat.id) {
+        <li class="archived__row">
+          <app-chat-list-item [chat]="chat" (selected)="onOpenChat(chat.id)" />
+        </li>
+      }
+    </ul>
+  }
+</main>

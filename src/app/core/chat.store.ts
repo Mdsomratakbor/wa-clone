@@ -224,6 +224,17 @@ export class ChatStore {
       .map((chat) => chat.id);
   }
 
+  unarchiveConversations(ids: readonly string[]): void {
+    if (ids.length === 0) {
+      return;
+    }
+    const target = new Set(ids);
+    this.conversations.update((chats) =>
+      chats.map((chat) => (target.has(chat.id) ? { ...chat, archived: false } : chat)),
+    );
+    this.persist();
+  }
+
   deleteConversations(ids: readonly string[]): void {
     ids.forEach((id) => this.deleteConversation(id));
   }

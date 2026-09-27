@@ -7,6 +7,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/chat-list/chats-page').then((m) => m.ChatsPage),
   },
   {
+    path: 'archived',
+    loadComponent: () =>
+      import('./features/chat-list/archived-page').then((m) => m.ArchivedPage),
+  },
+  {
     path: 'calls',
     loadComponent: () => import('./features/calls/calls-page').then((m) => m.CallsPage),
   },
