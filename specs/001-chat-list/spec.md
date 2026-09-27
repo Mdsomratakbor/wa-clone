@@ -96,6 +96,11 @@ As a user I can reach the `Edit`, `Broadcast Lists`, and `New Group` actions fro
 > 14px masked bell before the timestamp (`data-testid="chat-mute-badge-{id}"`,
 > `aria-label="Muted"`). Off by default (no seed is muted), so the golden render is unchanged.
 > See `specs/033-chat-mute-badge`.
+>
+> **Drift note (F-034, 2026-09-26)**: When at least one conversation is archived, a pinned
+> **Archived** row (`data-testid="archived-row"`) renders above the list and opens `/archived`;
+> it is hidden in edit mode and while searching. Absent in the default state.
+> See `specs/034-archived-screen`.
 
 - **FR-003**: System MUST include a navigation bar with title `Chats` (`17/600 #000000`), trailing `Edit` action, and leading `Broadcast Lists` / `New Group` actions (`17/400 #007AFF`).
 - **FR-004**: System MUST include a 5-item tab bar (Settings, Chats, Camera, Calls, Status) with the active tab in accent `#007AFF` and inactive tabs in `#545458`.

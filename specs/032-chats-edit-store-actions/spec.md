@@ -36,8 +36,8 @@ honest while the archived view remains out of scope.
 
 ## Non-Goals
 
-- An **Archived** screen / navigation entry (spec 003 keeps it out of scope; restoration therefore
-  has no entry point yet — deliberately recorded, not silently faked).
+- ~~An **Archived** screen / navigation entry~~ — **resolved by F-034** (`/archived` route + a
+  pinned Archived row; tapping a chat there restores it).
 - Undo after delete/archive; swipe-to-archive; long-press context menu.
 
 ## User Stories

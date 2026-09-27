@@ -103,6 +103,8 @@ As a user I can archive or delete the selected chats and exit with the list upda
 > conversations, `Archive` flags them `archived` (kept in the store, hidden from the list, no
 > Archived screen yet). `Read All` has been live since F-022 (`markAllRead`). Copy, edit-mode
 > behavior and the placeholder state are unchanged. See `specs/032-chats-edit-store-actions`.
+> **F-034 (2026-09-26)** closed the "no Archived screen yet" gap: `/archived` plus a pinned
+> Archived row. See `specs/034-archived-screen`.
 - **FR-008**: An emptied list MUST show the existing `No chats` empty state, with nav and action bar intact (Clarification 6).
 - **FR-009**: Normal (non-edit) mode MUST remain visually identical to feature 001 (tab bar, FAB, `Edit`, no circles).
 
