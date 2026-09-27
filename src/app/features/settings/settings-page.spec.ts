@@ -135,12 +135,15 @@ describe('SettingsPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/settings/profile']);
   });
 
-  it('other row activation is a no-op (sub-pages are later features)', () => {
+  it('the Contacts row navigates to /contacts (F-039)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
-    el.querySelectorAll<HTMLButtonElement>('[data-testid="settings-row"]')[4]?.click();
-    fixture.detectChanges();
-    const rows = el.querySelectorAll('[data-testid="settings-row"]');
+    const rows = el.querySelectorAll<HTMLButtonElement>('[data-testid="settings-row"]');
     expect(rows[4]?.getAttribute('aria-label')).toBe('Contacts');
+    rows[4]?.click();
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/contacts']);
   });
 
   it('renders the Settings options trigger with an aria-label', () => {

@@ -415,4 +415,34 @@ describe('ChatStore', () => {
     reloaded.unarchiveConversations([]);
     expect(reloaded.conversations()).toBe(before);
   });
+
+  it('contactConversations dedupes by contact name, first occurrence wins (F-039)', () => {
+    const contacts = store.contactConversations();
+    const names = contacts.map((chat) => chat.contactName);
+    expect(new Set(names).size).toBe(names.length);
+
+    const duplicate = store
+      .conversations()
+      .filter((chat) => chat.contactName === contacts[0]?.contactName)
+      .map((chat) => chat.id);
+    if (duplicate.length > 1) {
+      expect(contacts[0]?.id).toBe(duplicate[0]);
+    }
+  });
+
+  it('contactConversations sorts alphabetically and follows the store (F-039)', () => {
+    const names = store.contactConversations().map((chat) => chat.contactName);
+    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+
+    const [first] = store.conversations();
+    store.deleteConversation(first.id);
+    expect(store.contactConversations().map((chat) => chat.id)).not.toContain(first.id);
+  });
+
+  it('contactConversations is empty when there are no conversations (F-039)', () => {
+    for (const chat of [...store.conversations()]) {
+      store.deleteConversation(chat.id);
+    }
+    expect(store.contactConversations()).toEqual([]);
+  });
 });

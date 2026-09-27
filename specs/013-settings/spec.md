@@ -109,5 +109,14 @@ To be filled from the `0:9198` payload:
 ## Closing note (deliberately incomplete)
 
 Until T001 lands, `settings-page` renders the structural profile header + hypothesis row list
-(stable testids/aria-labels) — replaced at G1 with the captured design. No exact design values are
+(stable testids/aria-labels) - replaced at G1 with the captured design. No exact design values are
 claimed anywhere.
+
+## Drift notes
+
+- **F-039 (2026-09-27)**: the last dead row is gone — `Contacts` navigates to `/contacts`, a new
+  screen whose list is derived from `ChatStore.contactConversations()` (distinct contact names,
+  alphabetical) with a search field, and rows open the existing contact-info screen. The Contacts
+  surface is **provisional**: the design map has no Contacts screen, so its chrome follows the
+  `StarredPage` + `ChatsPage` precedents and must be re-checked at the quota reset. The Settings
+  screen itself is unchanged, so `0-9135-settings` is unaffected. See `specs/039-contacts-screen/`.
