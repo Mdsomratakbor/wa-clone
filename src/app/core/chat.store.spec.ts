@@ -298,4 +298,49 @@ describe('ChatStore', () => {
   it('isMuted falls back to false for unknown chats', () => {
     expect(store.isMuted('chat-404')).toBe(false);
   });
+
+  it('clearMessages empties the thread and the preview but keeps the conversation', () => {
+    store.clearMessages(THREADED_CONTACT_ID);
+    expect(store.conversationMessages(THREADED_CONTACT_ID)).toEqual([]);
+    expect(store.conversations().some((c) => c.id === THREADED_CONTACT_ID)).toBe(true);
+    expect(store.conversations().find((c) => c.id === THREADED_CONTACT_ID)?.preview).toBe('');
+  });
+
+  it('clearMessages persists across a reload', () => {
+    store.clearMessages(THREADED_CONTACT_ID);
+    const reloaded = new ChatStore();
+    expect(reloaded.conversationMessages(THREADED_CONTACT_ID)).toEqual([]);
+    reloaded.reset();
+    expect(reloaded.conversationMessages(THREADED_CONTACT_ID).length).toBe(THREAD_SEED.length);
+  });
+
+  it('clearMessages keeps the conversation sendable', () => {
+    store.clearMessages(THREADED_CONTACT_ID);
+    store.sendMessage(THREADED_CONTACT_ID, 'Fresh start');
+    expect(store.conversationMessages(THREADED_CONTACT_ID).length).toBe(1);
+  });
+
+  it('deleteConversation removes the row, its thread and its starred keys', () => {
+    store.toggleStarred(THREADED_CONTACT_ID, store.conversationMessages(THREADED_CONTACT_ID)[0].id);
+    store.deleteConversation(THREADED_CONTACT_ID);
+    expect(store.conversations().some((c) => c.id === THREADED_CONTACT_ID)).toBe(false);
+    expect(store.conversationMessages(THREADED_CONTACT_ID)).toEqual([]);
+    expect(store.starred()).toEqual([]);
+    expect(store.contact(THREADED_CONTACT_ID)).toBeNull();
+  });
+
+  it('deleteConversation leaves other conversations untouched and persists', () => {
+    const otherId = CHAT_SEED[0].id;
+    store.deleteConversation(THREADED_CONTACT_ID);
+    const reloaded = new ChatStore();
+    expect(reloaded.conversations().some((c) => c.id === otherId)).toBe(true);
+    expect(reloaded.conversations().some((c) => c.id === THREADED_CONTACT_ID)).toBe(false);
+  });
+
+  it('reset restores a deleted conversation', () => {
+    store.deleteConversation(THREADED_CONTACT_ID);
+    store.reset();
+    expect(store.conversations().some((c) => c.id === THREADED_CONTACT_ID)).toBe(true);
+    expect(store.conversationMessages(THREADED_CONTACT_ID).length).toBe(THREAD_SEED.length);
+  });
 });

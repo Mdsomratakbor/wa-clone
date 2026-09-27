@@ -335,4 +335,62 @@ describe('ChatWindowPage', () => {
     openSheet(fixture);
     expect(sheetRows(fixture)[0]?.textContent?.trim()).toBe('Unmute');
   });
+
+  it('opens the More submenu and closes the parent sheet', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    openSheet(fixture);
+    sheetRows(fixture)[2]?.click();
+    fixture.detectChanges();
+    expect(sheetRows(fixture).map((r) => r.textContent?.trim())).toEqual([
+      'Clear messages',
+      'Delete chat',
+    ]);
+    expect(fixture.nativeElement.querySelector('app-chat-actions-modal')).toBeNull();
+  });
+
+  it('Clear messages empties the thread and closes the submenu', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    openSheet(fixture);
+    sheetRows(fixture)[2]?.click();
+    fixture.detectChanges();
+    sheetRows(fixture)[0]?.click();
+    fixture.detectChanges();
+    expect(TestBed.inject(ChatStore).conversationMessages('chat-006')).toEqual([]);
+    expect(fixture.nativeElement.querySelectorAll('app-message-bubble').length).toBe(0);
+    expect(fixture.nativeElement.querySelector('[data-testid="action-sheet"]')).toBeNull();
+    expect(
+      document.activeElement,
+    ).toBe(fixture.nativeElement.querySelector('[data-testid="chat-header__more"]'));
+  });
+
+  it('Delete chat removes the conversation and returns to the chats list', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    openSheet(fixture);
+    sheetRows(fixture)[2]?.click();
+    fixture.detectChanges();
+    sheetRows(fixture)[1]?.click();
+    fixture.detectChanges();
+    expect(
+      TestBed.inject(ChatStore).conversations().some((c) => c.id === 'chat-006'),
+    ).toBe(false);
+    expect(navSpy).toHaveBeenCalledWith(['/chats']);
+    expect(fixture.nativeElement.querySelector('[data-testid="action-sheet"]')).toBeNull();
+  });
+
+  it('dismisses the More submenu on Escape and restores focus', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    openSheet(fixture);
+    sheetRows(fixture)[2]?.click();
+    fixture.detectChanges();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[data-testid="action-sheet"]')).toBeNull();
+    expect(
+      document.activeElement,
+    ).toBe(fixture.nativeElement.querySelector('[data-testid="chat-header__more"]'));
+  });
 });
