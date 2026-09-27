@@ -6,6 +6,13 @@ import { PrefsStore } from '../../core/prefs.store';
 import { CHAT_SEED } from './chat-list.seed';
 import { NEW_CHAT_ACTIONS } from '../new-chat-modal/new-chat-modal.seed';
 
+function clickNavAction(el: HTMLElement, label: string): void {
+  const button = Array.from(
+    el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action'),
+  ).find((b) => b.textContent?.trim() === label);
+  button?.click();
+}
+
 describe('ChatsPage', () => {
   let fixture: ComponentFixture<ChatsPage>;
 
@@ -31,6 +38,62 @@ describe('ChatsPage', () => {
     fixture.detectChanges();
     const title = fixture.nativeElement.querySelector('.navigation-bar__title');
     expect(title?.textContent).toBe('Chats');
+  });
+
+  it('hides the Archived row when nothing is archived (F-034)', () => {
+    fixture = TestBed.createComponent(ChatsPage);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[data-testid="archived-row"]')).toBeNull();
+  });
+
+  it('renders the Archived row when a chat is archived and opens the screen (F-034)', () => {
+    const store = TestBed.inject(ChatStore);
+    const router = TestBed.inject(Router);
+    const navigate = spyOn(router, 'navigate').and.resolveTo(true);
+    store.archiveConversations([CHAT_SEED[0].id]);
+    fixture = TestBed.createComponent(ChatsPage);
+    fixture.detectChanges();
+    const row = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+      '[data-testid="archived-row"]',
+    );
+    expect(row).not.toBeNull();
+    expect(row?.getAttribute('aria-label')).toBe('Archived');
+    expect(row?.textContent?.trim()).toBe('Archived');
+    row?.click();
+    expect(navigate).toHaveBeenCalledWith(['/archived']);
+  });
+
+  it('keeps the Archived row out of edit mode and out of search results (F-034)', () => {
+    const store = TestBed.inject(ChatStore);
+    store.archiveConversations([CHAT_SEED[0].id]);
+    fixture = TestBed.createComponent(ChatsPage);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('[data-testid="archived-row"]')).not.toBeNull();
+
+    clickNavAction(el, 'Edit');
+    fixture.detectChanges();
+    expect(el.querySelector('[data-testid="archived-row"]')).toBeNull();
+
+    clickNavAction(el, 'Done');
+    fixture.detectChanges();
+    const search = el.querySelector<HTMLInputElement>('[data-testid="chat-search"]')!;
+    search.value = 'a';
+    search.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    expect(el.querySelector('[data-testid="archived-row"]')).toBeNull();
+  });
+
+  it('hides the Archived row once the last archived chat is restored (F-034)', () => {
+    const store = TestBed.inject(ChatStore);
+    store.archiveConversations([CHAT_SEED[0].id]);
+    fixture = TestBed.createComponent(ChatsPage);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('[data-testid="archived-row"]')).not.toBeNull();
+    store.unarchiveConversations([CHAT_SEED[0].id]);
+    fixture.detectChanges();
+    expect(el.querySelector('[data-testid="archived-row"]')).toBeNull();
   });
 
   it('renders an empty placeholder when the store has no conversations', () => {

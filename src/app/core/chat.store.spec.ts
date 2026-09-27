@@ -395,4 +395,24 @@ describe('ChatStore', () => {
     store.deleteConversations([]);
     expect(store.conversations()).toBe(before);
   });
+
+  it('unarchiveConversations clears exactly the given conversations', () => {
+    const [first, second] = CHAT_SEED;
+    store.archiveConversations([first.id, second.id]);
+    store.unarchiveConversations([first.id]);
+    expect(store.conversations().find((c) => c.id === first.id)?.archived).toBe(false);
+    expect(store.conversations().find((c) => c.id === second.id)?.archived).toBe(true);
+    expect(store.archivedIds()).toEqual([second.id]);
+  });
+
+  it('unarchiveConversations persists across a reload and ignores an empty selection', () => {
+    const [first] = CHAT_SEED;
+    store.archiveConversations([first.id]);
+    store.unarchiveConversations([first.id]);
+    const reloaded = new ChatStore();
+    expect(reloaded.archivedIds()).toEqual([]);
+    const before = reloaded.conversations();
+    reloaded.unarchiveConversations([]);
+    expect(reloaded.conversations()).toBe(before);
+  });
 });
