@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { CallStore } from '../../core/call.store';
 import { CallsPage } from './calls-page';
 import { CALL_SEED } from './calls.seed';
 
@@ -7,6 +8,7 @@ describe('CallsPage', () => {
   let fixture: ComponentFixture<CallsPage>;
 
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [CallsPage],
       providers: [provideRouter([])],
@@ -174,6 +176,8 @@ describe('CallsPage', () => {
   });
 
   it('row-body activation is a no-op in edit mode', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
     const edit = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
       (b) => b.textContent?.trim() === 'Edit',
@@ -183,7 +187,86 @@ describe('CallsPage', () => {
     const row = el.querySelector('.call-list-item') as HTMLElement;
     row?.click();
     fixture.detectChanges();
+    expect(router.navigate).not.toHaveBeenCalled();
     expect(el.querySelectorAll('app-call-list-item').length).toBe(CALL_SEED.length);
+  });
+
+  it('row activation opens the chat with the same contact (F-038)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+
+    const row = [...el.querySelectorAll<HTMLElement>('.call-list-item')].find((candidate) =>
+      candidate.textContent?.includes('Kieron Dotson'),
+    );
+    row?.click();
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/chat', 'chat-003']);
+  });
+
+  it('row activation works from the keyboard too (F-038)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+
+    const row = [...el.querySelectorAll<HTMLElement>('.call-list-item')].find((candidate) =>
+      candidate.textContent?.includes('Martin Randolph'),
+    );
+    row?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/chat', 'chat-007']);
+  });
+
+  it('row activation is a no-op when the contact has no chat (F-038)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+
+    const row = [...el.querySelectorAll<HTMLElement>('.call-list-item')].find((candidate) =>
+      candidate.textContent?.includes('Zack John'),
+    );
+    row?.click();
+    fixture.detectChanges();
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('the call-info button stays inert (F-038)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+    (el.querySelector('[data-testid="call-info"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('Clear persists: the log stays cleared after a reload (F-038)', () => {
+    const el = render();
+    const edit = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+      (b) => b.textContent?.trim() === 'Edit',
+    );
+    edit?.click();
+    fixture.detectChanges();
+    const clear = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+      (b) => b.textContent?.trim() === 'Clear',
+    );
+    clear?.click();
+    fixture.detectChanges();
+    expect(TestBed.inject(CallStore).calls()).toEqual([]);
+
+    const reloaded = TestBed.inject(CallStore);
+    expect(reloaded.calls()).toEqual([]);
+  });
+
+  it('an edit-mode removal persists (F-038)', () => {
+    const el = render();
+    const edit = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+      (b) => b.textContent?.trim() === 'Edit',
+    );
+    edit?.click();
+    fixture.detectChanges();
+    (el.querySelector('[data-testid="call-remove"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(TestBed.inject(CallStore).calls().length).toBe(CALL_SEED.length - 1);
   });
 
   it('tab selection is inert while editing', () => {

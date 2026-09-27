@@ -42,13 +42,34 @@ test.describe('Calls screen (US1)', () => {
     expect(color).toBe('rgb(255, 59, 48)');
   });
 
-  test('row controls are no-ops', async ({ page }) => {
+  test('New call and call info stay inert; a row opens the matching chat (F-038)', async ({
+    page,
+  }) => {
     const url = new URL(page.url()).pathname;
     await page.getByRole('button', { name: 'New call' }).click();
-    await page.getByRole('button', { name: 'Martin Randolph, outgoing, 10/13/19' }).click();
     await page.getByRole('button', { name: 'Call info for Martin Randolph' }).click();
     await expect(page).toHaveURL(url);
     await expect(page.getByTestId('call-list')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Martin Randolph, outgoing, 10/13/19' }).click();
+    await expect(page).toHaveURL(/\/chat\/chat-007$/);
+    await page.getByTestId('message-thread').waitFor();
+  });
+
+  test('a row without a matching chat stays put (F-038)', async ({ page }) => {
+    await page.getByRole('button', { name: 'Zack John, incoming, 9/24/19' }).click();
+    await expect(page).toHaveURL(/\/calls$/);
+    await page.getByTestId('call-list').waitFor();
+  });
+
+  test('the cleared call log stays cleared after a reload (F-038)', async ({ page }) => {
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.getByRole('button', { name: 'Clear' }).click();
+    await expect(page.getByTestId('empty-state')).toBeVisible();
+
+    await page.reload();
+    await page.getByTestId('empty-state').waitFor();
+    await expect(page.getByTestId('call-list')).toHaveCount(0);
   });
 
   test('matches the Figma golden render on mobile', async ({ page }) => {

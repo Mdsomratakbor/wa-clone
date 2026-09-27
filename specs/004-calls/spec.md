@@ -162,5 +162,14 @@ As a user I can read every control of the Calls header without triggering flows 
 ### Definition of Done
 - Spec, plan, tasks approved; clarifications resolved.
 - All unit + E2E validation targets pass.
-- Playwright visual check recorded (golden vs `0:10395`; documented drift).
+- Playwright visual check recorded (golden vs `0-10395`; documented drift).
 - Design-map row 004 marked implemented.
+
+## Drift notes
+
+- **F-038 (2026-09-27)**: the `calls` input and its seeding `effect` are gone; the log lives in
+  `CallStore` (`wa.call-store.v1`), so `Clear` and edit-mode removal now survive a reload — the
+  local-signal mutation was the F-032 bug class. Row activation opens the chat whose `contactName`
+  matches the entry (no match ⇒ stays put). `New call` and the call-info button stay no-ops because
+  they need a call surface (audit tier B6). The first run hydrates the identical 12 seeded entries,
+  so `0-10395-calls.png` is unaffected. See `specs/038-call-log/`.
