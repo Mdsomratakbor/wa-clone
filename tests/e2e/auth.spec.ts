@@ -29,13 +29,32 @@ test.describe('Authorization screen (US2)', () => {
 });
 
 test.describe('Authorization chroming + visual (US3)', () => {
-  test('Continue and keypad are no-ops', async ({ page }) => {
+  test('keypad entry, inline error and a valid number entering the app (F-037)', async ({
+    page,
+  }) => {
     await page.goto('/auth');
     await page.getByTestId('auth-page').waitFor();
-    await page.getByTestId('auth-key').first().click();
+    await expect(page.getByTestId('auth-phone')).toHaveText('');
+
+    for (const digit of ['9', '4', '1']) {
+      await page.getByRole('button', { name: digit, exact: true }).click();
+    }
+    await expect(page.getByTestId('auth-phone')).toHaveText('941');
+
+    await page.getByRole('button', { name: 'Delete digit' }).click();
+    await expect(page.getByTestId('auth-phone')).toHaveText('94');
+
     await page.getByRole('button', { name: 'Continue' }).click();
     await expect(page).toHaveURL(/\/auth$/);
-    await page.getByTestId('auth-page').waitFor();
+    await expect(page.getByTestId('auth-error')).toBeVisible();
+
+    for (const digit of ['1', '2', '3', '4', '5', '6', '7']) {
+      await page.getByRole('button', { name: digit, exact: true }).click();
+    }
+    await expect(page.getByTestId('auth-error')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Continue' }).click();
+    await expect(page).toHaveURL(/\/chats$/);
+    await page.getByTestId('chat-list').waitFor();
   });
 
   test.skip(

@@ -64,6 +64,15 @@ design file and re-routing the default would detach every reachable feature.
 
 ## Closing note (deliberately incomplete)
 
-Until T001 lands, `auth-page` renders the structural keypad (stable testids/aria-labels) —
+Until T001 lands, `auth-page` renders the structural keypad (stable testids/aria-labels) -
 replaced at G1 with the captured design. Entry wiring decision (default flow change) is gated on
 capture + owner approval.
+
+## Drift notes
+
+- **F-037 (2026-09-27)**: the controls are no longer no-ops and keypad state is no longer
+  map-external. Digits fill the phone region (max 15, `aria-live="polite"`), backspace edits it, and
+  `Continue` either shows an inline error (`auth-error`, < 7 digits) or navigates to `/chats`.
+  FR-005 still holds: `/` → `/chats` is unchanged, so `/auth` is not the entry route. OTP entry,
+  a country picker and storing the number remain non-goals, and the error wording is map-external
+  (to be re-checked at capture). See `specs/037-auth-keypad/`.
