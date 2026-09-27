@@ -12,6 +12,10 @@ values in place until then.
 
 **Input**: `figma/design-map.md` row 9 (`0:9072`) + `specs/009-new-chat-modal/research.md`
 
+> **Drift note (F-040, 2026-09-27)**: The `New group` row is no longer inert — it dismisses the
+> sheet and navigates to `/new-group` (`specs/040-new-group/spec.md`). `New community` remains
+> inert. `New contact` is unchanged.
+
 ---
 
 ## Summary

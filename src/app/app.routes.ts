@@ -81,6 +81,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/contacts/contacts-page').then((m) => m.ContactsPage),
   },
   {
+    path: 'new-group',
+    loadComponent: () =>
+      import('./features/new-group/new-group-page').then((m) => m.NewGroupPage),
+  },
+  {
     path: 'auth',
     loadComponent: () => import('./features/auth/auth-page').then((m) => m.AuthPage),
   },

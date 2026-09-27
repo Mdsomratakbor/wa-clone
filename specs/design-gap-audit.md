@@ -30,8 +30,8 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 
 | # | Design row | Entry point | Missing screen |
 | - | ---------- | ------------ | -------------- |
-| B1 | 13 Settings | `Contacts` row | Contacts list |
-| B2 | 1/3 Chats + 9 Add modal | `New Group` | group creation (name + participants) |
+| B1 | 13 Settings | `Contacts` row | Contacts list — **done (F-039)** |
+| B2 | 1/3 Chats + 9 Add modal | `New Group` | group creation (name + participants) — **done (F-040)** |
 | B3 | 1 Chats | `Broadcast Lists` | broadcast list screen |
 | B4 | 2 Chat window + 16 Chats settings | `Wallpaper` | wallpaper picker |
 | B5 | 16 Chats settings | `Font size` | size control (persisted, applied app-wide) |
@@ -60,7 +60,9 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   lives in `CallStore` (`wa.call-store.v1`) and removals/clears persist.
 - Calls rows are inert: **fixed (F-038)** — a row opens the chat with the same `contactName`
   (no match ⇒ stays put). `New call` and call info remain inert (B6).
-- 13 Settings: the last dead row is `Contacts` (B1).
+- 13 Settings: the last dead row is `Contacts` — **fixed (F-039)**.
+- Chats `New Group` / add-modal `New group` are live (F-040): a group conversation model plus
+  `/new-group` creation. `Broadcast Lists` (B3) and `New community` stay inert.
 
 ## Suggested order
 
@@ -68,12 +70,14 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 2. **A3** (profile persistence) — done (F-036).
 3. **A4** (auth keypad + Continue) — done (F-037).
 4. **Calls store-backing + row activation** — done (F-038).
-5. **B1/B2** (Contacts, New Group) — next: the two most valuable new screens, both re-use the chat
-   model.
-6. **B4/B5** (Wallpaper, Font size) — visible, persisted, app-wide.
-7. Remaining tier B, then tier C at the quota reset.
+5. **B1** (Contacts) — done (F-039).
+6. **B2** (New Group) — done (F-040).
+7. **B4/B5** (Wallpaper, Font size) — next: visible, persisted, app-wide.
+8. Remaining tier B, then tier C at the quota reset.
 
 ## Progress log
 
 - **2026-09-27** — Audit written; A1–A4 + the calls fixes landed as F-035…F-038 (331 → 357 unit
   tests, build green). Tier A is now empty; the next work is tier B or the quota reset.
+- **2026-09-27** — F-039 Contacts (370 unit) and F-040 New Group (385 unit) landed; build green.
+  B1 and B2 are done, so the next tier-B targets are B4/B5 then B3/B6…B12.

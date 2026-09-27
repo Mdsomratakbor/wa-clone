@@ -4,7 +4,8 @@
 
 **Created**: 2026-09-27
 
-**Status**: **In progress — implementing (spec-driven).**
+**Status**: **Complete — implemented, build green, unit 385/385 (Playwright runs paused per owner
+directive).**
 
 **Input**: design rows 1/3 (`New Group` nav) + 9 (`New group` add-modal entry) + gap audit tier B2 +
 `specs/040-new-group/research.md`

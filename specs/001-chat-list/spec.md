@@ -8,6 +8,12 @@
 
 **Input**: Figma design analysis → recommended first feature (design-map row 1, node `0:8855`)
 
+> **Drift note (F-040, 2026-09-27)**: The `New Group` leading action is no longer inert — it
+> navigates to `/new-group`, the group creation screen added by
+> `specs/040-new-group/spec.md`. `Broadcast Lists` remains a no-op (F-001/003). This supersedes the
+> original 001/003 "rendered, no wiring" treatment of `New Group` only; nothing else in 001 changes
+> (no seeded render, no nav bar or tab bar change).
+
 ## Context
 
 The Chat List is the primary landing screen of the WhatsApp UI. It presents the user's conversations as a scrollable list, each row showing a contact avatar, name, latest message preview, and a timestamp. A navigation bar provides the `Edit` action and entry points to `Broadcast Lists` / `New Group`; a tab bar at the bottom provides top-level navigation (Settings · Chats · Camera · Calls · Status); a floating `Actions` button opens the New Chat flow.

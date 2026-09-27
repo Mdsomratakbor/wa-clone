@@ -1,0 +1,68 @@
+<app-navigation-bar
+  title="New group"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="new-group" data-testid="new-group-page">
+  <div class="new-group__form">
+    <label class="new-group__field">
+      <span class="new-group__label">Group name</span>
+      <input
+        class="new-group__input"
+        data-testid="new-group-name"
+        type="text"
+        placeholder="Group name"
+        aria-label="Group name"
+        #nameInput
+        [value]="nameDraft()"
+        (input)="onNameInput(nameInput.value)"
+      />
+    </label>
+  </div>
+
+  @if (contacts().length === 0) {
+    <p class="new-group__empty" data-testid="new-group-empty" role="status">No contacts</p>
+  } @else {
+    <ul class="new-group__list" data-testid="new-group-list" aria-label="Select participants">
+      @for (contact of contacts(); track contact.id) {
+        <li class="new-group__row">
+          <button
+            type="button"
+            class="new-group__contact"
+            data-testid="new-group-contact"
+            [class.new-group__contact--selected]="isSelected(contact.id)"
+            [attr.aria-pressed]="isSelected(contact.id)"
+            [attr.aria-label]="contact.contactName"
+            (click)="onToggleContact(contact)"
+          >
+            <app-user-avatar [src]="contact.avatarRef" [name]="contact.contactName" [size]="40" />
+            <span class="new-group__contact-name">{{ contact.contactName }}</span>
+            @if (isSelected(contact.id)) {
+              <svg class="new-group__check" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+                <path
+                  d="m3.5 9.5 3.5 3.5 7.5-8"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            }
+          </button>
+        </li>
+      }
+    </ul>
+  }
+
+  <button
+    type="button"
+    class="new-group__create"
+    data-testid="new-group-create"
+    [disabled]="!canCreate()"
+    (click)="onCreate()"
+  >
+    Create
+  </button>
+</main>

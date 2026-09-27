@@ -161,7 +161,12 @@ export class ChatsPage {
       this.selectedIds.set(new Set());
       return;
     }
-    // F-001/003: broadcast-lists / new-group flows are later features.
+    if (id === 'new-group') {
+      // F-040: New Group creation (design-map rows 1/3 + 9).
+      void this.router.navigate(['/new-group']);
+      return;
+    }
+    // F-001/003: broadcast-lists is a later feature.
   }
 
   protected onFabPressed(): void {
@@ -181,12 +186,19 @@ export class ChatsPage {
   }
 
   protected onAddModalAction(id: string): void {
-    // F-009 targets (new group / community) are later features (spec Non-Goals).
     if (id === 'new-contact') {
       this.onDismissModal();
       const chatId = this.store.createConversation();
       void this.router.navigate(['/chat', chatId]);
+      return;
     }
+    if (id === 'new-group') {
+      // F-040: New group opens the same creation screen as the nav action (design-map row 9).
+      this.onDismissModal();
+      void this.router.navigate(['/new-group']);
+      return;
+    }
+    // F-009: new community is a later feature (spec Non-Goals).
   }
 
   protected onDismissModal(): void {

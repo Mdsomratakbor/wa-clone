@@ -35,7 +35,14 @@ function nowTime(): string {
 }
 
 function normalizeChats(seed: readonly ChatPreview[]): readonly ChatPreview[] {
-  return seed.map((chat) => ({ ...chat, read: false, muted: false, archived: false }));
+  return seed.map((chat) => ({
+    ...chat,
+    read: false,
+    muted: false,
+    archived: false,
+    kind: chat.kind ?? 'direct',
+    participants: chat.participants ?? [],
+  }));
 }
 
 function readStorage(key: string): string | null {
@@ -100,8 +107,26 @@ export class ChatStore {
     return id;
   }
 
-  toggleStarred(chatId: string, messageId: string): void {
-    const key = `${chatId}:${messageId}`;
+  createGroup(name: string, participants: readonly string[] = []): string {
+    this.newChatCounter += 1;
+    const id = `group-${this.newChatCounter}`;
+    const chat: ChatPreview = {
+      id,
+      contactName: name.trim(),
+      preview: '',
+      timestamp: nowTime(),
+      avatarRef: null,
+      read: true,
+      kind: 'group',
+      participants: [...participants],
+    };
+    this.conversations.update((chats) => [...chats, chat]);
+    this.threads.update((threads) => ({ ...threads, [id]: [] }));
+    this.persist();
+    return id;
+  }
+
+  toggleStarred(chatId: string, messageId: string): void {    const key = `${chatId}:${messageId}`;
     this.starred.update((list) =>
       list.includes(key) ? list.filter((k) => k !== key) : [...list, key],
     );
@@ -143,10 +168,18 @@ export class ChatStore {
     }
     return {
       name: chat.contactName,
-      subtitle: CONTACT_SUBTITLE,
+      subtitle: this.subtitleFor(chat),
       avatarRef: chat.avatarRef,
       muted: chat.muted ?? false,
     };
+  }
+
+  private subtitleFor(chat: ChatPreview): string {
+    if ((chat.kind ?? 'direct') !== 'group') {
+      return CONTACT_SUBTITLE;
+    }
+    const participants = chat.participants ?? [];
+    return participants.length > 0 ? `${participants.length} participants` : 'Group';
   }
 
   isMuted(chatId: string): boolean {
@@ -161,13 +194,17 @@ export class ChatStore {
     const seen = new Set<string>();
     const contacts: ChatPreview[] = [];
     for (const chat of this.conversations()) {
-      if (seen.has(chat.contactName)) {
+      if ((chat.kind ?? 'direct') === 'group' || seen.has(chat.contactName)) {
         continue;
       }
       seen.add(chat.contactName);
       contacts.push(chat);
     }
     return contacts.sort((a, b) => a.contactName.localeCompare(b.contactName));
+  }
+
+  groupParticipants(chatId: string): readonly string[] {
+    return this.conversations().find((c) => c.id === chatId)?.participants ?? [];
   }
 
   toggleMuted(chatId: string): void {

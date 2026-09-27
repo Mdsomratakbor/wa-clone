@@ -1,5 +1,7 @@
 export type TabKey = 'settings' | 'chats' | 'camera' | 'calls' | 'status';
 
+export type ChatKind = 'direct' | 'group';
+
 export interface ChatPreview {
   id: string;
   contactName: string;
@@ -10,6 +12,8 @@ export interface ChatPreview {
   phone?: string;
   muted?: boolean;
   archived?: boolean;
+  kind?: ChatKind;
+  participants?: readonly string[];
 }
 
 export interface TabItem {
