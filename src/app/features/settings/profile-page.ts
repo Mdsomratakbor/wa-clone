@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { PrefsStore } from '../../core/prefs.store';
 import { NavAction } from '../chat-list/chat.model';
 import { NavigationBar } from '../../shared/components/navigation-bar/navigation-bar';
-import { SETTINGS_PROFILE } from './settings.seed';
 
 @Component({
   selector: 'app-profile-page',
@@ -13,8 +13,10 @@ import { SETTINGS_PROFILE } from './settings.seed';
 })
 export class ProfilePage {
   private readonly router = inject(Router);
+  private readonly prefs = inject(PrefsStore);
 
-  protected readonly profile = SETTINGS_PROFILE;
+  protected readonly nameDraft = signal(this.prefs.profile().name);
+  protected readonly aboutDraft = signal(this.prefs.profile().about);
 
   protected readonly leadingActions: readonly NavAction[] = [
     { id: 'back', label: 'Back', icon: 'back' },
@@ -27,6 +29,11 @@ export class ProfilePage {
   }
 
   protected onSave(): void {
-    // F-020: persistence is a later feature / map-external.
+    const name = this.nameDraft().trim();
+    if (name.length === 0) {
+      return;
+    }
+    this.prefs.updateProfile(name, this.aboutDraft().trim());
+    void this.router.navigate(['/settings']);
   }
 }

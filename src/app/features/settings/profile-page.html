@@ -12,8 +12,10 @@
         class="profile__input"
         data-testid="profile-name"
         type="text"
-        [value]="profile.name"
         aria-label="Name"
+        #nameInput
+        [value]="nameDraft()"
+        (input)="nameDraft.set(nameInput.value)"
       />
     </label>
 
@@ -25,6 +27,9 @@
         type="text"
         placeholder="About"
         aria-label="About"
+        #aboutInput
+        [value]="aboutDraft()"
+        (input)="aboutDraft.set(aboutInput.value)"
       />
     </label>
 

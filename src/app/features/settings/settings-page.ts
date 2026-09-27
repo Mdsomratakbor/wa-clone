@@ -8,6 +8,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { PrefsStore } from '../../core/prefs.store';
 import { NavAction, TabItem, TabKey } from '../chat-list/chat.model';
 import { NavigationBar } from '../../shared/components/navigation-bar/navigation-bar';
 import { TabBar } from '../../shared/components/tab-bar/tab-bar';
@@ -32,10 +33,14 @@ const TAB_LABELS: Record<TabKey, string> = {
 })
 export class SettingsPage {
   private readonly router = inject(Router);
+  private readonly prefs = inject(PrefsStore);
   private readonly trigger =
     viewChild.required<ElementRef<HTMLButtonElement>>('settingsOptionsTrigger');
 
-  protected readonly profile = SETTINGS_PROFILE;
+  protected readonly profile = computed(() => ({
+    name: this.prefs.profile().name,
+    subtitle: SETTINGS_PROFILE.subtitle,
+  }));
   protected readonly rows: readonly SettingsRowSeed[] = SETTINGS_ROWS;
 
   protected readonly activeTab = signal<TabKey>('settings');

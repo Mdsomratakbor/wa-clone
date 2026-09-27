@@ -25,15 +25,23 @@ export type ChatSort = 'recent' | 'name' | 'unread';
 
 export const DEFAULT_CHAT_SORT: ChatSort = 'recent';
 
+export interface ProfileSnapshot {
+  name: string;
+  about: string;
+}
+
+export const DEFAULT_PROFILE: ProfileSnapshot = { name: 'Ani', about: '' };
+
 export const PREFS_KEY = 'wa.prefs.v1';
 
 interface PrefsSnapshotEnvelope {
-  version: 2;
+  version: number;
   prefs: PrefsSnapshot;
   chatSort: ChatSort;
+  profile?: ProfileSnapshot;
 }
 
-const PREFS_VERSION = 2;
+const PREFS_VERSION = 3;
 
 function readStorage(key: string): string | null {
   try {
@@ -63,6 +71,7 @@ function clearStorage(key: string): void {
 export class PrefsStore {
   readonly prefs = signal<PrefsSnapshot>({ ...DEFAULT_PREFS });
   readonly chatSort = signal<ChatSort>(DEFAULT_CHAT_SORT);
+  readonly profile = signal<ProfileSnapshot>({ ...DEFAULT_PROFILE });
 
   constructor() {
     this.hydrate();
@@ -83,10 +92,16 @@ export class PrefsStore {
     this.persist();
   }
 
+  updateProfile(name: string, about: string): void {
+    this.profile.set({ name, about });
+    this.persist();
+  }
+
   reset(): void {
     clearStorage(PREFS_KEY);
     this.prefs.set({ ...DEFAULT_PREFS });
     this.chatSort.set(DEFAULT_CHAT_SORT);
+    this.profile.set({ ...DEFAULT_PROFILE });
   }
 
   private persist(): void {
@@ -94,6 +109,7 @@ export class PrefsStore {
       version: PREFS_VERSION,
       prefs: this.prefs(),
       chatSort: this.chatSort(),
+      profile: this.profile(),
     };
     writeStorage(PREFS_KEY, JSON.stringify(envelope));
   }
@@ -109,11 +125,17 @@ export class PrefsStore {
     } catch {
       return;
     }
-    const envelope = parsed as { version: number; prefs: PrefsSnapshot; chatSort?: ChatSort };
-    if (envelope?.version !== 1 && envelope?.version !== PREFS_VERSION) {
+    const envelope = parsed as {
+      version: number;
+      prefs: PrefsSnapshot;
+      chatSort?: ChatSort;
+      profile?: ProfileSnapshot;
+    };
+    if (envelope?.version !== 1 && envelope?.version !== 2 && envelope?.version !== PREFS_VERSION) {
       return;
     }
     this.prefs.set({ ...DEFAULT_PREFS, ...envelope.prefs });
     this.chatSort.set(envelope.chatSort ?? DEFAULT_CHAT_SORT);
+    this.profile.set({ ...DEFAULT_PROFILE, ...envelope.profile });
   }
 }
