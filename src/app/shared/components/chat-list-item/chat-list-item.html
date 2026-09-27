@@ -46,6 +46,31 @@
   <div class="chat-list-item__body">
     <div class="chat-list-item__head">
       <span class="chat-list-item__name">{{ chat().contactName }}</span>
+      @if (chat().muted) {
+        <svg
+          class="chat-list-item__mute"
+          role="img"
+          aria-label="Muted"
+          [attr.data-testid]="'chat-mute-badge-' + chat().id"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+          <path
+            d="M12 4a5 5 0 0 1 5 5v4.2l1.6 1.6a1 1 0 0 1 .4.8l.02 1a1 1 0 0 1-1 1h-4.1a2.2 2.2 0 0 1-4.4 0H6a1 1 0 0 1-1-1l.02-1a1 1 0 0 1 .38-.8L7 13.2V9a5 5 0 0 1 5-5Z"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M3.5 3.5 20.5 20.5"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+          />
+        </svg>
+      }
       <time class="chat-list-item__timestamp">{{ chat().timestamp }}</time>
     </div>
     <p class="chat-list-item__preview">

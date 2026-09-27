@@ -63,6 +63,12 @@
     text-overflow: ellipsis;
   }
 
+  &__mute {
+    flex: none;
+    align-self: center;
+    color: var(--wa-text-secondary);
+  }
+
   &__timestamp {
     font-family: var(--wa-font-family);
     font-size: var(--wa-fs-preview);
