@@ -81,3 +81,9 @@ bottom action bar. The navigation bar shows a leading **Privacy** action and a c
    `0-8498-status.png` at 375x812.
 3. Responsive: `/status` no-overflow appended to `tests/e2e/responsive.spec.ts`.
 4. `figma/design-map.md` row 6 spec column set to `006`; spec status Implemented after closure.
+
+## Drift notes
+
+- **F-035 (2026-09-27)**: the `Privacy` nav action and the `My Status` row are no longer no-ops —
+  they navigate to `/settings` and `/status/compose`. The `tip`, header, tab bar and seeded feed are
+  unchanged, so `0-8498-status.png` is unaffected. See `specs/035-status-wiring/`.
