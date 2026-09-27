@@ -35,7 +35,7 @@ function nowTime(): string {
 }
 
 function normalizeChats(seed: readonly ChatPreview[]): readonly ChatPreview[] {
-  return seed.map((chat) => ({ ...chat, read: false, muted: false }));
+  return seed.map((chat) => ({ ...chat, read: false, muted: false, archived: false }));
 }
 
 function readStorage(key: string): string | null {
@@ -203,6 +203,29 @@ export class ChatStore {
       list.filter((key) => !key.startsWith(`${chatId}:`)),
     );
     this.persist();
+  }
+
+  archiveConversations(ids: readonly string[]): void {
+    if (ids.length === 0) {
+      return;
+    }
+    const target = new Set(ids);
+    this.conversations.update((chats) =>
+      chats.map((chat) =>
+        target.has(chat.id) ? { ...chat, archived: true } : chat,
+      ),
+    );
+    this.persist();
+  }
+
+  archivedIds(): readonly string[] {
+    return this.conversations()
+      .filter((chat) => chat.archived)
+      .map((chat) => chat.id);
+  }
+
+  deleteConversations(ids: readonly string[]): void {
+    ids.forEach((id) => this.deleteConversation(id));
   }
 
   setConversations(list: readonly ChatPreview[]): void {

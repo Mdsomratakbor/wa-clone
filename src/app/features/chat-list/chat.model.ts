@@ -9,6 +9,7 @@ export interface ChatPreview {
   read?: boolean;
   phone?: string;
   muted?: boolean;
+  archived?: boolean;
 }
 
 export interface TabItem {

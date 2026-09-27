@@ -91,7 +91,7 @@ export class ChatsPage {
 
   constructor() {
     effect(() => {
-      this.items.set([...this.conversations()]);
+      this.items.set(this.conversations().filter((chat) => !chat.archived));
     });
   }
 
@@ -193,11 +193,21 @@ export class ChatsPage {
   }
 
   protected onArchive(): void {
-    this.removeSelected();
+    const selected = [...this.selectedIds()];
+    if (selected.length === 0) {
+      return;
+    }
+    this.store.archiveConversations(selected);
+    this.selectedIds.set(new Set());
   }
 
   protected onDelete(): void {
-    this.removeSelected();
+    const selected = [...this.selectedIds()];
+    if (selected.length === 0) {
+      return;
+    }
+    this.store.deleteConversations(selected);
+    this.selectedIds.set(new Set());
   }
 
   protected onReadAll(): void {
@@ -212,14 +222,5 @@ export class ChatsPage {
       next.add(id);
     }
     this.selectedIds.set(next);
-  }
-
-  private removeSelected(): void {
-    const selected = this.selectedIds();
-    if (selected.size === 0) {
-      return;
-    }
-    this.items.set(this.items().filter((chat) => !selected.has(chat.id)));
-    this.selectedIds.set(new Set());
   }
 }
