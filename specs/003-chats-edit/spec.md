@@ -97,6 +97,12 @@ As a user I can archive or delete the selected chats and exit with the list upda
 - **FR-005**: In edit mode the FAB and tab bar MUST be replaced by the Chat Actions bar (`#F6F6F6`, hairline top shadow, visible `49px`) with `Archive`, `Read All`, `Delete` (Clarification 7).
 - **FR-006**: Action bar state MUST follow Clarification 5 (disabled `#C7C7CC` at 0 selected; `#007AFF`/`#FF3B30` enabled at ≥1 selected).
 - **FR-007**: `Delete` and `Archive` MUST remove the selected rows from the in-memory list and clear selection; `Read All` MUST be a no-op (Clarification 4).
+
+> **Drift note (F-032, 2026-09-26)**: Lines 20 / 64 / 84 / 99 / 148 are superseded — `Archive` and
+> `Delete` now act on the **store** and persist (F-024 principle): `Delete` removes the
+> conversations, `Archive` flags them `archived` (kept in the store, hidden from the list, no
+> Archived screen yet). `Read All` has been live since F-022 (`markAllRead`). Copy, edit-mode
+> behavior and the placeholder state are unchanged. See `specs/032-chats-edit-store-actions`.
 - **FR-008**: An emptied list MUST show the existing `No chats` empty state, with nav and action bar intact (Clarification 6).
 - **FR-009**: Normal (non-edit) mode MUST remain visually identical to feature 001 (tab bar, FAB, `Edit`, no circles).
 
