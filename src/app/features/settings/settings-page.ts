@@ -101,7 +101,10 @@ export class SettingsPage {
       void this.router.navigate(['/settings/data-storage']);
       return;
     }
-    // F-013: remaining row target (Contacts, row 21-adjacent) is a later feature.
+    if (row.id === 'contacts') {
+      // F-039: Contacts screen (design-map row 13 target; provisional surface).
+      void this.router.navigate(['/contacts']);
+    }
   }
 
   protected onSettingsOptions(): void {

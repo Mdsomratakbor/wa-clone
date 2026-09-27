@@ -1,0 +1,108 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.contacts {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--wa-surface);
+
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 12px 0;
+    padding: 8px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    background: rgba(118, 118, 128, 0.12);
+    color: var(--wa-text-secondary);
+  }
+
+  &__search-icon {
+    flex: 0 0 auto;
+  }
+
+  &__search-input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    outline: none;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-preview);
+    color: var(--wa-text-primary);
+
+    &::placeholder {
+      color: var(--wa-text-secondary);
+    }
+
+    &::-webkit-search-cancel-button {
+      display: none;
+    }
+  }
+
+  &__search-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    padding: 2px;
+    border: 0;
+    background: transparent;
+    color: var(--wa-text-secondary);
+    cursor: pointer;
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-y: auto;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--wa-surface-variant);
+    border-bottom: 0.5px solid color-mix(in srgb, var(--wa-border) 45%, transparent);
+    cursor: pointer;
+    outline: none;
+
+    &:focus-visible {
+      box-shadow: inset 0 0 0 2px var(--wa-accent);
+    }
+  }
+
+  &__name {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-chat-title);
+    font-weight: var(--wa-fw-semibold);
+    line-height: var(--wa-lh-chat-title);
+    letter-spacing: var(--wa-ls-tight);
+    color: var(--wa-on-surface);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__empty {
+    margin: 0;
+    padding: 24px 16px;
+    text-align: center;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-preview);
+    line-height: var(--wa-lh-preview);
+    color: var(--wa-text-secondary);
+  }
+}

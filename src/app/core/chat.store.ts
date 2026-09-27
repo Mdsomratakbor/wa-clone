@@ -157,6 +157,19 @@ export class ChatStore {
     return this.conversations().find((c) => c.contactName === contactName)?.id ?? null;
   }
 
+  contactConversations(): ChatPreview[] {
+    const seen = new Set<string>();
+    const contacts: ChatPreview[] = [];
+    for (const chat of this.conversations()) {
+      if (seen.has(chat.contactName)) {
+        continue;
+      }
+      seen.add(chat.contactName);
+      contacts.push(chat);
+    }
+    return contacts.sort((a, b) => a.contactName.localeCompare(b.contactName));
+  }
+
   toggleMuted(chatId: string): void {
     this.conversations.update((chats) =>
       chats.map((chat) =>

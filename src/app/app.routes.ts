@@ -77,6 +77,10 @@ export const routes: Routes = [
       import('./features/contact-info/edit-contact-page').then((m) => m.EditContactPage),
   },
   {
+    path: 'contacts',
+    loadComponent: () => import('./features/contacts/contacts-page').then((m) => m.ContactsPage),
+  },
+  {
     path: 'auth',
     loadComponent: () => import('./features/auth/auth-page').then((m) => m.AuthPage),
   },
