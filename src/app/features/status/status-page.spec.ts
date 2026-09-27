@@ -109,7 +109,7 @@ describe('StatusPage', () => {
     expect(el.querySelector('[data-testid="tab-stub"]')).toBeNull();
   });
 
-  it('camera and note navigate to compose; Privacy and row stay no-ops', () => {
+  it('camera and note navigate to compose', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
@@ -121,11 +121,47 @@ describe('StatusPage', () => {
     (el.querySelector('[data-testid="status-note"]') as HTMLButtonElement).click();
     fixture.detectChanges();
     expect(router.navigate).toHaveBeenCalledWith(['/status/compose']);
+  });
 
-    el.querySelector('.navigation-bar__action')?.dispatchEvent(new MouseEvent('click'));
-    (el.querySelector('[data-testid="status-my"]') as HTMLElement)?.click();
+  it('Privacy opens settings (F-035)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+
+    (el.querySelector('.navigation-bar__action') as HTMLElement).click();
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/settings']);
+  });
+
+  it('the My Status row opens the composer on click and on Enter (F-035)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+
+    (el.querySelector('[data-testid="status-my"]') as HTMLElement).click();
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/status/compose']);
+
+    (el.querySelector('[data-testid="status-my"]') as HTMLElement).dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter' }),
+    );
     fixture.detectChanges();
     expect(router.navigate).toHaveBeenCalledTimes(2);
+  });
+
+  it('wiring the row leaves the feed, header and tip untouched (F-035)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+
     expect(el.querySelector('[data-testid="status-feed"]')).not.toBeNull();
+    expect(el.querySelector('.status-page__name')?.textContent?.trim()).toBe('My Status');
+    expect(el.querySelector('.status-page__tip-text')).not.toBeNull();
+
+    (el.querySelector('[data-testid="status-my"]') as HTMLElement).click();
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/status/compose']);
+    expect(el.querySelector('[data-testid="status-feed"]')).not.toBeNull();
+    expect(el.querySelectorAll('.status-page__circle').length).toBe(2);
   });
 });

@@ -41,7 +41,7 @@ test.describe('Status feed (US1)', () => {
   });
 });
 
-test.describe('Status routing + no-ops (US2)', () => {
+test.describe('Status routing (US2)', () => {
   test('Chats, Calls, Camera and Settings tabs navigate away; Status stays', async ({
     page,
   }) => {
@@ -94,7 +94,7 @@ test.describe('Status routing + no-ops (US2)', () => {
     await page.getByTestId('status-my').waitFor();
   });
 
-  test('camera and note navigate to compose; Privacy and row stay no-ops', async ({ page }) => {
+  test('camera and note navigate to compose', async ({ page }) => {
     await page.goto('/status');
     await page.getByTestId('status-my').waitFor();
 
@@ -107,13 +107,27 @@ test.describe('Status routing + no-ops (US2)', () => {
     await page.getByTestId('status-note').click();
     await expect(page).toHaveURL(/\/status\/compose$/);
     await page.getByTestId('compose-page').waitFor();
+  });
 
+  test('Privacy opens settings and the My Status row opens the composer (F-035)', async ({
+    page,
+  }) => {
     await page.goto('/status');
     await page.getByTestId('status-my').waitFor();
     await page.getByRole('button', { name: 'Privacy' }).click();
+    await expect(page).toHaveURL(/\/settings$/);
+    await page.getByTestId('settings-page').waitFor();
+
+    await page.goto('/status');
+    await page.getByTestId('status-my').waitFor();
     await page.getByTestId('status-my').click();
-    await expect(page).toHaveURL(/\/status$/);
-    await expect(page.getByTestId('status-tip')).toBeVisible();
+    await expect(page).toHaveURL(/\/status\/compose$/);
+    await page.getByTestId('compose-page').waitFor();
+
+    await page.goto('/status');
+    await page.getByTestId('status-my').waitFor();
+    await page.getByTestId('status-my').press('Enter');
+    await expect(page).toHaveURL(/\/status\/compose$/);
   });
 });
 
