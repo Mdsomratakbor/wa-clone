@@ -82,6 +82,11 @@ export const routes: Routes = [
       import('./features/contact-info/contact-page').then((m) => m.ContactPage),
   },
   {
+    path: 'contact/:id/media',
+    loadComponent: () =>
+      import('./features/contact-info/media-page').then((m) => m.MediaPage),
+  },
+  {
     path: 'contact/:id/edit',
     loadComponent: () =>
       import('./features/contact-info/edit-contact-page').then((m) => m.EditContactPage),

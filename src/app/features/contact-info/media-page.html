@@ -1,0 +1,40 @@
+<app-navigation-bar
+  [title]="name()"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="media" data-testid="media-page">
+  @if (media().length === 0) {
+    <div class="media__empty" role="status" data-testid="media-empty">
+      <p class="media__empty-text">No media</p>
+    </div>
+  } @else {
+    <ul class="media__grid" data-testid="media-grid" aria-label="Media, photos and links">
+      @for (tile of media(); track tile.messageId) {
+        <li
+          class="media__tile"
+          data-testid="media-tile"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="tile.label"
+          (click)="onTileActivate(tile)"
+          (keydown.enter)="onTileActivate(tile)"
+          (keydown.space)="onTileActivate(tile)"
+        >
+          <span class="media__glyph" aria-hidden="true">
+            <svg width="20" height="24" viewBox="0 0 20 24" fill="none">
+              <path
+                d="M14 2H4C2.9 2 2 2.9 2 4v16c0 1.1 0.9 2 2 2h12c1.1 0 2-0.9 2-2V8L14 2Z"
+                fill="currentColor"
+                opacity="0.45"
+              />
+              <path d="M14 2v6h6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="media__name">{{ tile.name }}</span>
+        </li>
+      }
+    </ul>
+  }
+</main>

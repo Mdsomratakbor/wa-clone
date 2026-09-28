@@ -53,9 +53,17 @@ export class ContactPage {
   }
 
   protected onRowActivate(row: SettingsRowSeed): void {
-    // F-015: media/groups targets are later features (spec Non-Goals).
+    if (row.id === 'contact-media') {
+      // F-044: media sub-screen (entry row is design-verified via 0:9486; the
+      // screen's own chrome is provisional while the capture is blocked).
+      void this.router.navigate(['/contact', this.chatId(), 'media']);
+      return;
+    }
     if (row.id === 'contact-starred') {
       void this.router.navigate(['/starred-messages']);
+      return;
     }
+    // contact-groups stays inert: it needs shared-group membership data the store
+    // does not have (gap audit B8, non-goal of specs/044-media-screen).
   }
 }
