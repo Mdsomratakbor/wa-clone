@@ -19,9 +19,16 @@ entries for a flow whose screen and data model do not exist yet.
   distinct people I have chats with". Once groups exist, a group would leak into Contacts *and* into
   the group participant picker (a group as a group member). Filtering `kind !== 'group'` in the store
   fixes both call sites at once, which is why the filter lives there and not in the page.
+- Clarification pass (2026-09-27) changed the model once: participants are stored as contact chat
+  ids (`participantIds`) and resolved by `groupParticipants()` on read. Names were the first cut, but
+  that froze a snapshot — renaming a contact would have left the old name inside every group. Storing
+  ids also makes "a deleted contact drops out of the group" fall out of the same lookup.
+- The contact-info screen (F-015) had no group story: tapping a group name landed on the
+  single-contact screen with an empty phone row and Block/Report. `conversationKind()` lets that
+  screen branch once, instead of every future caller re-deriving the kind.
 - Group subtitle (FR-009): `contact()` already centralises the header subtitle, so one branch there
   covers the chat header, contact-info header and starred rows. Zero-participant groups read `Group`
-  rather than `0 participants`.
+  rather than `0 participants`, and the count is pluralised (`1 participant`).
 - Screen placement: `features/new-group/` — a top-level creation flow like `new-chat-modal`, not a
   sub-surface of contacts.
 - Chrome follows the repo: `StarredPage`/`ContactsPage` list rows, `EditContactPage`/`ProfilePage`
@@ -52,6 +59,9 @@ entries for a flow whose screen and data model do not exist yet.
 - [x] T005 — Unit tests + authored e2e
 - [x] T006 — Drift notes 001/003/009; build + unit green
 - [x] T007 — Commits
+- [x] T008 — `/speckit.clarify` pass (5 questions) + code alignment: blank-name throw, pluralised
+  subtitle, group-aware contact screen, `participantIds` resolved live, `groupParticipants()`
+  specced (FR-002b), `conversationKind()` (FR-012) — unit 390/390
 
 ## Commands
 

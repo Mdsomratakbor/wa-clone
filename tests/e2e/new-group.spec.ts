@@ -63,4 +63,20 @@ test.describe('New group (US1/US2)', () => {
     await page.getByRole('button', { name: 'Back' }).click();
     await expect(page).toHaveURL(/\/chats$/);
   });
+
+  test('a group contact screen lists participants instead of contact rows', async ({ page }) => {
+    await page.goto('/new-group');
+    await page.getByTestId('new-group-name').fill('Weekend plans');
+    const rows = page.getByTestId('new-group-contact');
+    await rows.nth(0).click();
+    await rows.nth(1).click();
+    await page.getByTestId('new-group-create').click();
+    await expect(page).toHaveURL(/\/chat\/group-\d+$/);
+
+    await page.getByTestId('chat-header__identity').click();
+    await expect(page).toHaveURL(/\/contact\/group-\d+$/);
+    await expect(page.getByTestId('contact-group-count')).toHaveText('2 participants');
+    await expect(page.getByTestId('contact-participant')).toHaveCount(2);
+    await expect(page.getByTestId('contact-row')).toHaveCount(0);
+  });
 });

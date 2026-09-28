@@ -56,10 +56,7 @@ export class NewGroupPage {
     if (name.length === 0) {
       return;
     }
-    const participants = [...this.selectedIds()]
-      .map((id) => this.contacts().find((contact) => contact.id === id)?.contactName)
-      .filter((value): value is string => value !== undefined);
-    const chatId = this.store.createGroup(name, participants);
+    const chatId = this.store.createGroup(name, [...this.selectedIds()]);
     void this.router.navigate(['/chat', chatId]);
   }
 }

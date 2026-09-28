@@ -95,7 +95,11 @@ describe('NewGroupPage', () => {
 
     const group = store.conversations().find((chat) => chat.kind === 'group');
     expect(group?.contactName).toBe('Weekend plans');
-    expect(group?.participants).toEqual([expected[0]?.contactName, expected[2]?.contactName]);
+    expect(group?.participantIds).toEqual([expected[0].id, expected[2].id]);
+    expect(store.groupParticipants(group!.id)).toEqual([
+      expected[0].contactName,
+      expected[2].contactName,
+    ]);
     expect(router.navigate).toHaveBeenCalledWith(['/chat', group?.id]);
   });
 
@@ -106,7 +110,9 @@ describe('NewGroupPage', () => {
     typeName(el, 'Solo');
     (el.querySelector('[data-testid="new-group-create"]') as HTMLButtonElement).click();
     fixture.detectChanges();
-    expect(store.conversations().find((chat) => chat.kind === 'group')?.participants).toEqual([]);
+    expect(store.conversations().find((chat) => chat.kind === 'group')?.participantIds).toEqual(
+      [],
+    );
     expect(router.navigate).toHaveBeenCalled();
   });
 

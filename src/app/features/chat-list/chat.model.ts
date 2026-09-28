@@ -13,7 +13,7 @@ export interface ChatPreview {
   muted?: boolean;
   archived?: boolean;
   kind?: ChatKind;
-  participants?: readonly string[];
+  participantIds?: readonly string[];
 }
 
 export interface TabItem {

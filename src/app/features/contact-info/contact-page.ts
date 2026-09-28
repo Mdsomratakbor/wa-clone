@@ -23,6 +23,11 @@ export class ContactPage {
   protected readonly name = computed(() => this.store.contactName(this.chatId()));
   protected readonly rows: readonly SettingsRowSeed[] = CONTACT_ROWS;
 
+  protected readonly isGroup = computed(
+    () => this.store.conversationKind(this.chatId()) === 'group',
+  );
+  protected readonly participants = computed(() => this.store.groupParticipants(this.chatId()));
+
   protected readonly leadingActions: readonly NavAction[] = [
     { id: 'back', label: 'Back', icon: 'back' },
   ];

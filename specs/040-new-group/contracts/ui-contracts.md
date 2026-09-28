@@ -13,8 +13,9 @@
 | picker | `new-group-contact` rows, one per direct contact, `aria-pressed` toggles, alphabetical |
 | create | `new-group-create` disabled until a trimmed name exists; activating creates the group and navigates to `/chat/group-<n>` |
 | empty | `new-group-empty` when there are no direct contacts |
-| group | `ChatPreview.kind='group'`, `participants: string[]`, id `group-<n>`, `read: true`, empty thread |
-| unchanged | chat list, chat window, `New community`, `Broadcast Lists`, seeded goldens |
+| group | `ChatPreview.kind='group'`, `participantIds: readonly string[]` (contact chat ids), id `group-<n>`, `read: true`, empty thread |
+| group info | `/contact/group-<n>` renders `contact-group-count` (`1 participant` / `2 participants`) and `contact-participant` rows, and no `contact-row` items |
+| unchanged | chat list, chat window, direct contact screen, `New community`, `Broadcast Lists`, seeded goldens |
 
 **Stability**: no seeded render moves; the new screen is reachable only from the two designed entries.
 

@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { ChatPreview } from '../features/chat-list/chat.model';
+import { ChatKind, ChatPreview } from '../features/chat-list/chat.model';
 import { CHAT_SEED } from '../features/chat-list/chat-list.seed';
 import { CHAT_SEED as THREAD_SEED } from '../features/chat-window/chat-window.seed';
 import { ContactHeader, Message } from '../features/chat-window/chat-window.model';
@@ -41,7 +41,7 @@ function normalizeChats(seed: readonly ChatPreview[]): readonly ChatPreview[] {
     muted: false,
     archived: false,
     kind: chat.kind ?? 'direct',
-    participants: chat.participants ?? [],
+    participantIds: chat.participantIds ?? [],
   }));
 }
 
@@ -107,18 +107,22 @@ export class ChatStore {
     return id;
   }
 
-  createGroup(name: string, participants: readonly string[] = []): string {
+  createGroup(name: string, participantIds: readonly string[] = []): string {
+    const trimmed = name.trim();
+    if (trimmed.length === 0) {
+      throw new Error('createGroup requires a non-empty name');
+    }
     this.newChatCounter += 1;
     const id = `group-${this.newChatCounter}`;
     const chat: ChatPreview = {
       id,
-      contactName: name.trim(),
+      contactName: trimmed,
       preview: '',
       timestamp: nowTime(),
       avatarRef: null,
       read: true,
       kind: 'group',
-      participants: [...participants],
+      participantIds: [...participantIds],
     };
     this.conversations.update((chats) => [...chats, chat]);
     this.threads.update((threads) => ({ ...threads, [id]: [] }));
@@ -126,7 +130,8 @@ export class ChatStore {
     return id;
   }
 
-  toggleStarred(chatId: string, messageId: string): void {    const key = `${chatId}:${messageId}`;
+  toggleStarred(chatId: string, messageId: string): void {
+    const key = `${chatId}:${messageId}`;
     this.starred.update((list) =>
       list.includes(key) ? list.filter((k) => k !== key) : [...list, key],
     );
@@ -178,8 +183,11 @@ export class ChatStore {
     if ((chat.kind ?? 'direct') !== 'group') {
       return CONTACT_SUBTITLE;
     }
-    const participants = chat.participants ?? [];
-    return participants.length > 0 ? `${participants.length} participants` : 'Group';
+    const participants = this.groupParticipants(chat.id);
+    if (participants.length === 0) {
+      return 'Group';
+    }
+    return participants.length === 1 ? '1 participant' : `${participants.length} participants`;
   }
 
   isMuted(chatId: string): boolean {
@@ -204,7 +212,19 @@ export class ChatStore {
   }
 
   groupParticipants(chatId: string): readonly string[] {
-    return this.conversations().find((c) => c.id === chatId)?.participants ?? [];
+    const chat = this.conversations().find((c) => c.id === chatId);
+    if (!chat) {
+      return [];
+    }
+    const byId = new Map(this.conversations().map((c) => [c.id, c.contactName]));
+    return (chat.participantIds ?? []).flatMap((id) => {
+      const name = byId.get(id);
+      return name === undefined ? [] : [name];
+    });
+  }
+
+  conversationKind(chatId: string): ChatKind {
+    return this.conversations().find((c) => c.id === chatId)?.kind ?? 'direct';
   }
 
   toggleMuted(chatId: string): void {

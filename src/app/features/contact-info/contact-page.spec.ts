@@ -110,4 +110,42 @@ describe('ContactPage', () => {
     rows[1]?.click(); // Groups
     expect(router.navigate).not.toHaveBeenCalled();
   });
+
+  describe('group awareness (F-040 clarified)', () => {
+    it('shows the group name, a participant count and the participant list', async () => {
+      const store = TestBed.inject(ChatStore);
+      const contacts = store.contactConversations();
+      const id = store.createGroup('Weekend plans', [contacts[0].id, contacts[1].id]);
+      const { el } = await render(id);
+
+      expect(el.querySelector('[data-testid="contact-name"]')?.textContent?.trim()).toBe(
+        'Weekend plans',
+      );
+      expect(el.querySelector('[data-testid="contact-group-count"]')?.textContent?.trim()).toBe(
+        '2 participants',
+      );
+      const participants = [
+        ...el.querySelectorAll('[data-testid="contact-participant"]'),
+      ].map((node) => node.textContent?.trim());
+      expect(participants).toEqual([contacts[0].contactName, contacts[1].contactName]);
+    });
+
+    it('omits the single-contact rows for a group', async () => {
+      const store = TestBed.inject(ChatStore);
+      const id = store.createGroup('No rows', [store.contactConversations()[0].id]);
+      const { el } = await render(id);
+      expect(el.querySelector('[data-testid="contact-list"]')).toBeNull();
+      expect(el.querySelectorAll('[data-testid="contact-row"]').length).toBe(0);
+      expect(el.querySelector('[data-testid="contact-messages"]')).not.toBeNull();
+    });
+
+    it('keeps the direct-contact rows unchanged for a direct chat', async () => {
+      const { el } = await render('chat-001');
+      expect(el.querySelector('[data-testid="contact-group-count"]')).toBeNull();
+      expect(el.querySelector('[data-testid="contact-participants"]')).toBeNull();
+      expect(el.querySelectorAll('[data-testid="contact-row"]').length).toBe(
+        CONTACT_ROWS.length,
+      );
+    });
+  });
 });
