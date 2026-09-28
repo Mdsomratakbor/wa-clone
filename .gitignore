@@ -48,6 +48,7 @@ Thumbs.db
 
 # Local tool logs
 *.log
+/logs/
 
 # Playwright
 test-results/
