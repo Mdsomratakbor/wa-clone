@@ -40,9 +40,19 @@ function normalizeChats(seed: readonly ChatPreview[]): readonly ChatPreview[] {
     read: false,
     muted: false,
     archived: false,
+    ...hydrateDefaults(chat),
+  }));
+}
+
+// Snapshots persisted before a kind existed carry no `kind`/`participantIds`.
+// Only those fields are filled on load: the persisted read/muted/archived flags
+// are user state and must survive a reload, so normalizeChats() (which forces
+// them false) is deliberately not reused here.
+function hydrateDefaults(chat: ChatPreview): Pick<ChatPreview, 'kind' | 'participantIds'> {
+  return {
     kind: chat.kind ?? 'direct',
     participantIds: chat.participantIds ?? [],
-  }));
+  };
 }
 
 function readStorage(key: string): string | null {
@@ -441,7 +451,7 @@ export class ChatStore {
     if (snapshot?.version !== STORE_VERSION) {
       return;
     }
-    this.conversations.set(snapshot.conversations);
+    this.conversations.set(snapshot.conversations.map((chat) => ({ ...chat, ...hydrateDefaults(chat) })));
     this.threads.set(snapshot.threads);
     this.starred.set(snapshot.starred ?? []);
     this.messageSequence = snapshot.messageSequence;

@@ -296,7 +296,7 @@ const options = [
       expect(TestBed.inject(ChatStore).conversations().length).toBe(before);
     });
 
-    it('Broadcast Lists stays a no-op (F-001/003)', () => {
+    it('Broadcast Lists opens the broadcast screen (F-042 FR-008)', () => {
       const router = TestBed.inject(Router);
       const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
       fixture = TestBed.createComponent(ChatsPage);
@@ -306,7 +306,20 @@ const options = [
       clickNavAction(el, 'Broadcast Lists');
       fixture.detectChanges();
 
-      expect(navSpy).not.toHaveBeenCalled();
+      expect(navSpy).toHaveBeenCalledWith(['/broadcasts']);
+    });
+
+    it('a broadcast does not appear in the Chats list (F-042 FR-003)', () => {
+      const store = TestBed.inject(ChatStore);
+      store.createBroadcast('Not in chats');
+      fixture = TestBed.createComponent(ChatsPage);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+
+      expect(el.textContent).not.toContain('Not in chats');
+      expect(el.querySelectorAll('app-chat-list-item').length).toBe(
+        store.chatsListConversations().length,
+      );
     });
   });
 

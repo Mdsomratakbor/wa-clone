@@ -513,4 +513,158 @@ describe('ChatStore', () => {
     expect(store.contact(empty)?.subtitle).toBe('Group');
     expect(store.contact('chat-006')?.subtitle).toBe(CONTACT_SUBTITLE);
   });
+
+  it('createBroadcast makes a broadcast with recipients and an empty thread (F-042 FR-002)', () => {
+    const id = store.createBroadcast('All hands', ['chat-001', 'chat-002']);
+    const broadcast = store.conversations().find((chat) => chat.id === id);
+
+    expect(id).toMatch(/^broadcast-\d+$/);
+    expect(broadcast?.kind).toBe('broadcast');
+    expect(broadcast?.contactName).toBe('All hands');
+    expect(broadcast?.participantIds).toEqual(['chat-001', 'chat-002']);
+    expect(broadcast?.read).toBe(true);
+    expect(broadcast?.preview).toBe('');
+    expect(store.conversationMessages(id)).toEqual([]);
+    expect(store.conversationKind(id)).toBe('broadcast');
+  });
+
+  it('createBroadcast trims the name, allows no recipients and cannot collide (F-042 FR-002)', () => {
+    const groupId = store.createGroup('A group');
+    const id = store.createBroadcast('  Shop updates  ');
+    const broadcast = store.conversations().find((chat) => chat.id === id);
+
+    expect(broadcast?.contactName).toBe('Shop updates');
+    expect(broadcast?.participantIds).toEqual([]);
+    expect(id).not.toBe(groupId);
+    expect(id).not.toMatch(/^chat-/);
+  });
+
+  it('createBroadcast refuses a blank name (F-042 FR-002a)', () => {
+    expect(() => store.createBroadcast('   ')).toThrow();
+    expect(() => store.createBroadcast('')).toThrow();
+  });
+
+  it('broadcast ids continue the shared counter without colliding with groups (F-042 FR-002)', () => {
+    const groupId = store.createGroup('Counter group');
+    const first = store.createBroadcast('Counter one');
+    const second = store.createBroadcast('Counter two');
+    const suffix = groupId.split('-')[1];
+
+    expect(first).toBe(`broadcast-${Number(suffix) + 1}`);
+    expect(second).toBe(`broadcast-${Number(suffix) + 2}`);
+  });
+
+  it('broadcastRecipients resolves current names and drops deleted contacts (F-042 FR-002b)', () => {
+    const first = store.contactConversations()[0];
+    const second = store.contactConversations()[1];
+    const id = store.createBroadcast('Live recipients', [first.id, second.id, 'chat-missing']);
+
+    expect(store.broadcastRecipients(id)).toEqual([first.contactName, second.contactName]);
+
+    store.updateContact(first.id, 'Renamed Recipient');
+    expect(store.broadcastRecipients(id)).toEqual(['Renamed Recipient', second.contactName]);
+
+    store.deleteConversation(second.id);
+    expect(store.broadcastRecipients(id)).toEqual(['Renamed Recipient']);
+  });
+
+  it('broadcastRecipients is empty for an unknown chat (F-042 FR-002b)', () => {
+    expect(store.broadcastRecipients('broadcast-404')).toEqual([]);
+  });
+
+  it('broadcasts lists only broadcasts, in insertion order (F-042 FR-004)', () => {
+    expect(store.broadcasts()).toEqual([]);
+
+    const first = store.createBroadcast('First list');
+    const second = store.createBroadcast('Second list');
+    store.createGroup('A group');
+
+    expect(store.broadcasts().map((chat) => chat.id)).toEqual([first, second]);
+  });
+
+  it('a broadcast is excluded from the Chats list, direct and group chats are not (F-042 FR-003)', () => {
+    const before = store.chatsListConversations().length;
+    const id = store.createBroadcast('Not in chats');
+
+    const listed = store.chatsListConversations();
+    expect(listed.some((chat) => chat.id === id)).toBe(false);
+    expect(listed.length).toBe(before);
+    expect(listed.some((chat) => chat.kind === 'group')).toBe(false);
+
+    const groupId = store.createGroup('Also not in chats');
+    expect(store.chatsListConversations().some((chat) => chat.id === groupId)).toBe(false);
+    expect(store.chatsListConversations().every((chat) => chat.kind === 'direct')).toBe(true);
+  });
+
+  it('the Chats list still hides archived chats (F-042 regression, F-032 behaviour)', () => {
+    const [first] = store.chatsListConversations();
+    store.archiveConversations([first.id]);
+    expect(store.chatsListConversations().some((chat) => chat.id === first.id)).toBe(false);
+  });
+
+  it('broadcasts are excluded from contactConversations (F-042 FR-010)', () => {
+    const contact = store.contactConversations()[0];
+    const id = store.createBroadcast('Not a contact', [contact.id]);
+
+    expect(store.contactConversations().some((chat) => chat.id === id)).toBe(false);
+    expect(store.contactConversations().map((chat) => chat.contactName)).not.toContain(
+      'Not a contact',
+    );
+    expect(store.contactConversations().some((chat) => chat.id === contact.id)).toBe(true);
+  });
+
+  it('a created broadcast persists across a reload (F-042 FR-002)', () => {
+    const contact = store.contactConversations()[0];
+    const id = store.createBroadcast('Persisted list', [contact.id]);
+    const reloaded = new ChatStore();
+    const broadcast = reloaded.conversations().find((chat) => chat.id === id);
+
+    expect(broadcast?.kind).toBe('broadcast');
+    expect(broadcast?.participantIds).toEqual([contact.id]);
+    expect(reloaded.broadcastRecipients(id)).toEqual([contact.contactName]);
+    expect(reloaded.broadcasts().map((chat) => chat.id)).toEqual([id]);
+  });
+
+  it('a v1 snapshot hydrates with no broadcast and keeps every other chat (F-042 FR-001)', () => {
+    window.localStorage.setItem(
+      PERSISTENCE_KEY,
+      JSON.stringify({
+        version: 1,
+        conversations: [
+          { id: 'chat-x', contactName: 'Legacy', preview: 'hi', timestamp: '10:00' },
+          {
+            id: 'chat-y',
+            contactName: 'Archived friend',
+            preview: '',
+            timestamp: '09:00',
+            read: true,
+            muted: true,
+            archived: true,
+          },
+        ],
+        threads: {},
+        starred: [],
+        messageSequence: 0,
+        newChatCounter: 7,
+      }),
+    );
+    const reloaded = new ChatStore();
+    const legacy = reloaded.conversations().find((chat) => chat.id === 'chat-x');
+
+    expect(legacy?.kind).toBe('direct');
+    expect(legacy?.participantIds).toEqual([]);
+    expect(reloaded.broadcasts()).toEqual([]);
+    expect(reloaded.chatsListConversations().map((chat) => chat.id)).toEqual(['chat-x']);
+
+    const archived = reloaded.conversations().find((chat) => chat.id === 'chat-y');
+    expect(archived?.read).toBe(true);
+    expect(archived?.muted).toBe(true);
+    expect(archived?.archived).toBe(true);
+    expect(reloaded.archivedIds()).toEqual(['chat-y']);
+  });
+
+  it('the broadcast name is shown as the conversation title (F-042 FR-009)', () => {
+    const id = store.createBroadcast('Status updates');
+    expect(store.contact(id)?.name).toBe('Status updates');
+  });
 });
