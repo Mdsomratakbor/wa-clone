@@ -102,12 +102,21 @@ describe('ContactPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/starred-messages']);
   });
 
-  it('Media/Groups rows remain no-ops', async () => {
+  it('the Media row routes to /contact/:id/media (feature 044)', async () => {
     const { el, router } = await render('chat-001');
     spyOn(router, 'navigate').and.resolveTo(true);
     const rows = [...el.querySelectorAll<HTMLButtonElement>('[data-testid="contact-row"]')];
-    rows[0]?.click(); // Media, photos and links
-    rows[1]?.click(); // Groups
+    const media = rows.find((r) => r.getAttribute('aria-label') === 'Media, photos and links');
+    media?.click();
+    expect(router.navigate).toHaveBeenCalledWith(['/contact', 'chat-001', 'media']);
+  });
+
+  it('the Groups row stays a no-op (B8 is not built)', async () => {
+    const { el, router } = await render('chat-001');
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const rows = [...el.querySelectorAll<HTMLButtonElement>('[data-testid="contact-row"]')];
+    const groups = rows.find((r) => r.getAttribute('aria-label') === 'Groups');
+    groups?.click();
     expect(router.navigate).not.toHaveBeenCalled();
   });
 
