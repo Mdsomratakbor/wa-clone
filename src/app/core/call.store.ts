@@ -35,6 +35,9 @@ export class CallStore {
     this.hydrate();
   }
 
+  // F-043: the call-info sheet's Delete action calls this directly. No new store
+  // method was needed - the sheet is view state and stays on the page, so nothing
+  // about it is persisted; the snapshot shape and version are unchanged.
   removeCall(id: string): void {
     this.calls.update((list) => list.filter((entry) => entry.id !== id));
     this.persist();

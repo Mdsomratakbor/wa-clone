@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { CallStore } from '../../core/call.store';
+import { ChatStore } from '../../core/chat.store';
 import { CallsPage } from './calls-page';
 import { CALL_SEED } from './calls.seed';
 
@@ -230,13 +231,163 @@ describe('CallsPage', () => {
     expect(router.navigate).not.toHaveBeenCalled();
   });
 
-  it('the call-info button stays inert (F-038)', () => {
-    const router = TestBed.inject(Router);
-    spyOn(router, 'navigate').and.resolveTo(true);
-    const el = render();
-    (el.querySelector('[data-testid="call-info"]') as HTMLButtonElement).click();
-    fixture.detectChanges();
-    expect(router.navigate).not.toHaveBeenCalled();
+  describe('call info sheet (feature 043)', () => {
+    function rowLabels(el: HTMLElement): string[] {
+      return [
+        ...el.querySelectorAll<HTMLElement>('[data-testid="action-sheet-row"]'),
+      ].map((row) => (row.textContent ?? '').trim());
+    }
+
+    function openSheetForFirstRow(el: HTMLElement): void {
+      (el.querySelector('[data-testid="call-info"]') as HTMLButtonElement).click();
+      fixture.detectChanges();
+    }
+
+    function clickRow(el: HTMLElement, label: string): void {
+      const row = [
+        ...el.querySelectorAll<HTMLElement>('[data-testid="action-sheet-row"]'),
+      ].find((it) => (it.textContent ?? '').trim() === label);
+      (row as HTMLButtonElement).click();
+      fixture.detectChanges();
+    }
+
+    it('the info button opens the sheet and does not navigate (FR-001)', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+      const el = render();
+
+      expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+      openSheetForFirstRow(el);
+
+      expect(el.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
+      expect(navSpy).not.toHaveBeenCalled();
+    });
+
+    it('the sheet shows the four actions in order (FR-002)', () => {
+      const el = render();
+      openSheetForFirstRow(el);
+      expect(rowLabels(el)).toEqual(['Message', 'Voice call', 'Video call', 'Delete']);
+    });
+
+    it('Message opens the chat for the tapped row and marks it read (FR-004)', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+      const el = render();
+      const first = CALL_SEED[0];
+
+      openSheetForFirstRow(el);
+      clickRow(el, 'Message');
+
+      const chatId = TestBed.inject(ChatStore).chatIdForContactName(first.contactName);
+      expect(navSpy).toHaveBeenCalledWith(['/chat', chatId]);
+      expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+      expect(TestBed.inject(ChatStore).conversationMessages(chatId as string)).toBeDefined();
+    });
+
+    it('Message closes the sheet but stays put when the contact has no chat (FR-004)', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+      const el = render();
+      // call-005 is Zack John, who has no chat in the chat seed - the F-038 "stays put" case.
+      const orphanIndex = CALL_SEED.findIndex(
+        (call) => TestBed.inject(ChatStore).chatIdForContactName(call.contactName) === null,
+      );
+      expect(orphanIndex).toBeGreaterThan(-1);
+
+      const infoButtons = el.querySelectorAll<HTMLButtonElement>('[data-testid="call-info"]');
+      infoButtons[orphanIndex]?.click();
+      fixture.detectChanges();
+      expect(el.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
+
+      clickRow(el, 'Message');
+
+      expect(navSpy).not.toHaveBeenCalled();
+      expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+    });
+
+    it('Delete removes that row only and it stays removed (FR-005)', () => {
+      const el = render();
+      const store = TestBed.inject(CallStore);
+      const target = CALL_SEED[0];
+      const before = store.calls().length;
+
+      openSheetForFirstRow(el);
+      clickRow(el, 'Delete');
+
+      expect(store.calls().length).toBe(before - 1);
+      expect(store.calls().some((call) => call.id === target.id)).toBe(false);
+      expect(el.querySelectorAll('app-call-list-item').length).toBe(before - 1);
+      expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+
+      const reloaded = new CallStore();
+      expect(reloaded.calls().some((call) => call.id === target.id)).toBe(false);
+    });
+
+    it('Voice call and Video call dismiss the sheet and change nothing (FR-006)', () => {
+      const el = render();
+      const store = TestBed.inject(CallStore);
+
+      for (const label of ['Voice call', 'Video call']) {
+        openSheetForFirstRow(el);
+        clickRow(el, label);
+        expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+      }
+
+      expect(store.calls().length).toBe(CALL_SEED.length);
+      expect(el.querySelectorAll('app-call-list-item').length).toBe(CALL_SEED.length);
+    });
+
+    it('the backdrop and Escape both dismiss without side effects (FR-003)', () => {
+      const store = TestBed.inject(CallStore);
+
+      for (const close of [
+        (el: HTMLElement) =>
+          (el.querySelector('[data-testid="action-sheet-backdrop"]') as HTMLElement).click(),
+        () => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })),
+      ]) {
+        const el = render();
+        openSheetForFirstRow(el);
+        close(el);
+        fixture.detectChanges();
+        expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+      }
+
+      expect(store.calls().length).toBe(CALL_SEED.length);
+    });
+
+    it('the sheet cannot be opened while editing (FR-007)', () => {
+      const el = render();
+      const edit = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+        (b) => b.textContent?.trim() === 'Edit',
+      );
+      edit?.click();
+      fixture.detectChanges();
+
+      expect(el.querySelectorAll('[data-testid="call-info"]').length).toBe(0);
+      expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+    });
+
+    it('new call is still inert while the sheet is in scope (FR-008)', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+      const el = render();
+      const newCall = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].at(-1);
+
+      newCall?.click();
+      fixture.detectChanges();
+
+      expect(navSpy).not.toHaveBeenCalled();
+      expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+    });
+
+    it('the list keeps 12 rows and no horizontal overflow at 320px (FR-011)', () => {
+      const el = render();
+      openSheetForFirstRow(el);
+      const sheet = el.querySelector<HTMLElement>('[data-testid="action-sheet"]');
+
+      expect(el.querySelectorAll('app-call-list-item').length).toBe(CALL_SEED.length);
+      expect(sheet?.scrollWidth).toBeLessThanOrEqual(sheet?.clientWidth ?? 0);
+    });
   });
 
   it('Clear persists: the log stays cleared after a reload (F-038)', () => {
