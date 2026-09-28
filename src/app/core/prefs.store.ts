@@ -25,6 +25,12 @@ export type ChatSort = 'recent' | 'name' | 'unread';
 
 export const DEFAULT_CHAT_SORT: ChatSort = 'recent';
 
+export type FontScale = 'small' | 'default' | 'large' | 'extra-large';
+
+export const FONT_SCALES: readonly FontScale[] = ['small', 'default', 'large', 'extra-large'];
+
+export const DEFAULT_FONT_SCALE: FontScale = 'default';
+
 export interface ProfileSnapshot {
   name: string;
   about: string;
@@ -38,10 +44,15 @@ interface PrefsSnapshotEnvelope {
   version: number;
   prefs: PrefsSnapshot;
   chatSort: ChatSort;
+  fontScale?: FontScale;
   profile?: ProfileSnapshot;
 }
 
-const PREFS_VERSION = 3;
+const PREFS_VERSION = 4;
+
+function isFontScale(value: unknown): value is FontScale {
+  return FONT_SCALES.includes(value as FontScale);
+}
 
 function readStorage(key: string): string | null {
   try {
@@ -71,6 +82,7 @@ function clearStorage(key: string): void {
 export class PrefsStore {
   readonly prefs = signal<PrefsSnapshot>({ ...DEFAULT_PREFS });
   readonly chatSort = signal<ChatSort>(DEFAULT_CHAT_SORT);
+  readonly fontScale = signal<FontScale>(DEFAULT_FONT_SCALE);
   readonly profile = signal<ProfileSnapshot>({ ...DEFAULT_PROFILE });
 
   constructor() {
@@ -92,6 +104,11 @@ export class PrefsStore {
     this.persist();
   }
 
+  setFontScale(value: FontScale): void {
+    this.fontScale.set(value);
+    this.persist();
+  }
+
   updateProfile(name: string, about: string): void {
     this.profile.set({ name, about });
     this.persist();
@@ -101,6 +118,7 @@ export class PrefsStore {
     clearStorage(PREFS_KEY);
     this.prefs.set({ ...DEFAULT_PREFS });
     this.chatSort.set(DEFAULT_CHAT_SORT);
+    this.fontScale.set(DEFAULT_FONT_SCALE);
     this.profile.set({ ...DEFAULT_PROFILE });
   }
 
@@ -109,6 +127,7 @@ export class PrefsStore {
       version: PREFS_VERSION,
       prefs: this.prefs(),
       chatSort: this.chatSort(),
+      fontScale: this.fontScale(),
       profile: this.profile(),
     };
     writeStorage(PREFS_KEY, JSON.stringify(envelope));
@@ -129,13 +148,15 @@ export class PrefsStore {
       version: number;
       prefs: PrefsSnapshot;
       chatSort?: ChatSort;
+      fontScale?: FontScale;
       profile?: ProfileSnapshot;
     };
-    if (envelope?.version !== 1 && envelope?.version !== 2 && envelope?.version !== PREFS_VERSION) {
+    if (envelope?.version !== 1 && envelope?.version !== 2 && envelope?.version !== 3 && envelope?.version !== PREFS_VERSION) {
       return;
     }
     this.prefs.set({ ...DEFAULT_PREFS, ...envelope.prefs });
     this.chatSort.set(envelope.chatSort ?? DEFAULT_CHAT_SORT);
+    this.fontScale.set(isFontScale(envelope.fontScale) ? envelope.fontScale : DEFAULT_FONT_SCALE);
     this.profile.set({ ...DEFAULT_PROFILE, ...envelope.profile });
   }
 }

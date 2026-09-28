@@ -1,0 +1,45 @@
+<app-navigation-bar
+  title="Font size"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="font-size" data-testid="font-size-page">
+  <div
+    class="font-size__options"
+    role="radiogroup"
+    aria-label="Font size"
+    data-testid="font-size-options"
+  >
+    @for (option of options; track option) {
+      <button
+        type="button"
+        role="radio"
+        class="font-size__option"
+        data-testid="font-size-option"
+        [class.font-size__option--selected]="isSelected(option)"
+        [attr.aria-checked]="isSelected(option)"
+        [attr.aria-label]="label(option)"
+        (click)="onSelect(option)"
+      >
+        <span class="font-size__label">{{ label(option) }}</span>
+        <svg
+          class="font-size__check"
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 10.5 8 14.5 16 5.5"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+    }
+  </div>
+</main>

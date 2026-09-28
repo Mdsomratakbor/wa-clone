@@ -53,6 +53,11 @@ export const routes: Routes = [
       import('./features/settings/chats-settings-page').then((m) => m.ChatsSettingsPage),
   },
   {
+    path: 'settings/chats/font-size',
+    loadComponent: () =>
+      import('./features/settings/font-size-page').then((m) => m.FontSizePage),
+  },
+  {
     path: 'settings/notifications',
     loadComponent: () =>
       import('./features/settings/notifications-page').then((m) => m.NotificationsPage),

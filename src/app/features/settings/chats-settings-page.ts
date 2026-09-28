@@ -45,7 +45,10 @@ export class ChatsSettingsPage {
     }
   }
 
-  protected onRowActivate(_row: SettingsRowSeed): void {
-    // F-016: wallpaper/font/keyboard targets are later features.
+  protected onRowActivate(row: SettingsRowSeed): void {
+    // F-041: Font size owns its own screen; F-016's other targets stay inert.
+    if (row.id === 'chats-font-size') {
+      void this.router.navigate(['/settings/chats/font-size']);
+    }
   }
 }

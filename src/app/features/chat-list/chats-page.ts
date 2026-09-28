@@ -60,6 +60,7 @@ export class ChatsPage {
   protected readonly sortOptions: readonly { value: ChatSort; label: string }[] = SORT_OPTIONS;
 
   protected readonly chatSort = this.prefs.chatSort;
+  protected readonly fontScale = this.prefs.fontScale;
 
   protected readonly visibleItems = computed<readonly ChatPreview[]>(() => {
     const list = this.items();

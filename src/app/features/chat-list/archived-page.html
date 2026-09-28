@@ -4,7 +4,7 @@
   (action)="onNavAction($event)"
 ></app-navigation-bar>
 
-<main class="archived" data-testid="archived-page">
+<main class="archived" data-testid="archived-page" [attr.data-font-scale]="fontScale()">
   @if (chats().length === 0) {
     <div class="archived__empty" role="status" data-testid="archived-empty">
       <p class="archived__empty-text">No archived chats</p>

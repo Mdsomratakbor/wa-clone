@@ -11,6 +11,7 @@ import {
 import type { ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatStore } from '../../core/chat.store';
+import { PrefsStore } from '../../core/prefs.store';
 import { ChatHeader } from '../../shared/components/chat-header/chat-header';
 import { ActionSheet } from '../../shared/components/action-sheet/action-sheet';
 import { Composer } from '../../shared/components/composer/composer';
@@ -31,8 +32,11 @@ export class ChatWindowPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly store = inject(ChatStore);
+  private readonly prefs = inject(PrefsStore);
   private readonly header = viewChild(ChatHeader);
   private readonly thread = viewChild<ElementRef<HTMLDivElement>>('thread');
+
+  protected readonly fontScale = this.prefs.fontScale;
 
   protected readonly contact = computed<ContactHeader>(() =>
     this.store.contact(this.chatId()) ?? CHAT_CONTACT,

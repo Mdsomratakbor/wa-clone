@@ -1,4 +1,4 @@
-<div class="chat-window">
+<div class="chat-window" [attr.data-font-scale]="fontScale()">
   <app-chat-header
     [contact]="contact()"
     (back)="onBack()"

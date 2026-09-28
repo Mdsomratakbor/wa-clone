@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChatStore } from '../../core/chat.store';
+import { PrefsStore } from '../../core/prefs.store';
 import { NavAction } from '../chat-list/chat.model';
 import { ChatListItem } from '../../shared/components/chat-list-item/chat-list-item';
 import { NavigationBar } from '../../shared/components/navigation-bar/navigation-bar';
@@ -15,6 +16,9 @@ import { NavigationBar } from '../../shared/components/navigation-bar/navigation
 export class ArchivedPage {
   private readonly router = inject(Router);
   private readonly store = inject(ChatStore);
+  private readonly prefs = inject(PrefsStore);
+
+  protected readonly fontScale = this.prefs.fontScale;
 
   protected readonly chats = computed(() => {
     const archived = new Set(this.store.archivedIds());
