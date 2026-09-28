@@ -4,7 +4,10 @@
 
 **Created**: 2026-09-28
 
-**Status**: **Specified** (clarify pass recorded below; plan + tasks pending)
+**Status**: **Complete - implemented, build green, unit 417/417. G1 capture still BLOCKED**
+(Figma 429, reset 2026-10-02 18:38 UTC), so the picker chrome, the step labels and the
+multipliers remain PROVISIONAL hypotheses - see UNKNOWN below. Playwright runs paused per owner
+directive; the e2e spec is authored, not executed.
 
 **Input**: design row 16 (`Chats Settings`, frame `0:9973`, `Font size` row) + gap audit tier B5 +
 `specs/041-font-size/research.md`

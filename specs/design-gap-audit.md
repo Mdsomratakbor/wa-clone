@@ -4,9 +4,11 @@
 **Method**: design rows 1–21 (the 21 screens in the design map) cross-referenced with the app's
 17 routes, every row/button handler, and the 21 spec sets. Rows 1–7 carry exact captured geometry;
 rows 8–21 are recorded from their spec sets (captures pending).
-**Live re-verification**: blocked — Figma REST returned `429` with `Retry after 72844s` on
-2026-09-27, so this audit must be re-checked against `scripts/capture-figma.mjs` output at the
-quota reset (~2026-09-28 02:00 UTC).
+**Live re-verification**: blocked - Figma REST returned `429` with `Retry after 375849s` on
+2026-09-28 10:07 UTC, so this audit must be re-checked against `scripts/capture-figma.mjs` output at
+the quota reset (**2026-10-02 18:38 UTC**). One request slipped through before the limit and is
+recorded in `specs/041-font-size/research.md`: the row-16 payload shows 4 row groups = 6 rows,
+against the 5-row `CHATS_SETTINGS_ROWS` seed (open finding, not yet reconciled).
 
 ## Headline
 
@@ -34,7 +36,7 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 | B2 | 1/3 Chats + 9 Add modal | `New Group` | group creation (name + participants) — **done (F-040)** |
 | B3 | 1 Chats | `Broadcast Lists` | broadcast list screen |
 | B4 | 2 Chat window + 16 Chats settings | `Wallpaper` | wallpaper picker |
-| B5 | 16 Chats settings | `Font size` | size control (persisted, applied app-wide) |
+| B5 | 16 Chats settings | `Font size` | size control (persisted, applied app-wide) — **done (F-041)** |
 | B6 | 4/5 Calls | `New call`, row tap, call info | call screen / call-info sheet |
 | B7 | 15 Contact info | `Media, photos and links` | media grid |
 | B8 | 15 Contact info | `Groups` | shared-groups list |
@@ -72,8 +74,9 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 4. **Calls store-backing + row activation** — done (F-038).
 5. **B1** (Contacts) — done (F-039).
 6. **B2** (New Group) — done (F-040).
-7. **B4/B5** (Wallpaper, Font size) — next: visible, persisted, app-wide.
-8. Remaining tier B, then tier C at the quota reset.
+7. **B4/B5** (Wallpaper, Font size) — B5 **done (F-041)**; B4 (Wallpaper) blocked: it needs real
+   imagery no capture can supply while the quota is exhausted.
+8. Remaining tier B, then tier C at the quota reset (**2026-10-02 18:38 UTC**).
 
 ## Progress log
 
@@ -81,3 +84,7 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   tests, build green). Tier A is now empty; the next work is tier B or the quota reset.
 - **2026-09-27** — F-039 Contacts (370 unit) and F-040 New Group (385 unit) landed; build green.
   B1 and B2 are done, so the next tier-B targets are B4/B5 then B3/B6…B12.
+- **2026-09-28** — F-041 Font size (417 unit) landed; build green. B5 done: the `Font size` row now
+  opens a picker and the choice is persisted and applied to chat text only. The quota reset moved
+  out to 2026-10-02 18:38 UTC, so F-041's screen chrome ships PROVISIONAL with capture tasks
+  T011–T013 open. Next tier-B target is **B4** once imagery can be captured, else B3/B6.
