@@ -1,4 +1,4 @@
-# Design Research + Plan + Tasks + Quickstart: call log (feature 038)
+# Design Research: WhatsApp Calls — persisted call log and live row activation
 
 **Source**: gap audit ("Also worth fixing": `Clear` is the F-032 bug class) + tier-A row wiring.
 
@@ -25,30 +25,10 @@
 - Golden safety: the first run hydrates the identical 12 seeded entries, so `0-8649-calls` and the
   edit-mode goldens are unchanged.
 
-## Plan
+## Canonical artifacts
 
-1. `core/call.store.ts` (new) + spec: `calls`, `removeCall`, `clearCalls`, persistence, `hasChat`-
-   free (chat lookup stays in `ChatStore`).
-2. `ChatStore`: add `chatIdForContactName(name)` (returns `string | null`).
-3. `calls-page.ts`: read the store, drop the input/effect, `clear` → `clearCalls()`, remove →
-   `removeCall()`, row activation → chat navigation.
-4. Unit: new store spec + updated page spec. E2E updated (paused).
-5. 004 drift note; build + unit green; commits (spec → feat → test).
+The plan and the task list that used to live in this file now live in the canonical
+Speckit artifacts for this feature:
 
-**Gates**: G1 store + page; G2 build/unit green + e2e authored; G3 close + drift note.
-
-## Tasks
-
-- [x] T001 — Spec set `specs/038-call-log/`
-- [x] T002 — `CallStore` + `ChatStore` contact lookup
-- [x] T003 — `CallsPage` store wiring and row activation
-- [x] T004 — Unit tests + authored e2e
-- [x] T005 — 004 drift note; build + unit green
-- [x] T006 — Commits
-
-## Commands
-
-```powershell
-npm run build
-npx ng test --watch=false --reporters=progress   # playwright runs paused per owner directive
-```
+- `plan.md` - approach, phases, review gates, drift policy
+- `tasks.md` - the delivery checklist (this file keeps the research record only)

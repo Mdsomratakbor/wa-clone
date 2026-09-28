@@ -1,4 +1,4 @@
-# Design Research + Plan + Tasks + Quickstart: auth keypad (feature 037)
+# Design Research: WhatsApp Authorization — working keypad and Continue
 
 **Source**: gap audit tier A (`specs/design-gap-audit.md`, A4) — a fully designed screen whose every
 control is inert.
@@ -22,29 +22,10 @@ control is inert.
   (the `:root` block auto-emits every map entry) and is reusable by later tier-B screens.
 - No store involvement: nothing about the entered number is persisted (no session identity exists).
 
-## Plan
+## Canonical artifacts
 
-1. `_tokens.scss`: add `error` colour.
-2. `auth-page.ts`: `phone` signal, `submitted` flag, `error` computed, `onKey`/`onDelete`/
-   `onContinue`, `Router` injection.
-3. `auth-page.html`: render digits + `aria-live`, add the conditional error paragraph.
-4. `auth-page.scss`: `.auth__error` using `var(--wa-error)`.
-5. Unit + e2e (paused); 021 drift note; build + unit green; commits (spec → feat → test).
+The plan and the task list that used to live in this file now live in the canonical
+Speckit artifacts for this feature:
 
-**Gates**: G1 keypad + continue; G2 build/unit green + e2e authored; G3 close + drift note.
-
-## Tasks
-
-- [x] T001 — Spec set `specs/037-auth-keypad/`
-- [x] T002 — Keypad entry + validation + Continue
-- [x] T003 — Error token + styles
-- [x] T004 — Unit tests + authored e2e
-- [x] T005 — 021 drift note; build + unit green
-- [x] T006 — Commits
-
-## Commands
-
-```powershell
-npm run build
-npx ng test --watch=false --reporters=progress   # playwright runs paused per owner directive
-```
+- `plan.md` - approach, phases, review gates, drift policy
+- `tasks.md` - the delivery checklist (this file keeps the research record only)

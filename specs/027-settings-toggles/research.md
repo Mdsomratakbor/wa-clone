@@ -1,4 +1,4 @@
-# Design Research + Plan + Tasks + Quickstart: Settings — persisted toggles (feature 027)
+# Design Research: WhatsApp Settings — persisted toggles
 
 **Source**: behaviour slice (future work 2). Reuses: F-024 snapshot/persist pattern
 (`prefs.store.ts`), shared component conventions (`input()`/`output()` signal API), seed-driven
@@ -19,32 +19,10 @@ settings screens (`chats-settings-page`, `notifications-page`).
 - A new root `PrefsStore` (key `wa.prefs.v1`) mirrors `ChatStore`'s persist/hydrate/reset
   contract; a presentational `app-toggle` (`role="switch"`) keeps row chrome testable.
 
-## Plan
+## Canonical artifacts
 
-1. `PrefsStore` + `1prefs.store.spec.ts`.
-2. `app-toggle` shared component + spec.
-3. Chats Settings + Notifications: toggle rows bound to the store; chevron rows unchanged.
-4. Composer: Enter gated on `prefs.enterKeySends`.
-5. Spec drift notes (016, 017); e2e authored (paused); build + unit validation.
-6. Commits (spec → feat → test).
+The plan and the task list that used to live in this file now live in the canonical
+Speckit artifacts for this feature:
 
-**Gates**: G1 no-op (no new capture); G2 build/unit green + e2e authored (runs paused); G3
-close + drift notes.
-
-## Tasks
-
-- [x] T001 — Spec set `specs/027-settings-toggles/` (this set)
-- [x] T002 — `PrefsStore` + units
-- [x] T003 — `app-toggle` component + spec
-- [x] T004 — Chats Settings / Notifications toggle rows
-- [x] T005 — Composer Enter gating
-- [x] T006 — Spec updates + authored e2e
-- [x] T007 — Drift notes (016/017), build green + unit green
-- [x] T008 — Commits
-
-## Commands
-
-```powershell
-npm run build
-npx ng test --watch=false --reporters=progress   # playwright runs paused per owner directive
-```
+- `plan.md` - approach, phases, review gates, drift policy
+- `tasks.md` - the delivery checklist (this file keeps the research record only)

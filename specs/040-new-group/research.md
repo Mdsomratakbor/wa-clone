@@ -1,4 +1,4 @@
-# Design Research + Plan + Tasks + Quickstart: new group (feature 040)
+# Design Research: WhatsApp New Group (group kind + creation screen)
 
 **Source**: gap audit tier B2 — `New Group` (rows 1/3) and `New group` (row 9) are two designed
 entries for a flow whose screen and data model do not exist yet.
@@ -39,33 +39,10 @@ entries for a flow whose screen and data model do not exist yet.
 - No seeded render moves: the screen is reachable only from the two designed entries and the seeded
   chat list is unchanged.
 
-## Plan
+## Canonical artifacts
 
-1. `chat.model.ts`: `ChatKind`, `kind`, `participants`; `normalizeChats` fills the defaults.
-2. `chat.store.ts`: `createGroup`, group filter in `contactConversations()`, group subtitle in
-   `contact()`.
-3. `features/new-group/new-group-page.{ts,html,scss}` + spec.
-4. Route `/new-group`; chats-page nav + add-modal wiring.
-5. E2E authored (paused); drift notes 001/003/009; build + unit green; commits (spec → feat → test).
+The plan and the task list that used to live in this file now live in the canonical
+Speckit artifacts for this feature:
 
-**Gates**: G1 model + screen + entries; G2 build/unit green + e2e authored; G3 close + drift notes.
-
-## Tasks
-
-- [x] T001 — Spec set `specs/040-new-group/`
-- [x] T002 — Model + `createGroup` + contacts filter + group subtitle
-- [x] T003 — `NewGroupPage` (name, multi-select, create)
-- [x] T004 — Route + Chats nav / add-modal wiring
-- [x] T005 — Unit tests + authored e2e
-- [x] T006 — Drift notes 001/003/009; build + unit green
-- [x] T007 — Commits
-- [x] T008 — `/speckit.clarify` pass (5 questions) + code alignment: blank-name throw, pluralised
-  subtitle, group-aware contact screen, `participantIds` resolved live, `groupParticipants()`
-  specced (FR-002b), `conversationKind()` (FR-012) — unit 390/390
-
-## Commands
-
-```powershell
-npm run build
-npx ng test --watch=false --reporters=progress   # playwright runs paused per owner directive
-```
+- `plan.md` - approach, phases, review gates, drift policy
+- `tasks.md` - the delivery checklist (this file keeps the research record only)

@@ -1,4 +1,4 @@
-# Design Research + Plan + Tasks + Quickstart: muted badge on chat rows (feature 033)
+# Design Research: WhatsApp Chats — muted badge on chat rows
 
 **Source**: the mute feature (F-030) is only visible inside the chat window. The list is the
 primary surface, so the state needs a list-side reflection.
@@ -19,26 +19,10 @@ primary surface, so the state needs a list-side reflection.
   in the design), badge inside `ChatListItem` title text (would break the captured name/timestamp
   metrics and the row's `aria-label`).
 
-## Plan
+## Canonical artifacts
 
-1. `ChatListItem` template: conditional bell in the head line; scoped SCSS (`flex: none`, colour
-   token reuse, no fixed row height changes).
-2. Unit coverage (item + page, incl. reload instance); e2e extended (paused).
-3. Drift note (`specs/001`); build + unit validation; commits (spec → feat → test).
+The plan and the task list that used to live in this file now live in the canonical
+Speckit artifacts for this feature:
 
-**Gates**: G1 default render unchanged; G2 build/unit green + e2e authored; G3 close + drift note.
-
-## Tasks
-
-- [x] T001 — Spec set `specs/033-chat-mute-badge/` (this set)
-- [x] T002 — Row badge (template + SCSS)
-- [x] T003 — Unit tests + e2e extension
-- [x] T004 — 001 drift note; build + unit green
-- [x] T005 — Commits
-
-## Commands
-
-```powershell
-npm run build
-npx ng test --watch=false --reporters=progress   # playwright runs paused per owner directive
-```
+- `plan.md` - approach, phases, review gates, drift policy
+- `tasks.md` - the delivery checklist (this file keeps the research record only)

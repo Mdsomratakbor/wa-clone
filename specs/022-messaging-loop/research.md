@@ -1,4 +1,4 @@
-# Design Research + Plan + Tasks + Quickstart: Messaging Loop (feature 022)
+# Design Research: WhatsApp Messaging Loop
 
 **Source**: map-external behaviour slice (future work 2, item 1). Reuses design chrome:
 composer `0:8452`, chat row `0:8115`, bubble group `0:8260`, Chat Actions bar `0:8524` (feature
@@ -13,33 +13,10 @@ composer `0:8452`, chat row `0:8115`, bubble group `0:8260`, Chat Actions bar `0
 - Read state today is implicit; the SMS-style goldens for rows 001/003/002 must not change for
   `read !== true` rows → render the tick only when read.
 
-## Plan
+## Canonical artifacts
 
-1. `ChatStore` (signals: `conversations`, `threads`; `sendMessage`, `markAllRead`,
-   `openConversation`, `setConversations`, `reset`).
-2. `Composer` draft + `(send)` output, mic↔Send swap, Enter-to-send.
-3. `ChatWindowPage` → store messages + `onSend`, scroll-to-latest, open→read.
-4. `ChatListItem` read tick; `ChatsPage` conversations from store.
-5. Specs/unit updates; e2e authored (paused); build + unit validation.
-6. Commit (spec → feat → docs).
+The plan and the task list that used to live in this file now live in the canonical
+Speckit artifacts for this feature:
 
-**Gates**: G1 no-op (no new Figma data needed — map-external); G2 build/unit green + e2e
-authored (runs paused); G3 close + drift notes.
-
-## Tasks
-
-- [x] T001 — Spec set `specs/022-messaging-loop/` (this set)
-- [x] T002 — `ChatStore` service + unit spec
-- [x] T003 — `Composer` draft/send/mic↔Send/Enter + unit updates
-- [x] T004 — `ChatWindowPage` store wiring + `onSend` + scroll + open→read + unit updates
-- [x] T005 — `ChatListItem` read tick + `ChatsPage` store-driven + unit updates
-- [x] T006 — E2E `messaging.spec.ts` authored; drift notes (003 Read All)
-- [x] T007 — build green + unit green
-- [x] T008 — design-map / quickstart note + commits
-
-## Commands
-
-```powershell
-npm run build
-npx ng test --watch=false --reporters=progress   # playwright runs paused per owner directive
-```
+- `plan.md` - approach, phases, review gates, drift policy
+- `tasks.md` - the delivery checklist (this file keeps the research record only)

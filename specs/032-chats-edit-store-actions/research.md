@@ -1,4 +1,4 @@
-# Design Research + Plan + Tasks + Quickstart: Chats edit-mode store actions (feature 032)
+# Design Research: WhatsApp Chats — edit-mode Archive / Delete backed by the store
 
 **Source**: spec 003 explicitly shipped Archive/Delete as in-memory list mutations ("archived
 view is out of scope"). F-024 later made persistence a project principle, so those two actions
@@ -19,29 +19,10 @@ became the last in-memory-only mutations in the app — and a reload resurrected
 - No new chrome, no new copy: the captured `Archive · Read All · Delete` bar and the placeholder
   state are untouched, so goldens are unaffected.
 
-## Plan
+## Canonical artifacts
 
-1. Model + store: `archived?`, `normalizeChats` seeds `false`, `archiveConversations`,
-   `deleteConversations` (delegates to the single-id cleanup).
-2. `ChatsPage`: drop `removeSelected`'s local mutation; filter archived in the `items` effect.
-3. Unit coverage (store + page, including a fresh-instance persistence check); e2e updated
-   (paused).
-4. Drift note (`specs/003`); build + unit validation; commits (spec → feat → test).
+The plan and the task list that used to live in this file now live in the canonical
+Speckit artifacts for this feature:
 
-**Gates**: G1 model/store shape; G2 build/unit green + e2e authored; G3 close + drift note.
-
-## Tasks
-
-- [x] T001 — Spec set `specs/032-chats-edit-store-actions/` (this set)
-- [x] T002 — Model + store archive/delete
-- [x] T003 — ChatsPage store-backed actions + archived filter
-- [x] T004 — Unit tests + e2e updates
-- [x] T005 — 003 drift note; build + unit green
-- [x] T006 — Commits
-
-## Commands
-
-```powershell
-npm run build
-npx ng test --watch=false --reporters=progress   # playwright runs paused per owner directive
-```
+- `plan.md` - approach, phases, review gates, drift policy
+- `tasks.md` - the delivery checklist (this file keeps the research record only)

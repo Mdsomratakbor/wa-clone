@@ -1,4 +1,4 @@
-# Design Research + Plan + Tasks + Quickstart: contacts screen (feature 039)
+# Design Research: WhatsApp Contacts screen (Settings → Contacts)
 
 **Source**: gap audit tier B1 — design row 13's `Contacts` row is the last dead row on Settings, and
 the design map has no Contacts screen, so the chrome is provisional by definition.
@@ -28,28 +28,10 @@ the design map has no Contacts screen, so the chrome is provisional by definitio
 - Two empty states (no contacts at all vs. a query with no match) share one element whose copy
   differs, so a single `contacts-empty` testid covers both while the text stays assertable.
 
-## Plan
+## Canonical artifacts
 
-1. `ChatStore.contactConversations()` + store spec.
-2. `features/contacts/contacts-page.{ts,html,scss}` + spec.
-3. `/contacts` lazy route; `SettingsPage` `contacts` row → `/contacts`.
-4. E2E authored (paused); 013 drift note; build + unit green; commits (spec → feat → test).
+The plan and the task list that used to live in this file now live in the canonical
+Speckit artifacts for this feature:
 
-**Gates**: G1 store + screen + row wiring; G2 build/unit green + e2e authored; G3 close + drift note.
-
-## Tasks
-
-- [x] T001 — Spec set `specs/039-contacts-screen/`
-- [x] T002 — `ChatStore.contactConversations()` + tests
-- [x] T003 — `ContactsPage` (list, search, empty states)
-- [x] T004 — Route + Settings row wiring
-- [x] T005 — Unit tests + authored e2e
-- [x] T006 — 013 drift note; build + unit green
-- [x] T007 — Commits
-
-## Commands
-
-```powershell
-npm run build
-npx ng test --watch=false --reporters=progress   # playwright runs paused per owner directive
-```
+- `plan.md` - approach, phases, review gates, drift policy
+- `tasks.md` - the delivery checklist (this file keeps the research record only)

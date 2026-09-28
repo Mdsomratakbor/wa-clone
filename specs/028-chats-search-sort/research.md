@@ -1,4 +1,4 @@
-# Design Research + Plan + Tasks + Quickstart: Chats — search + sort (feature 028)
+# Design Research: WhatsApp Chats — search + sort
 
 **Source**: backlog "chat-list search/sort" (future work 2). Reuses: `PrefsStore` (F-027),
 `ChatsPage` (chat-list feature), the `items` effect that mirrors `ChatStore.conversations()`.
@@ -16,29 +16,10 @@
 - The chats tab currently renders `items()` directly in `@for`; search/sort slot in as a
   `visibleItems` computed so edit-mode, modal, FAB and tab flows are untouched.
 
-## Plan
+## Canonical artifacts
 
-1. `PrefsStore` v2 `chatSort` + `setChatSort` + tolerant hydrate + units.
-2. `ChatsPage`: `searchQuery`, `visibleItems`, `onSearchInput`/`clearSearch`/`onSort`, sort
-   segment + search bar template/SCSS (hidden while editing).
-3. Unit coverage; e2e authored (paused); build + unit validation.
-4. Drift note in `specs/001-chat-list`; commits (spec → feat → test).
+The plan and the task list that used to live in this file now live in the canonical
+Speckit artifacts for this feature:
 
-**Gates**: G1 golden re-capture pending Figma/playwright unblock (chrome is new); G2 build/unit
-green + e2e authored; G3 close + drift note.
-
-## Tasks
-
-- [x] T001 — Spec set `specs/028-chats-search-sort/` (this set)
-- [x] T002 — `PrefsStore` v2 (chatSort) + units
-- [x] T003 — ChatsPage search + sort behaviour + chrome
-- [x] T004 — Unit extension + authored e2e
-- [x] T005 — 001 drift note; build green + unit green
-- [x] T006 — Commits
-
-## Commands
-
-```powershell
-npm run build
-npx ng test --watch=false --reporters=progress   # playwright runs paused per owner directive
-```
+- `plan.md` - approach, phases, review gates, drift policy
+- `tasks.md` - the delivery checklist (this file keeps the research record only)

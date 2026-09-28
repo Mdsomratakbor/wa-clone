@@ -1,4 +1,4 @@
-# Design Research + Plan + Tasks + Quickstart: Status wiring (feature 035)
+# Design Research: WhatsApp Status — live row targets (Privacy / My Status)
 
 **Source**: gap audit tier A (`specs/design-gap-audit.md`, A1/A2) — designed controls whose targets
 already exist.
@@ -19,26 +19,10 @@ already exist.
 - No store mutation, so no persistence concerns; no chrome, so no golden risk (`0:8257`-class
   captures for status are unaffected).
 
-## Plan
+## Canonical artifacts
 
-1. `StatusPage`: `onNavAction('privacy')` → `/settings`; `onRowActivate()` → `/status/compose`.
-2. Unit: replace the "stay no-ops" test with the four routing assertions.
-3. E2E authored (paused).
-4. Drift note (`specs/006`); build + unit validation; commits (spec → feat → test).
+The plan and the task list that used to live in this file now live in the canonical
+Speckit artifacts for this feature:
 
-**Gates**: G1 behavior only; G2 build/unit green + e2e authored; G3 close + drift note.
-
-## Tasks
-
-- [x] T001 — Spec set `specs/035-status-wiring/` (this set)
-- [x] T002 — Status page routing
-- [x] T003 — Unit tests + authored e2e
-- [x] T004 — 006 drift note; build + unit green
-- [x] T005 — Commits
-
-## Commands
-
-```powershell
-npm run build
-npx ng test --watch=false --reporters=progress   # playwright runs paused per owner directive
-```
+- `plan.md` - approach, phases, review gates, drift policy
+- `tasks.md` - the delivery checklist (this file keeps the research record only)

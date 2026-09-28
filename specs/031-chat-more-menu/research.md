@@ -1,4 +1,4 @@
-# Design Research + Plan + Tasks + Quickstart: Chat — More menu (feature 031)
+# Design Research: WhatsApp Chat — More menu (clear messages / delete chat)
 
 **Source**: the last chat-actions row that maps to store behavior without new capture. "More" in
 the real product groups destructive/管理 actions; the two we can honestly support from existing
@@ -16,30 +16,10 @@ data are **Clear messages** and **Delete chat**.
 - Deleting the open conversation must leave the user somewhere valid → navigate to `/chats`
   (the same convention as the chat header back button).
 
-## Plan
+## Canonical artifacts
 
-1. Store: `clearMessages(chatId)`, `deleteConversation(chatId)` (thread + starred cleanup).
-2. Seed: `CHAT_MORE_ACTIONS` (`Clear messages`, `Delete chat`).
-3. `ChatWindowPage`: `moreOpen` signal, submenu `ActionSheet`, `onChatAction('chat-more')` swaps
-   sheets, `onMoreAction` applies + navigates, `onDismissMore()` restores focus.
-4. Unit coverage (store + window page); e2e authored (paused).
-5. Drift note (`specs/010`); build + unit validation; commits (spec → feat → test).
+The plan and the task list that used to live in this file now live in the canonical
+Speckit artifacts for this feature:
 
-**Gates**: G1 submenu row set provisional (no capture needed for behavior); G2 build/unit green +
-e2e authored; G3 close + drift note.
-
-## Tasks
-
-- [x] T001 — Spec set `specs/031-chat-more-menu/` (this set)
-- [x] T002 — Store clear/delete + starred cleanup
-- [x] T003 — Submenu sheet + handlers
-- [x] T004 — Unit tests + authored e2e
-- [x] T005 — 010 drift note; build + unit green
-- [x] T006 — Commits
-
-## Commands
-
-```powershell
-npm run build
-npx ng test --watch=false --reporters=progress   # playwright runs paused per owner directive
-```
+- `plan.md` - approach, phases, review gates, drift policy
+- `tasks.md` - the delivery checklist (this file keeps the research record only)

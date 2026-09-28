@@ -1,4 +1,4 @@
-# Design Research + Plan + Tasks + Quickstart: Archived screen (feature 034)
+# Design Research: WhatsApp Archived chats screen
 
 **Source**: F-032 shipped archiving as a flag with no destination — an incomplete loop. This slice
 finishes it, reusing only components and store state that already exist.
@@ -21,30 +21,10 @@ finishes it, reusing only components and store state that already exist.
 - **Empty state.** The screen keeps a `No archived chats` status line mirroring the chats list's
   `No chats` placeholder rather than inventing artwork.
 
-## Plan
+## Canonical artifacts
 
-1. Store: `unarchiveConversations(ids)`.
-2. `ArchivedPage` (ts/html/scss) + `/archived` route; nav back → `/chats`; tap → unarchive +
-   `/chat/:id`.
-3. `ChatsPage`: pinned row gated on `!editing() && !searchActive() && archivedCount() > 0`.
-4. Unit coverage (store, archived page, chats page); e2e authored (paused).
-5. Drift notes (`specs/001`, `003`, `032`); build + unit validation; commits (spec → feat → test).
+The plan and the task list that used to live in this file now live in the canonical
+Speckit artifacts for this feature:
 
-**Gates**: G1 default render unchanged; G2 build/unit green + e2e authored; G3 close + drift notes.
-
-## Tasks
-
-- [x] T001 — Spec set `specs/034-archived-screen/` (this set)
-- [x] T002 — Store unarchive
-- [x] T003 — ArchivedPage + route
-- [x] T004 — ChatsPage pinned row
-- [x] T005 — Unit tests + authored e2e
-- [x] T006 — Drift notes; build + unit green
-- [x] T007 — Commits
-
-## Commands
-
-```powershell
-npm run build
-npx ng test --watch=false --reporters=progress   # playwright runs paused per owner directive
-```
+- `plan.md` - approach, phases, review gates, drift policy
+- `tasks.md` - the delivery checklist (this file keeps the research record only)
