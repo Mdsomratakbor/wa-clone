@@ -43,6 +43,13 @@ the matching chat.
 ## Non-Goals
 
 - A call screen, in-call UI, or a call-info sheet (tier B6).
+
+> **Drift note (F-043, 2026-09-28)**: The first Non-Goal is now split. The **call-info sheet is
+> built** (`specs/043-call-info/spec.md`): it reuses `app-action-sheet`, shows Message / Voice call /
+> Video call / Delete, and its `Delete` calls this feature's `removeCall()`, so the persistence
+> guarantees here cover the sheet's delete path unchanged. Still not built: the **call screen and
+> in-call UI** — which is why `+ new call` and the sheet's two call actions stay inert. The second
+> and third Non-Goals here are unchanged.
 - Adding call entries (no new-call flow), call durations, or avatars.
 - Grouping the log by contact (the design's flat list is kept).
 

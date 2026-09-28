@@ -4,7 +4,8 @@
 
 **Created**: 2026-09-28
 
-**Status**: **Specified** (clarify pass recorded below; plan + tasks pending)
+**Status**: **Implemented** (build green, unit 456/456, e2e authored not run). G1 capture **BLOCKED**
+— action labels, order and sheet chrome remain PROVISIONAL, tasks T010–T012 open.
 
 **Input**: gap audit tier B6 + design rows 4/5 (`0:10395`, `0:8597`) + `figma/design-analysis.md` §6.1
 

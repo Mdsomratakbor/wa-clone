@@ -8,6 +8,12 @@
 
 **Input**: Figma design analysis -> design-map row 5, node `0:8597`
 
+> **Drift note (F-043, 2026-09-28)**: This spec hides the info button in edit mode; that is
+> unchanged and now load-bearing — `CallsPage.onCallInfo` also returns early while `editing()`, so
+> the call-info sheet is unreachable in edit mode by two independent guards. Edit-mode removal is
+> also now conditional on no sheet being open, so a pending `Delete` from the sheet cannot race a
+> minus-circle removal. Nothing else in 005 moves. See `specs/043-call-info/spec.md`.
+
 ## Context
 
 The Calls Edit screen is the Calls list (feature 004, node `0:10395`) with **edit mode active**: every call row gains a leading 21px red circle with a white minus (`#FF3B30`), the row content shifts right (avatar 16 -> 47, name 68 -> 99), and the trailing blue info button disappears. The navigation bar flips `Edit` -> `Done` (#007AFF semibold, leading) and the trailing slot swaps the `+ new call` icon for a `Clear` text action; the centred `All | Missed` segmented control persists unchanged. Unlike Chats Edit (feature 003) there is **no bottom action bar** — the tab bar remains visible with `Calls` active.

@@ -8,6 +8,14 @@
 
 **Input**: Figma design analysis -> design-map row 4, node `0:10395`
 
+> **Drift note (F-043, 2026-09-28)**: Decision 3 above ("`+ new call`, row activation, and the info
+> button are all no-ops in 004") is now partly superseded. The **info button** opens the call-info
+> action sheet (`specs/043-call-info/spec.md`), and row activation went live earlier in F-038 — a
+> call row opens the contact's chat, with "no match ⇒ stays put". Only `+ new call` remains inert,
+> and its reason comment now names the in-call screen as the missing surface. The Calls list itself
+> is unchanged: 12 rows, the static `All | Missed` control, no title, `Edit` leading, and the same
+> row treatment and glyphs as 004. The sheet's own chrome is provisional (no design node).
+
 ## Context
 
 The Calls screen presents the user's phone-call history as a scrollable list of 12 rows, each showing a 40px contact avatar, the contact name, a call-direction line (arrow glyph + `outgoing` / `incoming` / `missed` label), a right-aligned date, and a trailing blue info button. Missed calls render the contact name in system red `#FF3B30`. The navigation bar carries a leading `Edit` action, a centred `All | Missed` segmented control (static in feature 004), and a trailing `+ new call` icon; there is no screen title. The shell chrome (status bar, tab bar, home indicator) is identical to features 001-003.

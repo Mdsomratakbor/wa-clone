@@ -37,7 +37,7 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 | B3 | 1 Chats | `Broadcast Lists` | broadcast list screen — **done (F-042)**, list + entry only; create form still missing, chrome PROVISIONAL |
 | B4 | 2 Chat window + 16 Chats settings | `Wallpaper` | wallpaper picker |
 | B5 | 16 Chats settings | `Font size` | size control (persisted, applied app-wide) — **done (F-041)** |
-| B6 | 4/5 Calls | `New call`, row tap, call info | call screen / call-info sheet |
+| B6 | 4/5 Calls | `New call`, row tap, call info | call screen / call-info sheet — **partially done**: row tap (F-038) and the call-info sheet (F-043); the calling flow + in-call screen remain, and its chrome is PROVISIONAL |
 | B7 | 15 Contact info | `Media, photos and links` | media grid |
 | B8 | 15 Contact info | `Groups` | shared-groups list |
 | B9 | 14 Account | `Security`, `Two-step verification`, `Change number`, `Delete my account` | 4 sub-screens |
@@ -61,7 +61,10 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 - Calls `Clear` (row 5) mutated a local list only — the F-032 bug class. **Fixed (F-038)**: the log
   lives in `CallStore` (`wa.call-store.v1`) and removals/clears persist.
 - Calls rows are inert: **fixed (F-038)** — a row opens the chat with the same `contactName`
-  (no match ⇒ stays put). `New call` and call info remain inert (B6).
+  (no match ⇒ stays put). The `ⓘ` info button is live too (**F-043**): it opens a call-info sheet
+  over the list with Message / Voice call / Video call / Delete, where `Message` opens the chat and
+  `Delete` removes the entry and persists. `New call` is the only inert Calls control left — its
+  destination is a contact picker plus the in-call screen (B6).
 - 13 Settings: the last dead row is `Contacts` — **fixed (F-039)**.
 - Chats `New Group` / add-modal `New group` are live (F-040): a group conversation model plus
   `/new-group` creation. `Broadcast Lists` is live too (F-042): a `broadcast` conversation kind,
@@ -81,7 +84,9 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
    imagery no capture can supply while the quota is exhausted.
 8. **B3** (Broadcast Lists) — done for list + entry (F-042); the create form remains and is itself
    capture-gated.
-9. Remaining tier B, then tier C at the quota reset (**2026-10-02 18:38 UTC**).
+9. **B6** (Calls) — done for row tap (F-038) and the call-info sheet (F-043); the calling flow and
+   in-call screen remain.
+10. Remaining tier B, then tier C at the quota reset (**2026-10-02 18:38 UTC**).
 
 ## Progress log
 
@@ -100,3 +105,10 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   2026-10-02 quota). The v1-snapshot test also caught a real hydrate defect: pre-F-040 snapshots
   loaded with `kind === undefined`; hydration now fills `kind`/`participantIds` without touching
   persisted `read`/`muted`/`archived`. Next tier-B target: **B6** (Calls), since B4 needs imagery.
+- **2026-09-28** — F-043 Call info sheet (456 unit) landed; build green. B6 partially done: the
+  `ⓘ` button on the Calls list opens an action sheet, and with row tap (F-038) two of B6's three
+  dead controls are live. `Message` and `Delete` work; `Voice call` / `Video call` render and are
+  focusable but inert, because their destination is the in-call screen that this feature
+  deliberately did not build — the same split F-042 made on Broadcast Lists. The sheet reused
+  `app-action-sheet`, so no new shared component and no route were needed. Still open: `+ new call`
+  and the calling flow.
