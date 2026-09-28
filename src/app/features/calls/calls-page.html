@@ -54,3 +54,10 @@
 </div>
 
 <app-tab-bar [items]="tabs()" (select)="onTabSelect($event)" />
+
+@if (infoCall() !== null) {
+  <app-call-info-modal
+    (action)="onSheetAction($event)"
+    (dismiss)="onSheetDismiss()"
+  />
+}

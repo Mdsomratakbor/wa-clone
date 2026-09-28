@@ -1,0 +1,6 @@
+<app-action-sheet
+  [title]="title()"
+  [actions]="actions"
+  (action)="action.emit($event)"
+  (dismiss)="dismiss.emit()"
+/>

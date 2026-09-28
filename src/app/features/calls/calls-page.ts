@@ -13,6 +13,7 @@ import { TabBar } from '../../shared/components/tab-bar/tab-bar';
 import { CallStore } from '../../core/call.store';
 import { ChatStore } from '../../core/chat.store';
 import { CallEntry } from './calls.model';
+import { CallInfoModal } from './call-info-modal';
 
 const TAB_KEYS: readonly TabKey[] = ['settings', 'chats', 'camera', 'calls', 'status'];
 const TAB_LABELS: Record<TabKey, string> = {
@@ -25,7 +26,7 @@ const TAB_LABELS: Record<TabKey, string> = {
 
 @Component({
   selector: 'app-calls-page',
-  imports: [NavigationBar, CallListItem, TabBar],
+  imports: [NavigationBar, CallListItem, TabBar, CallInfoModal],
   templateUrl: './calls-page.html',
   styleUrl: './calls-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,6 +39,7 @@ export class CallsPage {
   protected readonly activeTab = signal<TabKey>('calls');
   protected readonly editing = signal(false);
   protected readonly items = computed(() => this.callStore.calls());
+  protected readonly infoCall = signal<CallEntry | null>(null);
 
   protected readonly tabs = computed<TabItem[]>(() =>
     TAB_KEYS.map((key) => ({ key, label: TAB_LABELS[key], active: key === this.activeTab() })),
@@ -94,13 +96,48 @@ export class CallsPage {
       this.callStore.clearCalls();
       return;
     }
-    // F-038: new-call (calling flow) stays inert - it needs a call surface (audit B6).
+    // F-043: new-call stays inert. Its destination is a contact picker plus an in-call screen
+    // (timer, mute, hangup); F-043 shipped the call-info sheet only, so the calling flow is
+    // still a separate feature (audit B6).
   }
 
   protected onCallSelected(call: CallEntry): void {
     if (this.editing()) {
       return;
     }
+    this.openChatFor(call);
+  }
+
+  protected onCallInfo(call: CallEntry): void {
+    if (this.editing()) {
+      return;
+    }
+    this.infoCall.set(call);
+  }
+
+  protected onSheetAction(id: string): void {
+    const call = this.infoCall();
+    if (call === null) {
+      return;
+    }
+    this.infoCall.set(null);
+    if (id === 'message') {
+      this.openChatFor(call);
+      return;
+    }
+    if (id === 'delete') {
+      this.callStore.removeCall(call.id);
+      return;
+    }
+    // voice-call / video-call: their destination is the in-call screen, which is out of scope
+    // here. The row is deliberately rendered and focusable (see specs/043-call-info/spec.md).
+  }
+
+  protected onSheetDismiss(): void {
+    this.infoCall.set(null);
+  }
+
+  private openChatFor(call: CallEntry): void {
     const chatId = this.chatStore.chatIdForContactName(call.contactName);
     if (chatId === null) {
       return;
@@ -108,12 +145,8 @@ export class CallsPage {
     void this.router.navigate(['/chat', chatId]);
   }
 
-  protected onCallInfo(_call: CallEntry): void {
-    // F-038: call info stays inert - it needs a call-info surface (audit B6).
-  }
-
   protected onCallRemove(call: CallEntry): void {
-    if (this.editing()) {
+    if (this.editing() && this.infoCall() === null) {
       this.callStore.removeCall(call.id);
     }
   }
