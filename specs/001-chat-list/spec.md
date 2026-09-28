@@ -8,6 +8,13 @@
 
 **Input**: Figma design analysis → recommended first feature (design-map row 1, node `0:8855`)
 
+> **Drift note (F-042, 2026-09-28)**: The `Broadcast Lists` leading action is no longer a no-op —
+> it navigates to `/broadcasts`, the broadcast list screen added by
+> `specs/042-broadcast-lists/spec.md`. Broadcast conversations are excluded from the Chats list by
+> `kind`, not by a new field, so a broadcast never appears on this screen (it is seeded empty, so the
+> default render is unchanged). This supersedes the 001/003 "rendered, no wiring" treatment of
+> `Broadcast Lists` only; nothing else in 001 changes.
+>
 > **Drift note (F-040, 2026-09-27)**: The `New Group` leading action is no longer inert — it
 > navigates to `/new-group`, the group creation screen added by
 > `specs/040-new-group/spec.md`. `Broadcast Lists` remains a no-op (F-001/003). This supersedes the

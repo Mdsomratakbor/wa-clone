@@ -10,9 +10,9 @@ Node IDs below are taken directly from Figma via the Figma API. URLs use the hyp
 
 | # | Feature | Figma Frame | Node ID | Angular Feature | Spec |
 | - | ------- | ----------- | ------- | --------------- | ---- |
-| 1 | Chat List (Chats) | WhatsApp Chats | `0:8855` | `features/chat-list` — ✅ **implemented** (US1–US3, 2026-09-23) | 001 |
+| 1 | Chat List (Chats) | WhatsApp Chats | `0:8855` | `features/chat-list` — ✅ **implemented** (US1–US3, 2026-09-23); `New Group` live since F-040, `Broadcast Lists` live since F-042 (opens `/broadcasts`; broadcast screen chrome provisional - no broadcast screen node known) | 001, 040, 042 |
 | 2 | Chat Window | WhatsApp Chat | `0:8257` | `feature/chat-window` — ✅ **implemented** (US1–US3, 2026-09-23) | 002 |
-| 3 | Chats (Edit mode) | WhatsApp Chats Edit | `0:8114` | `feature/chat-list` (edit) — ✅ **implemented** (US1–US3, 2026-09-23) | 003 |
+| 3 | Chats (Edit mode) | WhatsApp Chats Edit | `0:8114` | `feature/chat-list` (edit) — ✅ **implemented** (US1–US3, 2026-09-23); list excludes group/broadcast kinds since F-042 | 003, 042 |
 | 4 | Calls | WhatsApp Calls | `0:10395` | `feature/calls` — ✅ **implemented** (US1–US3, 2026-09-23) | 004 |
 | 5 | Calls (Edit mode) | WhatsApp Calls Edit | `0:8597` | `feature/calls` (edit) — ✅ **implemented** (US1-US3, 2026-09-23) | 005 |
 | 6 | Status (feed) | WhatsApp Status | `0:8498` | `feature/status` - ? **implemented** (US1-US3, 2026-09-23) | 006 |

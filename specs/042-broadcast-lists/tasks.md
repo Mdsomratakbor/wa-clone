@@ -50,7 +50,33 @@ npx ng test --watch=false --reporters=progress   # playwright runs paused per ow
 - `[ ]` items are capture-gated and stay open until the quota resets.
 - `createBroadcast()` ships **without a UI caller** on purpose (Non-Goals); the create flow is a
   later feature and must not be smuggled in here.
-- `normalizeChats()` and snapshot version `1` are deliberately untouched, so F-040 and earlier
-  snapshots keep hydrating.
+- Snapshot version stays `1` and `normalizeChats()` is untouched. Hydration gained a separate
+  `hydrateDefaults()` — the v1-snapshot test exposed that `hydrate()` set conversations raw, so a
+  pre-F-040 snapshot came back with `kind === undefined`. `normalizeChats()` could not be reused
+  there because it forces `read`/`muted`/`archived` false, which would wipe user state on every
+  reload. The hydrate fix rides in the `test(042)` commit with a regression test for both halves.
 - `broadcasts()` is not archived-filtered: `archived` is a Chats-list concept and a broadcast is
   never in that list.
+
+## Closure - FR to test traceability
+
+| FR | Test |
+|----|------|
+| FR-001 | `a v1 snapshot hydrates with no broadcast and keeps every other chat` |
+| FR-002 | `createBroadcast makes a broadcast with recipients and an empty thread`, `a created broadcast persists across a reload` |
+| FR-002a | `createBroadcast refuses a blank name` |
+| FR-002b | `broadcastRecipients resolves current names and drops deleted contacts`, `broadcastRecipients is empty for an unknown chat` |
+| FR-003 | `a broadcast is excluded from the Chats list, direct and group chats are not`, `a broadcast does not appear in the Chats list` (ChatsPage) |
+| FR-004 | `broadcasts lists only broadcasts, in insertion order` |
+| FR-005 | `renders the header: Back leading, Broadcast lists title`, `does not render the tab bar`, `navigates to /chats when Back is activated` |
+| FR-006 | `renders one ChatListItem row per broadcast`, `shows the empty state when there are no broadcasts`, `follows a broadcast created after render` |
+| FR-007 | `opening a row marks the broadcast read and navigates to the chat` |
+| FR-008 | `Broadcast Lists opens the broadcast screen` (ChatsPage) |
+| FR-009 | `the broadcast name is shown as the conversation title` |
+| FR-010 | `broadcasts are excluded from contactConversations` |
+| FR-011 | `carries the stored font scale` |
+| FR-012 | `shows the empty state when there are no broadcasts` (empty case), `does not render direct or group chats` |
+| regression | `the Chats list still hides archived chats`, `createBroadcast trims the name, allows no recipients and cannot collide`, `broadcast ids continue the shared counter without colliding with groups` |
+
+**Result**: `npm run build` green; unit **440/440** (baseline 417, +23). E2E authored, not run.
+Commits: `7f4986e` docs, `94a0603` feat, `a73beed` test.

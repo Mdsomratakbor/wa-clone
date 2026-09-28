@@ -61,6 +61,11 @@ honest while the archived view remains out of scope.
 1. Spec 003's "in-memory list" semantics (and its "focusable no-op Read All" note) are superseded
    by the F-024 persistence principle — drift noted in `specs/003`.
 2. Archive no longer deletes: the conversation is retained in the store with `archived: true`.
+3. **Drift note (F-042, 2026-09-28)**: this spec documents the Chats list as "`!archived` only".
+   F-042 added a second exclusion — aggregate kinds (`group`, `broadcast`) never appear in the
+   Chats list — and moved the filter out of the page effect into
+   `ChatStore.chatsListConversations()` so both exclusions are testable in one place. The archived
+   semantics above are unchanged. See `specs/042-broadcast-lists/spec.md`.
 
 ## Caveat (deliberately incomplete until G1)
 

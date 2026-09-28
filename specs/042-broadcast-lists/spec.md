@@ -28,6 +28,23 @@ and the spec changes with it.**
 - Q: Should the broadcast list ship with seeded data?  A (**agent default**): **no seed** - the
   screen ships the real WhatsApp empty state, so nothing is invented without a design source.
 
+### Session 2 - 2026-09-28 (discovery during implementation)
+
+The FR-001 v1-snapshot test failed and exposed a real defect rather than a wrong expectation:
+`hydrate()` did `conversations.set(snapshot.conversations)` with no normalization, so a snapshot
+written before F-040 loaded with `kind === undefined`. Every read site compensates with
+`(chat.kind ?? 'direct')`, which is why it was invisible — but the load path and the seed path
+disagreed about the shape of a stored chat.
+
+- Q: How is a legacy snapshot normalized?  A (**agent decision, no owner prompt**): fill
+  `kind`/`participantIds` only, via a new private `hydrateDefaults()` helper, and leave the
+  persisted `read`/`muted`/`archived` flags exactly as stored. `normalizeChats()` is **not** reused
+  there: it forces those three flags `false`, which is right for a fresh seed and would silently
+  wipe user state on every reload (unread chats reappearing, archives and mutes vanishing).
+  Basis: FR-001 says snapshots "hydrate unchanged", and unreading every chat is not unchanged.
+  This is a defect fix inside FR-001's stated scope, not a contract change; the snapshot version
+  stays `1` and no migration is added. Flagged here rather than edited silently, per the drift rule.
+
 ## Summary
 
 Row 1/3 of the design puts a `Broadcast Lists` action in the Chats nav, and it has been a dead
@@ -45,7 +62,8 @@ guard, collision-free id, empty thread, `read: true`, persist, return id).
 
 - **FR-001** `ChatKind` becomes `'direct' | 'group' | 'broadcast'`; `ChatPreview.kind` stays
   optional, `normalizeChats()` still defaults to `'direct'`, and existing persisted snapshots
-  (version `1`) hydrate unchanged.
+  (version `1`) hydrate unchanged — filling `kind`/`participantIds` defaults only, never
+  re-forcing the persisted `read`/`muted`/`archived` flags (see Clarifications, session 2).
 - **FR-002** `ChatStore.createBroadcast(name, recipientIds)` creates a conversation with
   `kind: 'broadcast'`, the trimmed name, the given recipient chat ids, an empty thread,
   `read: true`, and an id that cannot collide with direct chats or groups (`broadcast-<n>`,

@@ -34,7 +34,7 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 | - | ---------- | ------------ | -------------- |
 | B1 | 13 Settings | `Contacts` row | Contacts list — **done (F-039)** |
 | B2 | 1/3 Chats + 9 Add modal | `New Group` | group creation (name + participants) — **done (F-040)** |
-| B3 | 1 Chats | `Broadcast Lists` | broadcast list screen |
+| B3 | 1 Chats | `Broadcast Lists` | broadcast list screen — **done (F-042)**, list + entry only; create form still missing, chrome PROVISIONAL |
 | B4 | 2 Chat window + 16 Chats settings | `Wallpaper` | wallpaper picker |
 | B5 | 16 Chats settings | `Font size` | size control (persisted, applied app-wide) — **done (F-041)** |
 | B6 | 4/5 Calls | `New call`, row tap, call info | call screen / call-info sheet |
@@ -64,7 +64,10 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   (no match ⇒ stays put). `New call` and call info remain inert (B6).
 - 13 Settings: the last dead row is `Contacts` — **fixed (F-039)**.
 - Chats `New Group` / add-modal `New group` are live (F-040): a group conversation model plus
-  `/new-group` creation. `Broadcast Lists` (B3) and `New community` stay inert.
+  `/new-group` creation. `Broadcast Lists` is live too (F-042): a `broadcast` conversation kind,
+  `createBroadcast()`, and the `/broadcasts` list screen. Broadcasts are excluded from the Chats
+  list, and `createBroadcast()` ships **without a UI caller** — the create form is still missing, so
+  B3 is *partially* done. `New community` stays inert.
 
 ## Suggested order
 
@@ -76,7 +79,9 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 6. **B2** (New Group) — done (F-040).
 7. **B4/B5** (Wallpaper, Font size) — B5 **done (F-041)**; B4 (Wallpaper) blocked: it needs real
    imagery no capture can supply while the quota is exhausted.
-8. Remaining tier B, then tier C at the quota reset (**2026-10-02 18:38 UTC**).
+8. **B3** (Broadcast Lists) — done for list + entry (F-042); the create form remains and is itself
+   capture-gated.
+9. Remaining tier B, then tier C at the quota reset (**2026-10-02 18:38 UTC**).
 
 ## Progress log
 
@@ -88,3 +93,10 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   opens a picker and the choice is persisted and applied to chat text only. The quota reset moved
   out to 2026-10-02 18:38 UTC, so F-041's screen chrome ships PROVISIONAL with capture tasks
   T011–T013 open. Next tier-B target is **B4** once imagery can be captured, else B3/B6.
+- **2026-09-28** — F-042 Broadcast lists (440 unit) landed; build green. B3 done for list + entry:
+  a `broadcast` kind, `createBroadcast()`, the `/broadcasts` screen, and `Broadcast Lists` wired off
+  its multi-year no-op. The dead action is gone, but the screen is unreachable in practice — no
+  create form and no seed — so the empty state is what ships. Chrome stays PROVISIONAL (same
+  2026-10-02 quota). The v1-snapshot test also caught a real hydrate defect: pre-F-040 snapshots
+  loaded with `kind === undefined`; hydration now fills `kind`/`participantIds` without touching
+  persisted `read`/`muted`/`archived`. Next tier-B target: **B6** (Calls), since B4 needs imagery.

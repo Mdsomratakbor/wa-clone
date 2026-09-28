@@ -6,8 +6,14 @@
 
 **Status**: Implemented — all validation targets pass (2026-09-23)
 
+> **Drift note (F-042, 2026-09-28)**: The Chats list is now filtered by kind as well as
+> `archived`: group and broadcast conversations are excluded (`chatsListConversations()`). Neither
+> is seeded, so edit mode still lists exactly the same 9 direct chats. The excluded leading action
+> `Broadcast Lists` is now wired to `/broadcasts` (it was a no-op here and in 001). See
+> `specs/042-broadcast-lists/spec.md`.
+>
 > **Drift note (F-022, 2026-09-26)**: `Read All` was "control-only no-op" in 003 (no read
-> state existed). F-022 introduced `ChatStore` with read state; `Read All` is now functional —
+> state existed). F-022 introduced `ChatStore` with read state; `Read All` is now functional -
 > it marks every conversation read and renders read ticks. Layout/semantics unchanged; see
 > `specs/022-messaging-loop/spec.md` deviations.
 

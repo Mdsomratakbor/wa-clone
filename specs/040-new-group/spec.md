@@ -30,6 +30,16 @@ before a screen: `ChatPreview` gains a `kind` and a `participants` list, `ChatSt
 `createGroup`, and a provisional `/new-group` screen collects a name plus participants and opens the
 new group chat.
 
+> **Drift note (F-042, 2026-09-28)**: Two lines in this spec are superseded by
+> `specs/042-broadcast-lists/spec.md`. (1) `kind?: 'direct' | 'group'` becomes
+> `kind?: 'direct' | 'group' | 'broadcast'` — the same optional field, one more aggregate, so
+> broadcasts reuse `participantIds` and `createBroadcast` mirrors `createGroup` instead of
+> introducing a parallel concept. (2) "existing persisted snapshots hydrate unchanged" is now
+> precise: hydration fills `kind`/`participantIds` defaults through `hydrateDefaults()` and
+> preserves the persisted `read`/`muted`/`archived` flags, which the seed-time `normalizeChats()`
+> deliberately forces false. The snapshot version stays `1` and no migration is added. Groups
+> themselves are unchanged: `groupParticipants()` and `createGroup()` behave exactly as specified.
+
 ## Functional Requirements
 
 - **FR-001** `ChatPreview` gains optional `kind?: 'direct' | 'group'` and
