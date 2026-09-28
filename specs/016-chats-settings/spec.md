@@ -41,6 +41,13 @@ selection are later features / map-external; rows are no-ops here.
 - **FR-003**: Back returns to `/settings`.
 - **FR-004**: All rows are no-ops (later features / map-external).
 
+> **Drift note (F-041, 2026-09-28)**: The `Font size` row is no longer a no-op - it navigates to
+> `/settings/chats/font-size` (F-041 FR-007). `Wallpaper` and `Keyboard` remain inert.
+> **Open finding (F-041)**: the 2026-09-28 capture of `0:9973` shows **4 row groups = 6 rows**
+> (1 + 1 + 1 + 3, with two separators in the last group) while `CHATS_SETTINGS_ROWS` seeds 5.
+> The seed is a declared hypothesis and must be reconciled at G1; F-041 deliberately did not
+> change it (one feature per series).
+
 > **Drift note (F-027, 2026-09-26)**: Rows are no longer all no-ops. **Enter key sends** and
 > **Media visibility** render as persisted switches (`PrefsStore`, `wa.prefs.v1`); **Enter key
 > sends** now gates the composer's Enter handler (OFF ⇒ Enter inert). Wallpaper/Font size/

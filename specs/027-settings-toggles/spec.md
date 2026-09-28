@@ -27,10 +27,17 @@ across reloads via localStorage) with their consumer behaviors declared as later
   `vibrate`, `popup`, `light`, `showPreviews` with `DEFAULT_PREFS`.
 - **FR-002** `PrefsStore.toggle(key)` flips and persists; `set(key, value)` persists explicitly;
   `reset()` clears storage and restores defaults.
+
 - **FR-003** Shared `app-toggle` switch component (`role="switch"`, `aria-checked`, no text).
 - **FR-004** Chats Settings: **Enter key sends** and **Media visibility** rows render as toggles
   bound to the store; Wallpaper/Font size/Keyboard keep chevron rows. Notifications: all five
   rows render as toggles.
+
+> **Drift note (F-041, 2026-09-28)**: `Font size` still renders as a chevron row (its visual
+> treatment is unchanged), but the row is no longer inert - it navigates to
+> `/settings/chats/font-size`. The `wa.prefs.v1` envelope also moved to **version 4** and now
+> carries a non-boolean `fontScale` field next to `chatSort`; `hydrate()` accepts 1-4 and defaults
+> a missing or invalid value, so every snapshot written by F-027..F-040 still loads.
 - **FR-005** Composer Enter: `enterKeySends` ON → Enter sends (current behavior); OFF → Enter is
   inert (single-line input cannot hold a newline — documented deviation). Send button/`(send)`
   unchanged.

@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ArchivedPage } from './archived-page';
 import { ChatStore } from '../../core/chat.store';
+import { PrefsStore } from '../../core/prefs.store';
 import { CHAT_SEED } from './chat-list.seed';
 
 describe('ArchivedPage', () => {
@@ -18,6 +19,7 @@ describe('ArchivedPage', () => {
     }).compileComponents();
     store = TestBed.inject(ChatStore);
     store.reset();
+    TestBed.inject(PrefsStore).reset();
   });
 
   function render(): HTMLElement {
@@ -85,5 +87,13 @@ describe('ArchivedPage', () => {
     store.unarchiveConversations([first.id]);
     fixture.detectChanges();
     expect(el.querySelectorAll('.archived__row').length).toBe(0);
+  });
+
+  it('carries the stored font scale so archived matches the main list (F-041 FR-008)', () => {
+    TestBed.inject(PrefsStore).setFontScale('large');
+    const el = render();
+    expect(el.querySelector('[data-testid="archived-page"]')?.getAttribute('data-font-scale')).toBe(
+      'large',
+    );
   });
 });

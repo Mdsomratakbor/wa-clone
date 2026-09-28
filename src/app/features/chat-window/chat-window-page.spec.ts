@@ -43,8 +43,22 @@ describe('ChatWindowPage', () => {
     TestBed.inject(PrefsStore).reset();
   });
 
-  it('renders the contact header from the seeded contact', () => {
+  it('carries the stored font scale on the chat window root (F-041 FR-009)', () => {
+    TestBed.inject(PrefsStore).setFontScale('extra-large');
     fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    const root = (fixture.nativeElement as HTMLElement).querySelector('.chat-window');
+    expect(root?.getAttribute('data-font-scale')).toBe('extra-large');
+  });
+
+  it('renders the default font scale when none is stored (F-041 FR-009)', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    const root = (fixture.nativeElement as HTMLElement).querySelector('.chat-window');
+    expect(root?.getAttribute('data-font-scale')).toBe('default');
+  });
+
+  it('renders the contact header from the seeded contact', () => {    fixture = TestBed.createComponent(ChatWindowPage);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('.chat-header__name')?.textContent).toBe(CHAT_CONTACT.name);

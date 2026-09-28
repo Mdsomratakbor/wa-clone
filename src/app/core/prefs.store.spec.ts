@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import {
   DEFAULT_CHAT_SORT,
+  DEFAULT_FONT_SCALE,
   DEFAULT_PREFS,
   DEFAULT_PROFILE,
   PREFS_KEY,
@@ -104,6 +105,77 @@ describe('PrefsStore', () => {
     store.updateProfile('Someone', 'About me');
     store.reset();
     expect(store.profile()).toEqual(DEFAULT_PROFILE);
+    expect(localStorage.getItem(PREFS_KEY)).toBeNull();
+  });
+
+  it('starts with the default font scale (F-041 FR-001)', () => {
+    expect(store.fontScale()).toBe(DEFAULT_FONT_SCALE);
+    expect(DEFAULT_FONT_SCALE).toBe('default');
+  });
+
+  it('setFontScale persists the step across reloads (F-041 FR-003, FR-014)', () => {
+    store.setFontScale('large');
+    expect(store.fontScale()).toBe('large');
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    expect(TestBed.inject(PrefsStore).fontScale()).toBe('large');
+  });
+
+  it('persists a version 4 envelope (F-041 FR-002)', () => {
+    store.setFontScale('small');
+    const raw = localStorage.getItem(PREFS_KEY);
+    expect(raw).not.toBeNull();
+    expect(JSON.parse(raw as string).version).toBe(4);
+    expect(JSON.parse(raw as string).fontScale).toBe('small');
+  });
+
+  it('hydrates a v3 envelope with the default font scale (F-041 FR-002)', () => {
+    localStorage.setItem(
+      PREFS_KEY,
+      JSON.stringify({ version: 3, prefs: DEFAULT_PREFS, chatSort: 'recent' }),
+    );
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const reloaded = TestBed.inject(PrefsStore);
+    expect(reloaded.fontScale()).toBe(DEFAULT_FONT_SCALE);
+    expect(reloaded.prefs()).toEqual(DEFAULT_PREFS);
+  });
+
+  it('keeps a stored font scale when hydrating a v4 envelope (F-041 FR-014)', () => {
+    localStorage.setItem(
+      PREFS_KEY,
+      JSON.stringify({
+        version: 4,
+        prefs: DEFAULT_PREFS,
+        chatSort: 'recent',
+        fontScale: 'extra-large',
+      }),
+    );
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    expect(TestBed.inject(PrefsStore).fontScale()).toBe('extra-large');
+  });
+
+  it('falls back to the default font scale for an unknown stored value (F-041 FR-002)', () => {
+    localStorage.setItem(
+      PREFS_KEY,
+      JSON.stringify({
+        version: 4,
+        prefs: DEFAULT_PREFS,
+        chatSort: 'recent',
+        fontScale: 'enormous',
+      }),
+    );
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    expect(TestBed.inject(PrefsStore).fontScale()).toBe(DEFAULT_FONT_SCALE);
+  });
+
+  it('reset restores the default font scale (F-041 FR-003)', () => {
+    store.setFontScale('extra-large');
+    store.reset();
+    expect(store.fontScale()).toBe(DEFAULT_FONT_SCALE);
     expect(localStorage.getItem(PREFS_KEY)).toBeNull();
   });
 });

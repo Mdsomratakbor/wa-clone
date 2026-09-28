@@ -33,6 +33,21 @@ describe('ChatsPage', () => {
     expect(rows.length).toBe(CHAT_SEED.length);
   });
 
+  it('carries the stored font scale on the list body (F-041 FR-008)', () => {
+    TestBed.inject(PrefsStore).setFontScale('small');
+    fixture = TestBed.createComponent(ChatsPage);
+    fixture.detectChanges();
+    const body = (fixture.nativeElement as HTMLElement).querySelector('.chats-page__body');
+    expect(body?.getAttribute('data-font-scale')).toBe('small');
+  });
+
+  it('renders the default font scale when none is stored (F-041 FR-008)', () => {
+    fixture = TestBed.createComponent(ChatsPage);
+    fixture.detectChanges();
+    const body = (fixture.nativeElement as HTMLElement).querySelector('.chats-page__body');
+    expect(body?.getAttribute('data-font-scale')).toBe('default');
+  });
+
   it('renders the navigation bar with the Chats title', () => {
     fixture = TestBed.createComponent(ChatsPage);
     fixture.detectChanges();
