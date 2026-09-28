@@ -130,6 +130,29 @@ export class ChatStore {
     return id;
   }
 
+  createBroadcast(name: string, recipientIds: readonly string[] = []): string {
+    const trimmed = name.trim();
+    if (trimmed.length === 0) {
+      throw new Error('createBroadcast requires a non-empty name');
+    }
+    this.newChatCounter += 1;
+    const id = `broadcast-${this.newChatCounter}`;
+    const chat: ChatPreview = {
+      id,
+      contactName: trimmed,
+      preview: '',
+      timestamp: nowTime(),
+      avatarRef: null,
+      read: true,
+      kind: 'broadcast',
+      participantIds: [...recipientIds],
+    };
+    this.conversations.update((chats) => [...chats, chat]);
+    this.threads.update((threads) => ({ ...threads, [id]: [] }));
+    this.persist();
+    return id;
+  }
+
   toggleStarred(chatId: string, messageId: string): void {
     const key = `${chatId}:${messageId}`;
     this.starred.update((list) =>
@@ -179,6 +202,23 @@ export class ChatStore {
     };
   }
 
+  private isAggregate(chat: ChatPreview): boolean {
+    const kind = chat.kind ?? 'direct';
+    return kind === 'group' || kind === 'broadcast';
+  }
+
+  private resolveContactNames(chatId: string): readonly string[] {
+    const chat = this.conversations().find((c) => c.id === chatId);
+    if (!chat) {
+      return [];
+    }
+    const byId = new Map(this.conversations().map((c) => [c.id, c.contactName]));
+    return (chat.participantIds ?? []).flatMap((id) => {
+      const name = byId.get(id);
+      return name === undefined ? [] : [name];
+    });
+  }
+
   private subtitleFor(chat: ChatPreview): string {
     if ((chat.kind ?? 'direct') !== 'group') {
       return CONTACT_SUBTITLE;
@@ -202,7 +242,7 @@ export class ChatStore {
     const seen = new Set<string>();
     const contacts: ChatPreview[] = [];
     for (const chat of this.conversations()) {
-      if ((chat.kind ?? 'direct') === 'group' || seen.has(chat.contactName)) {
+      if (this.isAggregate(chat) || seen.has(chat.contactName)) {
         continue;
       }
       seen.add(chat.contactName);
@@ -211,16 +251,20 @@ export class ChatStore {
     return contacts.sort((a, b) => a.contactName.localeCompare(b.contactName));
   }
 
+  broadcasts(): ChatPreview[] {
+    return this.conversations().filter((chat) => (chat.kind ?? 'direct') === 'broadcast');
+  }
+
+  chatsListConversations(): ChatPreview[] {
+    return this.conversations().filter((chat) => !chat.archived && !this.isAggregate(chat));
+  }
+
   groupParticipants(chatId: string): readonly string[] {
-    const chat = this.conversations().find((c) => c.id === chatId);
-    if (!chat) {
-      return [];
-    }
-    const byId = new Map(this.conversations().map((c) => [c.id, c.contactName]));
-    return (chat.participantIds ?? []).flatMap((id) => {
-      const name = byId.get(id);
-      return name === undefined ? [] : [name];
-    });
+    return this.resolveContactNames(chatId);
+  }
+
+  broadcastRecipients(chatId: string): readonly string[] {
+    return this.resolveContactNames(chatId);
   }
 
   conversationKind(chatId: string): ChatKind {

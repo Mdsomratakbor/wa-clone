@@ -1,6 +1,6 @@
 export type TabKey = 'settings' | 'chats' | 'camera' | 'calls' | 'status';
 
-export type ChatKind = 'direct' | 'group';
+export type ChatKind = 'direct' | 'group' | 'broadcast';
 
 export interface ChatPreview {
   id: string;

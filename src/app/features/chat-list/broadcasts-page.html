@@ -1,0 +1,21 @@
+<app-navigation-bar
+  title="Broadcast lists"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="broadcasts" data-testid="broadcasts-page" [attr.data-font-scale]="fontScale()">
+  @if (chats().length === 0) {
+    <div class="broadcasts__empty" role="status" data-testid="broadcasts-empty">
+      <p class="broadcasts__empty-text">No broadcasts</p>
+    </div>
+  } @else {
+    <ul class="broadcasts__list" data-testid="broadcasts-list">
+      @for (chat of chats(); track chat.id) {
+        <li class="broadcasts__row">
+          <app-chat-list-item [chat]="chat" (selected)="onOpenChat(chat.id)" />
+        </li>
+      }
+    </ul>
+  }
+</main>

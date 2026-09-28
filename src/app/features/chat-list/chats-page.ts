@@ -98,7 +98,7 @@ export class ChatsPage {
 
   constructor() {
     effect(() => {
-      this.items.set(this.conversations().filter((chat) => !chat.archived));
+      this.items.set(this.store.chatsListConversations());
     });
   }
 
@@ -167,7 +167,11 @@ export class ChatsPage {
       void this.router.navigate(['/new-group']);
       return;
     }
-    // F-001/003: broadcast-lists is a later feature.
+    if (id === 'broadcast-lists') {
+      // F-042: broadcast list screen (design-map rows 1/3).
+      void this.router.navigate(['/broadcasts']);
+      return;
+    }
   }
 
   protected onFabPressed(): void {
