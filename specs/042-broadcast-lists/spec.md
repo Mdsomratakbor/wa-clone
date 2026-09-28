@@ -4,7 +4,8 @@
 
 **Created**: 2026-09-28
 
-**Status**: **Specified** (clarify pass recorded below; plan + tasks pending)
+**Status**: **Implemented** (build green, unit 440/440, e2e authored not run). G1 capture **BLOCKED**
+— screen chrome remains PROVISIONAL, tasks T011–T013 open.
 
 **Input**: design row 1/3 (`Broadcast Lists` nav action) + gap audit tier B3 +
 `specs/042-broadcast-lists/research.md`
@@ -18,15 +19,26 @@ agent-proposed defaults below were adopted. They are recorded here because they 
 decisions, not derived facts - each one is marked with the basis it rests on. **Reverse any of them
 and the spec changes with it.**
 
-- Q: How much of Broadcast Lists should F-042 cover?  A (**agent default**): **list + entry only** -
+**Owner ratification (2026-09-28, post-implementation)**: the three answers below were put back to
+the owner explicitly as "agent defaults" once the feature was built, and all three were confirmed
+unchanged — *keep the nav action live with no create form*, *keep broadcasts out of Chats and
+unseeded*, *keep the nav title / empty copy / row treatment provisional*. The implementation shipped
+as recorded; no code change resulted from the ratification.
+
+- Q: How much of Broadcast Lists should F-042 cover?  A (**agent default, owner-ratified**): **list + entry only** -
   model, `/broadcasts` screen, nav wiring. Creating a broadcast is deferred, because the create
   form's chrome cannot be specified without a capture and a half-built form is worse than none.
   Basis: conservative under a blocked capture gate.
-- Q: Should a broadcast appear in the main Chats list?  A (**agent default**): **no** - broadcasts
-  are excluded from Chats and live only in `/broadcasts`, matching real WhatsApp, where a broadcast
-  is not a peer conversation.
-- Q: Should the broadcast list ship with seeded data?  A (**agent default**): **no seed** - the
-  screen ships the real WhatsApp empty state, so nothing is invented without a design source.
+- Q: Should a broadcast appear in the main Chats list?  A (**agent default, owner-ratified**):
+  **no** - broadcasts are excluded from Chats and live only in `/broadcasts`, matching real
+  WhatsApp, where a broadcast is not a peer conversation.
+- Q: Should the broadcast list ship with seeded data?  A (**agent default, owner-ratified**):
+  **no seed** - the screen ships the real WhatsApp empty state, so nothing is invented without a
+  design source.
+- Q: Should the provisional chrome wait for the capture?  A (**owner, 2026-09-28**): **yes** -
+  leave the nav title `Broadcast lists`, the `No broadcasts` copy and the row treatment
+  PROVISIONAL until the quota resets on 2026-10-02, rather than guessing the pushed screen's title
+  to match the nav action label.
 
 ### Session 2 - 2026-09-28 (discovery during implementation)
 
