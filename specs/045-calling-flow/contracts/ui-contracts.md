@@ -1,11 +1,12 @@
 # UI Contracts: Calling Flow and In-Call Screen (feature 045)
 
 **Status**: G1 **BLOCKED and not clearable** — neither screen in this feature has a Figma node.
+**Directive**: functional over display (2026-09-29). No control in this contract may be
+display-only; every one changes real `CallSession` state.
 
 ## 1. Design-verified: the entry points
 
-These are already rendered by shipped code and are cited to real nodes. They are contracts, not
-hypotheses.
+Already rendered by shipped code and cited to real nodes. These are contracts, not hypotheses.
 
 | Control | Source | Node | Contract |
 | ------- | ------ | ---- | -------- |
@@ -13,9 +14,9 @@ hypotheses.
 | Chat header `Call` | design row 2, Chat window | `chat-header.html:75` | Phone glyph, nav-trailing on the chat header. Currently inert, `aria-label="Call, coming soon"`. |
 | Chat header `Video call` | design row 2, Chat window | `chat-header.html:63` | Video glyph, nav-trailing. Currently inert, `aria-label="Video call, coming soon"`. |
 
-**Removal of "coming soon" is a required part of this contract.** Those labels are a design
-confession in the accessibility tree: they tell a screen-reader user the feature does not exist.
-Once the control is live, the label names the action and its target.
+**Removal of "coming soon" is a required part of this contract.** Those labels tell a screen-reader
+user the feature does not exist. Once the control is live, the label names the action and its target
+(`Call Martha Craig`, `Video call Martha Craig`).
 
 ## 2. PROVISIONAL: the in-call screen
 
@@ -24,15 +25,16 @@ Once the control is live, the label names the action and its target.
 
 Hypotheses, all modelled on real WhatsApp:
 
-- **Field**: full-bleed dark field (a new token; see §4).
+- **Field**: full-bleed dark field (a new token; see §5).
 - **Top**: contact avatar (large), contact name, call kind (`Voice call` / `Video call`).
-- **Duration**: `mm:ss` beneath the name, driven by the injected clock. Real WhatsApp starts it at
-  0 on connect; so does this.
-- **Controls**: a two-row grid, four controls. `Mute`, `Speaker`, `Video` (toggle, labelled
-  unavailable — there is no stream), and `Hang up`, which is the red circle, visually dominant, on
-  its own row.
-- **Disclosure**: a small line reading `Simulated call`. Copy is a hypothesis; its **presence** is
-  not optional (FR-004, Non-Goals).
+- **Duration**: `mm:ss`, real elapsed time from the injected clock, **zero until the session reaches
+  `connected`**, then counting once per second.
+- **Controls**: a two-row grid, four controls: `Mute`, `Speaker`, `Video` (all real toggles) and
+  `Hang up`, the red circle, visually dominant on its own row.
+- **States**: the screen renders the real session state — `dialing` / `ringing` before connection
+  (duration reads `00:00`), `connected` with a running duration.
+- **No "Simulated call" banner.** An earlier draft specified one; revoked under the functional
+  directive because there is no faked result to disclose.
 
 ## 3. PROVISIONAL: the contact picker
 
@@ -49,20 +51,31 @@ per `AGENTS.md`.
 
 ## 5. Accessibility contract
 
-- `Mute` / `Speaker` / `Video` are `aria-pressed` toggles. A toggle that changes nothing is still
-  required to report its state honestly.
+- `Mute` / `Speaker` / `Video` are `aria-pressed` toggles **backed by `CallSession` state**. Under
+  G4, a toggle that only changes its own label fails the gate.
 - `Hang up` is `aria-label`led and is the only way out; there is no implicit timeout.
-- The video affordance is labelled **unavailable**, not presented as working.
-- The duration uses **`role="timer"`**, not a live region. `role="status"` implies `aria-live`, which
-  would announce a new value every second — the single worst accessibility outcome available to this
-  screen. `role="timer"` is the correct semantic for content that updates on a timer.
-- The disclosure is readable text, not a `title` attribute or an icon.
+- The duration uses **`role="timer"`**, not a live region. `role="status"` implies `aria-live`,
+  which would announce a new value every second — the worst available outcome on this screen.
+  A test asserts the region carries no `aria-live`.
+- Toggles remain `focusable` and never `disabled`: they are live, and a disabled control would be a
+  lie in the other direction.
 
 ## 6. Data contract
 
+- `CallSession`: the live call state — `contactId`, `contactName`, `avatarRef`, `kind`, `state`,
+  `startedAtMs`, `connectedAtMs`, `elapsedMs`, `muted`, `speakerOn`, `videoOn`, `outcome`.
 - `CallEntry.outcome?: CallOutcome` — **optional**, normalized at load, so a pre-F-045 `v1` snapshot
   loads intact.
 - Snapshot `version` stays `1`; `nextCallSeq` defaults. A `version: 2` bump would discard every
   user's call log to ship an optional field.
+- **The session is never persisted** (FR-009).
 - Generated ids are `call-<n>`, monotonic, following the `group-<n>` convention in `ChatStore`.
 - `direction: 'outgoing'` is reused; a placed call adds no new direction value.
+- The log entry is written **at call end**, with the outcome derived from the final state.
+
+## 7. Backend seam (F-046, not this feature)
+
+`CallStore`'s API must stay persistence-agnostic: no method that only makes sense against
+localStorage, and a serializable versioned snapshot a port can be swapped beneath. The duplicated
+`readStorage`/`writeStorage` try/catch across all three stores is left in place on purpose —
+extracting it here would be a cross-store drive-by refactor.
