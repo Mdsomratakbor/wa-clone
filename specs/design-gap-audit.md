@@ -26,7 +26,7 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 | A3 | 20 Edit profile | `Save` | persist Name/About, reflect on Settings | **done (F-036)** |
 | A4 | 21 Auth | keypad digits / backspace / `Continue` | fill phone region, verify, enter the app | **done (F-037)** |
 | A5 | 12 Camera | `Flip` | swap front/back camera state | moved to tier C (see below) |
-| A6 | 2 Chat window | `Video call`, `Call` | start a call | needs a call screen → tier B |
+| A6 | 2 Chat window | `Video call`, `Call` | start a call | **DONE (F-045)** — both start a real call and open the in-call screen. The buttons are row 2, design-verified; the in-call chrome is PROVISIONAL |
 
 ## Tier B — real design flow, needs one new (hypothesis) screen
 
@@ -37,7 +37,7 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 | B3 | 1 Chats | `Broadcast Lists` | broadcast list screen — **done (F-042)**, list + entry only; create form still missing, chrome PROVISIONAL |
 | B4 | 2 Chat window + 16 Chats settings | `Wallpaper` | wallpaper picker |
 | B5 | 16 Chats settings | `Font size` | size control (persisted, applied app-wide) — **done (F-041)** |
-| B6 | 4/5 Calls | `New call`, row tap, call info | call screen / call-info sheet — **partially done**: row tap (F-038) and the call-info sheet (F-043); the calling flow + in-call screen remain, and its chrome is PROVISIONAL |
+| B6 | 4/5 Calls | `New call`, row tap, call info | call screen / call-info sheet — **DONE (F-045)**: row tap (F-038), the call-info sheet (F-043), and now the calling flow — picker at `/calls/new`, in-call screen at `/calls/active`, and all three previously inert controls wired. The new chrome is PROVISIONAL by construction (no Figma node exists) |
 | B7 | 15 Contact info | `Media, photos and links` | media grid — **done (F-044)**, derived from the chat's own `Message.file` entries; only chat-006 is populated, so the empty state is the default, and the grid chrome is PROVISIONAL |
 | B8 | 15 Contact info | `Groups` | shared-groups list — **open**: needs shared-group membership data the store does not hold, so the row stays inert |
 | B9 | 14 Account | `Security`, `Two-step verification`, `Change number`, `Delete my account` | 4 sub-screens |

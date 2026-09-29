@@ -34,7 +34,7 @@ The owner answered three scope questions directly, before any code.
 
 - Q: B6 needs an in-call screen, but the design file has no such screen — rows 4 and 5 are the Calls
   list and edit mode only. How should the calling flow be built?
-  A (**owner**): **full in-call screen, chrome provisional.** Wire all four inert controls to it: the
+  A (**owner**): **full in-call screen, chrome provisional.** Wire all five inert controls to it: the
   chat header's `Call` and `Video call`, the call-info sheet's `Voice call` and `Video call`, and
   Calls `+ new call`. Chrome is **PROVISIONAL** since no Figma node exists, the same posture
   F-042 and F-044 took.
@@ -70,15 +70,35 @@ recorded here rather than applied silently.
 Two answers survive unchanged: the injectable clock (now load-bearing, since real elapsed time
 depends on it) and the provisional chrome (a missing Figma node is not a choice).
 
+### Clarification pass 2 — raised during implementation (2026-09-29)
+
+Two contradictions surfaced only once the code existed, so per `AGENTS.md` §0 they went back through
+clarify instead of being resolved silently in code.
+
+1. **FR-008 did not define the legacy `outcome` default.** The spec required normalization but never
+   said what a v1 entry missing `outcome` becomes. The first implementation used a blanket
+   `'completed'`, which would report the seed's two missed calls (`call-004`, `call-012`) as completed
+   — directly contradicting the "Do not fake a success" constraint.
+   **Answer: derive from `direction`.** `missed` → `'missed'`, anything else → `'completed'`. An
+   `outcome` already on disk is preserved. Folded into FR-008.
+2. **The control count was wrong.** The spec said "four currently inert controls" while enumerating
+   five (chat-header `Call`, chat-header `Video call`, sheet `Voice call`, sheet `Video call`, Calls
+   `+ new call`).
+   **Answer: five.** The count in the Summary and Scope sections was a counting error, not a scope
+   decision; all five are wired and tested. Wording corrected.
+
+Neither answer changed the contract's intent — both removed places where the implementation could
+have quietly disagreed with it.
+
 ## Summary
 
-Complete the calling flow. Today four controls across three screens render and do nothing, all
+Complete the calling flow. Today five controls across three screens render and do nothing, all
 because the same destination does not exist: the chat header's `Call` and `Video call`
 (`src/app/shared/components/chat-header/chat-header.html:63,75`, both labelled "coming soon", audit
 **A6**), the call-info sheet's `Voice call` and `Video call` (F-043 left them inert by design), and
 Calls `+ new call` (F-043 left it inert by design).
 
-This feature adds a contact picker for `+ new call` and an in-call screen, and points all four
+This feature adds a contact picker for `+ new call` and an in-call screen, and points all five
 controls at them.
 
 The flow is a **real state machine** over local state: `dialing -> ringing -> connected -> ended`,
@@ -105,7 +125,8 @@ originates and terminates on one device.
 - An **in-call screen** (route `/calls/active`) running the real state machine.
 - A **persisted call-log entry written at call end**, with an `outcome` derived from the real final
   state.
-- Wiring the four currently inert controls to the flow.
+- Wiring the **five** currently inert controls to the flow: chat-header `Call`, chat-header
+  `Video call`, call-info-sheet `Voice call`, call-info-sheet `Video call`, and Calls `+ new call`.
 - A monotonic id counter, following the `group-<n>` convention already in `ChatStore`.
 - A `CallSession` model owned by `CallStore`, so the session is state, not component-local.
 
@@ -136,7 +157,7 @@ originates and terminates on one device.
 - **There is no design source for the in-call screen or the contact picker.** The file has no such
   frames. `figma/design-map.md` rows 4 and 5 are the Calls list and Calls edit mode, and neither
   contains an in-call screen. **No node ID is cited, and none is invented.**
-- The four **entry points** are design-verified, because they already exist as rendered controls:
+- The five controls are design-verified, because they already exist as rendered controls:
   the Calls list `+ new call` (row 4, `0:10395`), and the chat-window header buttons (row 2, from
   `chat-header.html`). The F-043 sheet's rows are provisional (F-043's own gate).
 - Therefore: **every pixel of the in-call screen and the contact picker is PROVISIONAL.** The state
@@ -172,6 +193,10 @@ originates and terminates on one device.
 - **FR-008** `CallEntry` gains an **optional** `outcome` field, normalized at load by
   `normalizeCalls()`, so pre-existing v1 snapshots keep working. `direction` is unchanged: it already
   has `'outgoing'`, and `outcome` is orthogonal (an outgoing call can be completed or missed).
+  A legacy entry with no `outcome` is normalized **from its `direction`**: `missed` becomes `'missed'`,
+  anything else becomes `'completed'`. A blanket `'completed'` default is forbidden - the seed ships
+  two missed calls (`call-004`, `call-012`) and defaulting them to completed is the faked success
+  this feature exists to remove. An `outcome` already present on disk is preserved, not overwritten.
 - **FR-009** An in-progress session and its duration are **not persisted**. A reload restores the log
   with its recorded outcomes, not a call that was in progress. Persisting live session state would
   require restoring a call that is not there.
@@ -209,7 +234,7 @@ originates and terminates on one device.
 - **G1 (BLOCKED - Figma)**: the Figma REST API returned `429` (`Retry after 375849s`, quota reset
   **2026-10-02 18:38 UTC**). There is **no node for the in-call screen or the picker**, so G1 cannot
   be satisfied by waiting — there is nothing to wait for. Their chrome is **PROVISIONAL** by
-  construction, not merely pending capture. The four entry points are already design-verified.
+  construction, not merely pending capture. The five controls are already design-verified.
 - **G2**: `npm run build` green, and the full unit suite green with the exact count reported.
 - **G3**: closure commit, drift notes in F-043's spec and the chat-window spec, the gap audit and
   design map, checklist + converge clean.

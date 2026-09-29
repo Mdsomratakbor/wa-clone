@@ -148,3 +148,22 @@ other three modals. No new shared component is introduced.
 - [x] The inert `Voice call` / `Video call` rows are specified, not hidden (FR-006)
 - [x] The blocked G1 gate is recorded, not skipped
 - [x] Drift notes are planned for specs 004, 005 and 038
+
+## Drift Note — superseded by 045-calling-flow (2026-09-29)
+
+`specs/045-calling-flow` **supersedes the FR-006 inertness of this feature.** This spec is
+otherwise unchanged and still accurate.
+
+- **FR-006** (the `Voice call` / `Video call` rows are rendered, focusable, and deliberately do
+  nothing) is **revoked**. Both rows now start a real call against the contact behind the log row,
+  via the in-call screen at `/calls/active`.
+- **`+ new call`** in `CallsPage` likewise stopped being inert and now opens the contact picker at
+  `/calls/new`.
+- FR-001, FR-002 (the sheet itself and its four-action order), FR-004 (`Message` opens the chat),
+  FR-005 (`Delete`) and the 320px overflow constraint are **unchanged and still verified**. F-045
+  briefly broke FR-005 by closing the sheet per-branch instead of on every action; the F-043 test
+  caught it and the "close on every action" behaviour was restored.
+- The rationale recorded here — that these rows needed an in-call screen that did not exist — was
+  correct when written. It stopped being true once F-045 shipped that screen.
+- F-045's own clarify pass corrected a counting error carried over from this feature: the inert
+  set is **five** controls, not four (two header buttons, two sheet rows, `+ new call`).

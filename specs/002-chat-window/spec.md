@@ -182,3 +182,19 @@ As a user I can see and use the message input bar affordances.
 - Static seed mirrors the Figma thread copy exactly, including timestamps (`17:47` … `11:51` in Figma's on-canvas order, not recomputed).
 - Message node `0:8405` renders as a standard single-line bubble (`34px`) — content-driven height, recorded drift.
 - Wallpaper/avatar approximations are owner-approved drift (Clarifications 1–2), documented in `research.md`/`design-analysis.md`.
+
+## Drift Note — call header buttons made real by 045-calling-flow (2026-09-29)
+
+`specs/045-calling-flow` changes the chat-window header. This spec is otherwise unchanged.
+
+- The header's `Call` and `Video call` icon buttons were rendered but **inert** here, with
+  `aria-label="Call, coming soon"` / `"Video call, coming soon"` and no `(click)` handler. They are
+  audit item **A6** and were the only remaining dead controls on this screen.
+- They now emit `voiceCall` / `videoCall` from `ChatHeader`, and `ChatWindowPage` starts a real call
+  against the chat's contact, then navigates to `/calls/active?from=/chat/<id>`.
+- The `coming soon` aria-labels are **removed** — the calls are no longer coming soon, and a label
+  that denies the control's behaviour is worse than no label.
+- `ChatHeader` stays free of routing and stores: it emits intent, `ChatWindowPage` decides. This
+  keeps the shared component reusable.
+- The in-call screen itself is **PROVISIONAL** chrome (no Figma node exists). The header buttons
+  themselves are not — they are row 2, design-verified.

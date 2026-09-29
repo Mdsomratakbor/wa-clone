@@ -3,7 +3,7 @@
 **Input**: `specs/045-calling-flow/spec.md`, `specs/045-calling-flow/research.md`
 
 **Gates**: G1 = **BLOCKED, and not clearable** — no design node exists for the in-call screen or the
-picker, so the quota reset does not help; their chrome is provisional by construction. The four entry
+picker, so the quota reset does not help; their chrome is provisional by construction. The five controls
 points are already design-verified by existing rendered code. G2 = build + full unit green, e2e
 authored not run. G3 = closure + drift notes. G4 = no control in the shipped surface is
 display-only (project directive, 2026-09-29).
@@ -88,7 +88,7 @@ No earlier spec is edited to change its own requirements. The notes record what 
   picker, so this gate cannot be satisfied by waiting for the 2026-10-02 quota reset. The screen
   chrome is provisional permanently. `tasks.md` must not leave capture tasks open in a way that
   implies they will close. What G1 *can* still check: that no node ID is invented for either screen,
-  and that the four entry points are cited to real nodes (`0:10395`, row 2).
+  and that the five controls are cited to real nodes (`0:10395`, row 2).
 - **G2**: `npm run build` green; the **full** unit suite green with the exact count reported. A
   partial or filtered run is not a pass.
 - **G3**: closure commit; drift notes present in every superseded spec; `checklist` satisfied per

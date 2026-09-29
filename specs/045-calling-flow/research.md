@@ -3,9 +3,11 @@
 **Input**: `specs/045-calling-flow/spec.md`. Written before any code, to establish what exists,
 what is missing, and what the honest limits are.
 
-## 1. The four inert controls, located
+## 1. The five inert controls, located
 
-B6 is not one dead button; it is four, in three files, all blocked on one missing destination.
+B6 is not one dead button; it is five, in three files, all blocked on one missing destination. (The
+prose here originally said "four" against a five-row table — a counting error corrected in the
+implementation-time clarify pass; the table was always right.)
 
 | Control | Location | State today | Audit |
 | ------- | -------- | ----------- | ----- |
