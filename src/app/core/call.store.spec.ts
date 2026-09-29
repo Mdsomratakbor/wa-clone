@@ -68,20 +68,22 @@ describe('CallStore', () => {
   // F-045 T001: the v1 snapshot has no `outcome` and no `nextCallSeq`. Written
   // before the field existed so the normalizer is proven, not assumed.
   describe('F-045 v1 snapshot compatibility (T001)', () => {
-    function writeLegacySnapshot(): void {
+    function writeLegacySnapshot(
+      calls: readonly unknown[] = [
+        {
+          id: 'call-001',
+          contactName: 'Martin Randolph',
+          direction: 'outgoing',
+          date: '10/13/19',
+          avatarRef: null,
+        },
+      ],
+    ): void {
       localStorage.setItem(
         CALL_PERSISTENCE_KEY,
         JSON.stringify({
           version: 1,
-          calls: [
-            {
-              id: 'call-001',
-              contactName: 'Martin Randolph',
-              direction: 'outgoing',
-              date: '10/13/19',
-              avatarRef: null,
-            },
-          ],
+          calls,
         }),
       );
     }
@@ -90,6 +92,52 @@ describe('CallStore', () => {
       writeLegacySnapshot();
       const reloaded = reload();
       expect(reloaded.calls()[0]?.outcome).toBe('completed');
+    });
+
+    // Owner clarify: a blanket 'completed' default would report the two seeded
+    // missed calls (call-004, call-012) as completed - the "fake a success"
+    // outcome the spec forbids. The default is derived from `direction`.
+    it('derives a legacy missed entry as missed, never completed (FR-008)', () => {
+      writeLegacySnapshot([
+        {
+          id: 'call-004',
+          contactName: 'Karen Castillo',
+          direction: 'missed',
+          date: '9/30/19',
+          avatarRef: null,
+        },
+      ]);
+
+      expect(reload().calls()[0]?.outcome).toBe('missed');
+    });
+
+    it('derives an incoming legacy entry as completed (FR-008)', () => {
+      writeLegacySnapshot([
+        {
+          id: 'call-005',
+          contactName: 'Zack John',
+          direction: 'incoming',
+          date: '9/24/19',
+          avatarRef: null,
+        },
+      ]);
+
+      expect(reload().calls()[0]?.outcome).toBe('completed');
+    });
+
+    it('an outcome already on disk is preserved, not overwritten (FR-008)', () => {
+      writeLegacySnapshot([
+        {
+          id: 'call-004',
+          contactName: 'Karen Castillo',
+          direction: 'missed',
+          date: '9/30/19',
+          avatarRef: null,
+          outcome: 'completed',
+        },
+      ]);
+
+      expect(reload().calls()[0]?.outcome).toBe('completed');
     });
 
     it('defaults the id counter so a legacy log does not reissue call-1 (FR-007)', () => {

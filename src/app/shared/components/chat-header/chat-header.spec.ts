@@ -55,6 +55,66 @@ describe('ChatHeader', () => {
     expect(el.querySelector('[aria-label^="Call"]')).not.toBeNull();
   });
 
+  // F-045: these two used to be inert aria-labels reading "coming soon". T014.
+  it('the video call button emits videoCall (F-045 T014)', () => {
+    fixture = TestBed.createComponent(ChatHeader);
+    fixture.componentRef.setInput('contact', CONTACT);
+    fixture.detectChanges();
+    let emitted = false;
+    fixture.componentInstance.videoCall.subscribe(() => (emitted = true));
+
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="chat-header-video-call"]')
+      ?.click();
+
+    expect(emitted).toBe(true);
+  });
+
+  it('the call button emits voiceCall (F-045 T014)', () => {
+    fixture = TestBed.createComponent(ChatHeader);
+    fixture.componentRef.setInput('contact', CONTACT);
+    fixture.detectChanges();
+    let emitted = false;
+    fixture.componentInstance.voiceCall.subscribe(() => (emitted = true));
+
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="chat-header-call"]')
+      ?.click();
+
+    expect(emitted).toBe(true);
+  });
+
+  it('neither call label says "coming soon" any more (F-045 T014)', () => {
+    fixture = TestBed.createComponent(ChatHeader);
+    fixture.componentRef.setInput('contact', CONTACT);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+
+    expect(el.querySelector('[data-testid="chat-header-call"]')?.getAttribute('aria-label')).toBe(
+      'Call',
+    );
+    expect(
+      el.querySelector('[data-testid="chat-header-video-call"]')?.getAttribute('aria-label'),
+    ).toBe('Video call');
+  });
+
+  it('the two call outputs are independent (F-045 T014)', () => {
+    fixture = TestBed.createComponent(ChatHeader);
+    fixture.componentRef.setInput('contact', CONTACT);
+    fixture.detectChanges();
+    let voice = 0;
+    let video = 0;
+    fixture.componentInstance.voiceCall.subscribe(() => (voice += 1));
+    fixture.componentInstance.videoCall.subscribe(() => (video += 1));
+
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="chat-header-call"]')
+      ?.click();
+
+    expect(voice).toBe(1);
+    expect(video).toBe(0);
+  });
+
   it('renders the More options affordance', () => {
     fixture = TestBed.createComponent(ChatHeader);
     fixture.componentRef.setInput('contact', CONTACT);

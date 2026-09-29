@@ -91,7 +91,7 @@ describe('CallsPage', () => {
     expect(el.querySelector('[data-testid="tab-stub"]')).toBeNull();
   });
 
-  it('new-call is a no-op: list untouched, no navigation', () => {
+  it('new-call opens the contact picker (F-045 FR-003)', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
@@ -100,7 +100,7 @@ describe('CallsPage', () => {
     );
     newCall?.click();
     fixture.detectChanges();
-    expect(router.navigate).not.toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/calls/new']);
     expect(el.querySelectorAll('app-call-list-item').length).toBe(CALL_SEED.length);
   });
 
@@ -367,7 +367,7 @@ describe('CallsPage', () => {
       expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
     });
 
-    it('new call is still inert while the sheet is in scope (FR-008)', () => {
+    it('new call opens the picker and does not open the sheet (FR-008, F-045)', () => {
       const router = TestBed.inject(Router);
       const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
       const el = render();
@@ -376,8 +376,107 @@ describe('CallsPage', () => {
       newCall?.click();
       fixture.detectChanges();
 
-      expect(navSpy).not.toHaveBeenCalled();
+      expect(navSpy).toHaveBeenCalledWith(['/calls/new']);
       expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+    });
+
+    // F-045: the sheet's Voice/Video rows stopped being inert (F-043 FR-008).
+    it('the sheet Voice call row starts a real voice call (F-045 FR-004)', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+      const el = render();
+      openSheetForFirstRow(el);
+      fixture.detectChanges();
+
+      clickRow(el, 'Voice call');
+
+      const session = TestBed.inject(CallStore).session();
+      expect(session?.kind).toBe('voice');
+      expect(session?.target.contactName).toBe(CALL_SEED[0]?.contactName);
+      expect(navSpy).toHaveBeenCalledWith(['/calls/active'], { queryParams: { from: '/calls' } });
+    });
+
+    it('the sheet Video call row starts a real video call (F-045 FR-004)', () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate').and.resolveTo(true);
+      const el = render();
+      openSheetForFirstRow(el);
+      fixture.detectChanges();
+
+      clickRow(el, 'Video call');
+
+      expect(TestBed.inject(CallStore).session()?.kind).toBe('video');
+    });
+
+    it('the sheet closes after a call starts, rather than staying open (F-045 FR-004)', () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate').and.resolveTo(true);
+      const el = render();
+      openSheetForFirstRow(el);
+      fixture.detectChanges();
+
+      clickRow(el, 'Voice call');
+
+      expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+    });
+
+    it('the sheet Message row starts no call (F-045 FR-004)', () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate').and.resolveTo(true);
+      const el = render();
+      openSheetForFirstRow(el);
+      fixture.detectChanges();
+
+      clickRow(el, 'Message');
+
+      // F-043 already covers Message opening the chat. What F-045 must not break
+      // is that messaging stays a chat action and does not start a call.
+      expect(TestBed.inject(CallStore).session()).toBeNull();
+    });
+
+    // FR-012: a log row whose contact has no chat must still call. Bailing on the
+    // chat lookup (as openChatFor does) would leave Voice/Video dead again.
+    it('a sheet call row starts a call even when the contact has no chat (FR-012)', () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate').and.resolveTo(true);
+      const chatStore = TestBed.inject(ChatStore);
+      const index = CALL_SEED.findIndex(
+        (c) => chatStore.chatIdForContactName(c.contactName) === null,
+      );
+      expect(index).toBeGreaterThanOrEqual(0);
+      const orphan = CALL_SEED[index];
+
+      const el = render();
+      const infoButtons = el.querySelectorAll<HTMLButtonElement>('[data-testid="call-info"]');
+      infoButtons[index]?.click();
+      fixture.detectChanges();
+      clickRow(el, 'Voice call');
+
+      const session = TestBed.inject(CallStore).session();
+      expect(session?.target.contactName).toBe(orphan?.contactName);
+      expect(session?.target.avatarRef).toBeNull();
+      expect(session?.target.contactId).toBe('');
+    });
+
+    it('the sheet call rows are refused while a call is already live (F-045 FR-011)', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+      const callStore = TestBed.inject(CallStore);
+      callStore.startCall(
+        { contactId: 'chat-001', contactName: 'Alex Morgan', avatarRef: null },
+        'video',
+        0,
+      );
+      const first = callStore.session();
+      const el = render();
+      openSheetForFirstRow(el);
+      fixture.detectChanges();
+
+      clickRow(el, 'Voice call');
+
+      expect(callStore.session()).toBe(first);
+      expect(callStore.session()?.kind).toBe('video');
+      expect(navSpy).not.toHaveBeenCalled();
     });
 
     it('the list keeps 12 rows and no horizontal overflow at 320px (FR-011)', () => {

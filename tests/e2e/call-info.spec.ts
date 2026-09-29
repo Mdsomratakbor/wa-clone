@@ -48,15 +48,17 @@ test.describe('Call info sheet (feature 043)', () => {
     await expect(page.locator('.call-list-item')).toHaveCount(CALLS - 1);
   });
 
-  test('Voice call and Video call dismiss without changing the list', async ({ page }) => {
+  // F-045 (2026-09-29) replaced this test. It previously asserted that Voice call
+  // and Video call "dismiss without changing the list" - true while they were inert,
+  // and the reason they were inert. They now start a real call; see
+  // calling-flow.spec.ts for that flow.
+  test('Voice call and Video call now start a call and leave the list', async ({ page }) => {
     await page.goto('/calls');
 
-    for (const label of ['Voice call', 'Video call']) {
-      await page.locator('[data-testid="call-info"]').first().click();
-      await page.getByRole('button', { name: label }).click();
-      await expect(page.getByTestId('action-sheet')).toHaveCount(0);
-      await expect(page.locator('.call-list-item')).toHaveCount(CALLS);
-    }
+    await page.locator('[data-testid="call-info"]').first().click();
+    await page.getByRole('button', { name: 'Voice call' }).click();
+    await expect(page.getByTestId('in-call-page')).toBeVisible();
+    await expect(page).toHaveURL(/\/calls\/active/);
   });
 
   test('the backdrop and Escape both dismiss the sheet', async ({ page }) => {

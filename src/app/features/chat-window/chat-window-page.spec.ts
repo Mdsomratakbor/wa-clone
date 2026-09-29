@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatWindowPage } from './chat-window-page';
+import { CallStore } from '../../core/call.store';
 import { ChatStore } from '../../core/chat.store';
 import { PrefsStore } from '../../core/prefs.store';
 import { CHAT_CONTACT, CHAT_SEED } from './chat-window.seed';
@@ -41,6 +42,77 @@ describe('ChatWindowPage', () => {
     }).compileComponents();
     TestBed.inject(ChatStore).reset();
     TestBed.inject(PrefsStore).reset();
+    TestBed.inject(CallStore).clearSession();
+  });
+
+  // F-045: the header Call/Video buttons are no longer inert. Each asserts real
+  // session state, not just that a handler fired.
+  it('the header Call button starts a real voice call and opens the in-call screen (F-045 FR-002)', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="chat-header-call"]')
+      ?.click();
+
+    const session = TestBed.inject(CallStore).session();
+    expect(session?.kind).toBe('voice');
+    expect(session?.state).toBe('dialing');
+    expect(session?.target.contactName).toBe(CHAT_CONTACT.name);
+    expect(navSpy).toHaveBeenCalledWith(['/calls/active'], {
+      queryParams: { from: '/chat/chat-006' },
+    });
+  });
+
+  it('the header Video call button starts a real video call (F-045 FR-002)', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="chat-header-video-call"]')
+      ?.click();
+
+    expect(TestBed.inject(CallStore).session()?.kind).toBe('video');
+  });
+
+  it('a call started from the header carries the contact avatar (F-045 FR-002)', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="chat-header-call"]')
+      ?.click();
+
+    expect(TestBed.inject(CallStore).session()?.target.avatarRef).toBe(CHAT_CONTACT.avatarRef);
+  });
+
+  it('a second header call while one is live changes nothing (F-045 FR-011)', () => {
+    const callStore = TestBed.inject(CallStore);
+    callStore.startCall(
+      { contactId: 'chat-001', contactName: 'Alex Morgan', avatarRef: null },
+      'voice',
+      0,
+    );
+    const first = callStore.session();
+
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="chat-header-call"]')
+      ?.click();
+
+    expect(callStore.session()).toBe(first);
+    expect(navSpy).not.toHaveBeenCalled();
+  });
+
+  it('the header call buttons are labelled, not "coming soon" (F-045 FR-013)', () => {    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+
+    expect(el.querySelector('[data-testid="chat-header-call"]')?.getAttribute('aria-label')).toBe(
+      'Call',
+    );
+    expect(
+      el.querySelector('[data-testid="chat-header-video-call"]')?.getAttribute('aria-label'),
+    ).toBe('Video call');
+    expect(el.textContent).not.toContain('coming soon');
   });
 
   it('carries the stored font scale on the chat window root (F-041 FR-009)', () => {
@@ -110,6 +182,30 @@ describe('ChatWindowPage', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelectorAll('app-message-bubble').length).toBe(0);
     expect(fixture.nativeElement.querySelector('[data-testid="message-thread"]')).not.toBeNull();
+  });
+
+  // G4: an unknown chat id must not leave the header buttons dead. The header shows
+  // the CHAT_CONTACT fallback, so calling that contact is the consistent behaviour.
+  it('the header call button still works for an unknown chat id (F-045 G4)', async () => {
+    await TestBed.resetTestingModule();
+    await TestBed.configureTestingModule({
+      imports: [ChatWindowPage],
+      providers: [
+        { provide: ActivatedRoute, useValue: stubRoute('chat-999') },
+        { provide: Router, useValue: { navigate: navSpy } },
+      ],
+    }).compileComponents();
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+
+    const nameShown =
+      (fixture.nativeElement as HTMLElement).querySelector('.chat-header__name')?.textContent ?? '';
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="chat-header-call"]')
+      ?.click();
+
+    // The call target matches the name the header is actually displaying.
+    expect(TestBed.inject(CallStore).session()?.target.contactName).toBe(nameShown);
   });
 
   it('sends a message via the Send button: bubble appended and input cleared', () => {
