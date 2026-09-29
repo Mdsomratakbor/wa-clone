@@ -63,8 +63,9 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 - Calls rows are inert: **fixed (F-038)** — a row opens the chat with the same `contactName`
   (no match ⇒ stays put). The `ⓘ` info button is live too (**F-043**): it opens a call-info sheet
   over the list with Message / Voice call / Video call / Delete, where `Message` opens the chat and
-  `Delete` removes the entry and persists. `New call` is the only inert Calls control left — its
-  destination is a contact picker plus the in-call screen (B6).
+  `Delete` removes the entry and persists. **`New call` and the sheet's `Voice call` / `Video call`
+  are live as of F-045** — they open the contact picker and the in-call screen respectively. B6 is
+  done; no inert Calls control remains.
 - 13 Settings: the last dead row is `Contacts` — **fixed (F-039)**.
 - Chats `New Group` / add-modal `New group` are live (F-040): a group conversation model plus
   `/new-group` creation. `Broadcast Lists` is live too (F-042): a `broadcast` conversation kind,
@@ -91,8 +92,10 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
    imagery no capture can supply while the quota is exhausted.
 8. **B3** (Broadcast Lists) — done for list + entry (F-042); the create form remains and is itself
    capture-gated.
-9. **B6** (Calls) — done for row tap (F-038) and the call-info sheet (F-043); the calling flow and
-   in-call screen remain.
+9. **B6** (Calls) — **done (F-045)**: row tap (F-038), the call-info sheet (F-043), and the calling
+   flow — picker at `/calls/new`, in-call screen at `/calls/active`, and all five previously inert
+   controls wired. Audit **A6** closed in the same feature. The two new screens are PROVISIONAL by
+   construction: the design file has no node for either, so the quota reset cannot verify them.
 10. Remaining tier B, then tier C at the quota reset (**2026-10-02 18:38 UTC**).
 
 ## Progress log
@@ -119,3 +122,21 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   deliberately did not build — the same split F-042 made on Broadcast Lists. The sheet reused
   `app-action-sheet`, so no new shared component and no route were needed. Still open: `+ new call`
   and the calling flow.
+- **2026-09-29** — F-044 Media screen (469 unit) landed; build green. B7 done for the populated
+  case: a per-contact grid derived from that chat's own `Message.file` entries, so the screen cannot
+  contradict the chat window. Empty state is the honest default — only `chat-006` has a thread.
+  B8 (`Groups`) stays inert and needs shared-group membership the store does not hold.
+- **2026-09-29** — F-045 Calling flow (**549 unit**, +55) landed; build green, `tsc` clean. **B6
+  done, audit A6 closed**: all five inert controls are now live. The calling flow is a real state
+  machine (`dialing → ringing → connected → ended`) over local state on an injected clock, with
+  store-backed `Mute`/`Speaker`/`Video`, a `role="timer"` duration, and a log entry written at call
+  end whose `outcome` is derived from the state actually reached. `G1` is blocked **by
+  construction** — no Figma node exists for the picker or the in-call screen, so the 2026-10-02
+  quota reset cannot clear it; that chrome ships PROVISIONAL and is labelled as such in code.
+  Two clarify answers were needed: the legacy `outcome` default is derived from `direction` (a
+  blanket `completed` would have reported the seed's two missed calls as completed), and the inert
+  set is **five** controls, not four. Three defects surfaced and were fixed: an F-043 `Delete`
+  regression caught by its own existing test, and two latent dead-control holes in the chat-window
+  and Calls-page call paths that would have left controls inert for exactly the contacts F-043
+  left them inert for. Next: the **forward-only audit** of remaining inert features, then F-046's
+  backend seam.
