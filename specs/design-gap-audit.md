@@ -38,8 +38,8 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 | B4 | 2 Chat window + 16 Chats settings | `Wallpaper` | wallpaper picker |
 | B5 | 16 Chats settings | `Font size` | size control (persisted, applied app-wide) — **done (F-041)** |
 | B6 | 4/5 Calls | `New call`, row tap, call info | call screen / call-info sheet — **partially done**: row tap (F-038) and the call-info sheet (F-043); the calling flow + in-call screen remain, and its chrome is PROVISIONAL |
-| B7 | 15 Contact info | `Media, photos and links` | media grid |
-| B8 | 15 Contact info | `Groups` | shared-groups list |
+| B7 | 15 Contact info | `Media, photos and links` | media grid — **done (F-044)**, derived from the chat's own `Message.file` entries; only chat-006 is populated, so the empty state is the default, and the grid chrome is PROVISIONAL |
+| B8 | 15 Contact info | `Groups` | shared-groups list — **open**: needs shared-group membership data the store does not hold, so the row stays inert |
 | B9 | 14 Account | `Security`, `Two-step verification`, `Change number`, `Delete my account` | 4 sub-screens |
 | B10 | 17 Notifications | `Sound`, `Vibrate`, `Popup notification` | 3 sub-screens |
 | B11 | 18 Data and storage | `Storage usage`, `Media auto-download`, `Images`, `Audio`, `Videos`, `Documents`, `Network usage` | storage management |
@@ -71,6 +71,13 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   `createBroadcast()`, and the `/broadcasts` list screen. Broadcasts are excluded from the Chats
   list, and `createBroadcast()` ships **without a UI caller** — the create form is still missing, so
   B3 is *partially* done. `New community` stays inert.
+
+- 15 Contact info: the `Media, photos and links` row is **fixed (F-044)** — it opens a per-contact
+  media grid derived from that chat's own file messages, so the screen cannot contradict the chat
+  window. Only `chat-006` (Martha Craig) has a thread, and it holds all four file messages, so eight
+  of nine contacts get the empty state; that is the honest result of not inventing per-contact
+  media. The `Groups` row (B8) stays inert: it needs shared-group membership the store does not
+  have, and inventing it would mean inventing the social graph.
 
 ## Suggested order
 

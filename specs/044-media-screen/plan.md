@@ -2,6 +2,9 @@
 
 **Input**: `specs/044-media-screen/spec.md`, `specs/044-media-screen/research.md`
 
+**Status**: **Implemented** 2026-09-28 — `feat` `b5b4785`, `test` `1b08826`, build green, unit 469/469,
+e2e authored not run. G1 remains BLOCKED, so the grid chrome below is still PROVISIONAL.
+
 **Gates**: G1 = capture BLOCKED (Figma `429`, reset 2026-10-02 18:38 UTC). The **entry row is
 design-verified** (`0:9486`); the media screen's own chrome is PROVISIONAL. G2 = build + unit green,
 e2e authored not run. G3 = closure + drift notes in 015 + gap audit.
@@ -27,17 +30,11 @@ store change, no model change, no seed, no new shared component.
 ### Derivation
 
 ```ts
-protected readonly media = computed<MediaTile[]>(() =>
-  this.store
-    .conversationMessages(this.chatId())
+protected readonly media = computed<readonly MediaTile[]>(() =>
+  [...this.store.conversationMessages(this.chatId())]
     .filter((m) => m.file !== null)
-    .toReversed()
-    .map((m) => ({
-      messageId: m.id,
-      name: `${m.file?.filename}.${m.file?.ext}`,
-      size: m.file?.size ?? '',
-      time: m.time,
-    })),
+    .reverse()
+    .map((m) => { /* filename.ext, size, aria label */ }),
 );
 ```
 
@@ -45,8 +42,11 @@ protected readonly media = computed<MediaTile[]>(() =>
 `FileInfo | null` without an `any` or a cast-to-silence; the filter above has already narrowed the
 value, so the `?? ''` fallbacks are unreachable rather than misleading.
 
-`toReversed()` rather than `.reverse()` — the former does not mutate, and `conversationMessages()`
-returns a stored array that must not be reordered in place.
+The spread-then-`reverse()` is deliberate: `conversationMessages()` returns the store's own array and
+reordering it in place would corrupt the chat window's chronological render. `toReversed()` was the
+first choice and does not compile — this project does not target lib `es2023` — so the copy is
+carried explicitly. Bumping the tsconfig `lib` for one call site would be a project-wide change
+that this feature should not make.
 
 ### Grid
 
@@ -82,7 +82,7 @@ Steps 1–2 are one `feat` commit; 3–4 are the `test` commit and the closure c
   the empty state explicit and tested (FR-004), and by not seeding fake media (research.md).
 - **A tile that looks interactive but does nothing.** The biggest honesty risk in this feature. The
   spec names it (FR-006) and the test asserts navigation is not attempted.
-- **Mutating the stored thread.** `toReversed()` avoids it; the test asserts the chat window still
+- **Mutating the stored thread.** The spread copy avoids it; the test asserts the chat window still
   renders the thread in chronological order after visiting the media screen.
 - **Provisional grid geometry.** 3 columns is a hypothesis. Nothing is captured, so there is no
   golden to re-baseline later.

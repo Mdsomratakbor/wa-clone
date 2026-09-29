@@ -4,7 +4,7 @@
 
 **Created**: 2026-09-28
 
-**Status**: **Specified** (clarify pass recorded below; plan + tasks pending)
+**Status**: **Implemented** (build green, unit 469/469; G1 capture still BLOCKED — see Review Gates)
 
 **Input**: design row 15 (`0:9486`, Contact Info) + gap audit tier B7
 
@@ -24,6 +24,15 @@ The owner answered two scope questions directly.
   data that cannot contradict the chat window. Only `chat-006` (Martha Craig) has a seeded thread
   with file messages, so the other 8 contacts get a genuine empty state — which is honest, and
   matches how a fresh install behaves.
+- Q (raised at implementation, see `tasks.md`): FR-007 asserted the media screen is reachable
+  *only* from a direct contact's row list, but `ContactPage.isGroup()` is `kind === 'group'`, so a
+  **broadcast** also renders the row list and can open the screen. Should the code enforce the
+  invariant, or the requirement be narrowed?  A (**owner**): **narrow FR-007, no code change.**
+  Two reasons, both recorded so the decision is not relitigated: `createBroadcast()` ships without
+  a UI caller and without a seed (F-042), so no broadcast can exist in the running app and the
+  invariant holds in-app without help; and making it real in code (`kind !== 'direct'`) would be a
+  behaviour change to shipped F-015/F-042 contact info — hiding the row list and showing a recipient
+  list for broadcasts — which is a different feature, not a correction to this one.
 
 ## Summary
 
@@ -56,9 +65,10 @@ and the empty-state copy are PROVISIONAL under a blocked capture gate.
 - **FR-006** A tile is keyboard reachable and activating it does **not** navigate: there is no
   media viewer in this design, so a tap is an observable no-op rather than a dead link. Opening the
   originating message is not in scope.
-- **FR-007** `Back` returns to `/contact/:id`, preserving the contact. A group or broadcast contact
-  shows the same screen — the row set is not rendered for groups, so the screen is reachable only
-  from a direct contact's row list.
+- **FR-007** `Back` returns to `/contact/:id`, preserving the contact. The row list is not rendered
+  for a **group** contact, so in the running app the screen is entered from a direct contact (and
+  would be entered from a broadcast, were one reachable). A group or broadcast has no thread, so
+  reached directly it shows the empty state — see the 2026-09-28 clarification.
 - **FR-008** The nav bar title is the contact's current name, so a rename in `ChatStore` is
   reflected immediately (the Contact info screen already reads live from the store).
 - **FR-009** The screen is read-only: no view, no filter, no sort control, no sharing, no deletion.
@@ -75,8 +85,9 @@ and the empty-state copy are PROVISIONAL under a blocked capture gate.
   is a design detail with no source here; a control invented to satisfy a guess is worse than none.
 - Tapping a tile to jump to its message in the chat window.
 - Persisting a view preference (grid size, sort) — no such control exists.
-- The `contact-media` row for group and broadcast contacts, whose row lists are replaced by a
-  participant list.
+- The `contact-media` row for **group** contacts, whose row list is replaced by a participant list.
+  A broadcast's row list is not replaced — that is the deliberate gap the 2026-09-28 clarification
+  leaves open, not an omission here.
 
 ## Review Gates
 
@@ -120,11 +131,11 @@ and the empty-state copy are PROVISIONAL under a blocked capture gate.
 
 ### Unit
 
-- `ChatStore`: the derived list is newest-first, excludes null-file messages, and is empty for a
-  chat with no thread and for an unknown id.
-- `MediaPage`: title is the contact's live name, tiles render one per file with filename + ext,
-  empty state for a contact with no thread, `Back` returns to `/contact/:id`, tiles are keyboard
-  reachable and activating one does not navigate, no overflow at 320px.
+- `MediaPage`: the derived list is newest-first and excludes null-file messages; tiles render one per
+  file with filename + ext; the title is the contact's live name; the empty state shows for a chat
+  with no thread and for an unknown id; `Back` returns to `/contact/:id`; tiles are keyboard
+  reachable and activating one does not navigate; the stored thread is not reordered; no overflow at
+  320px. The derivation lives in the page (FR-005), so these are page tests, not store tests.
 - `ContactPage`: the `contact-media` row navigates to `/contact/:id/media`; `contact-groups` is still
   inert.
 
@@ -139,6 +150,8 @@ and the empty-state copy are PROVISIONAL under a blocked capture gate.
 - [x] Read-only derivation is specified; no store or seed change (FR-005, FR-009)
 - [x] Empty state and unknown-id fallback are specified (FR-004, FR-011)
 - [x] The tile tap is an observable no-op, not a dead control (FR-006)
+- [x] FR-007 matches the shipped `isGroup()` behaviour; the broadcast gap is an owner decision,
+      recorded in Clarifications, not a silent narrowing
 - [x] The blocked G1 gate is recorded, not skipped, and the verified entry row is distinguished from
       the provisional sub-screen
 - [x] Drift notes are planned for specs 015 and the gap audit

@@ -51,6 +51,15 @@ action targets are later features (messaging, calling, media/groups screens not 
 > thread (`openConversation` + route), the **Starred messages** row routes to
 > `/starred-messages`, and the identity comes from `ChatStore` (renames reflect instantly and
 > persist). Media/Groups rows remain no-ops (spec Non-Goals).
+>
+> **Drift note (F-044, 2026-09-28)**: the tail of that note is now partly superseded. The
+> **`Media, photos and links`** row routes to `/contact/:id/media`, a per-contact grid derived from
+> the `Message.file` entries in that chat's own thread (`specs/044-media-screen`). The
+> **`Groups`** row is still a no-op — it needs shared-group membership data the store does not
+> hold (gap audit B8), so inventing it would mean inventing the social graph. The row list, its
+> order, the hero, the `Messages` action and the group/direct branching are unchanged. Only the
+> Media row's chrome inside the new screen is provisional; the row itself is design-verified via
+> `0:9486`.
 - **FR-005**: No horizontal overflow at any breakpoint.
 
 ## Non-Goals
