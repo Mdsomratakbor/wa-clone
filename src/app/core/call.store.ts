@@ -42,8 +42,16 @@ function writeStorage(key: string, value: string): void {
 // a snapshot written before this feature loads with `outcome: undefined` and the
 // Calls list renders a blank status. Same defect class F-042's hydrateDefaults()
 // caught, so the v1-snapshot test was written first.
+//
+// The default is derived from `direction`, not a blanket 'completed': the seed ships
+// two missed calls (call-004, call-012) and a blanket default would report them as
+// completed, which is the "fake a success" outcome the spec forbids. Owner
+// decision, recorded in the FR-008 clarification.
 function normalizeCalls(calls: readonly CallEntry[]): CallEntry[] {
-  return calls.map((call) => ({ ...call, outcome: call.outcome ?? 'completed' }));
+  return calls.map((call) => ({
+    ...call,
+    outcome: call.outcome ?? (call.direction === 'missed' ? 'missed' : 'completed'),
+  }));
 }
 
 @Injectable({ providedIn: 'root' })

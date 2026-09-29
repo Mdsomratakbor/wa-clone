@@ -1,0 +1,64 @@
+<!--
+  F-045. PROVISIONAL chrome: no Figma node exists for a contact picker (G1 blocked
+  and not clearable). Layout follows contacts-page.ts rather than inventing a
+  second search-and-list pattern.
+-->
+<app-navigation-bar
+  title="New call"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="picker" data-testid="call-picker-page">
+  <div class="picker__search">
+    <svg class="picker__search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <circle cx="7" cy="7" r="5.2" stroke="currentColor" stroke-width="1.5" />
+      <path d="m11 11 3.2 3.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+    <input
+      class="picker__search-input"
+      type="search"
+      data-testid="call-picker-search"
+      placeholder="Search"
+      aria-label="Search contacts"
+      #searchInput
+      [value]="searchQuery()"
+      (input)="onSearch(searchInput.value)"
+    />
+    @if (searchQuery().length > 0) {
+      <button
+        class="picker__search-clear"
+        type="button"
+        data-testid="call-picker-search-clear"
+        aria-label="Clear search"
+        (click)="onClearSearch()"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M2 2l10 10M12 2 2 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+      </button>
+    }
+  </div>
+
+  @if (contacts().length === 0) {
+    <p class="picker__empty" data-testid="call-picker-empty" role="status">{{ emptyLabel() }}</p>
+  } @else {
+    <ul class="picker__list" data-testid="call-picker-list" aria-label="Contacts">
+      @for (contact of contacts(); track contact.id) {
+        <li
+          class="picker__row"
+          data-testid="call-picker-row"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="'Call ' + contact.contactName"
+          (click)="onSelectContact(contact)"
+          (keydown.enter)="onSelectContact(contact)"
+          (keydown.space)="onSelectContact(contact)"
+        >
+          <app-user-avatar [src]="contact.avatarRef" [name]="contact.contactName" [size]="40" />
+          <span class="picker__name">{{ contact.contactName }}</span>
+        </li>
+      }
+    </ul>
+  }
+</main>

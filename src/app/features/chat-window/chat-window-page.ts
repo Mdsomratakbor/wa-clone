@@ -10,8 +10,11 @@ import {
 } from '@angular/core';
 import type { ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CallStore } from '../../core/call.store';
 import { ChatStore } from '../../core/chat.store';
+import { Clock } from '../../core/clock';
 import { PrefsStore } from '../../core/prefs.store';
+import { CallKind } from '../calls/calls.model';
 import { ChatHeader } from '../../shared/components/chat-header/chat-header';
 import { ActionSheet } from '../../shared/components/action-sheet/action-sheet';
 import { Composer } from '../../shared/components/composer/composer';
@@ -32,6 +35,8 @@ export class ChatWindowPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly store = inject(ChatStore);
+  private readonly callStore = inject(CallStore);
+  private readonly clock = inject(Clock);
   private readonly prefs = inject(PrefsStore);
   private readonly header = viewChild(ChatHeader);
   private readonly thread = viewChild<ElementRef<HTMLDivElement>>('thread');
@@ -94,6 +99,34 @@ export class ChatWindowPage {
 
   protected onChatActions(): void {
     this.chatActionsOpen.set(true);
+  }
+
+  /**
+   * F-045: the header Call/Video buttons now start a real call. FR-011 - if a call is
+   * already live, startCall refuses and the user stays in the chat rather than losing
+   * it, so this is a no-op on screen by design, not a broken button.
+   *
+   * Reads `contact()`, not `store.contact()`, so the call always matches the name the
+   * header is displaying. The computed already falls back to CHAT_CONTACT for an
+   * unknown id, so these buttons are never dead.
+   */
+  protected onCall(kind: CallKind): void {
+    const contact = this.contact();
+    const started = this.callStore.startCall(
+      {
+        contactId: this.chatId(),
+        contactName: contact.name,
+        avatarRef: contact.avatarRef,
+      },
+      kind,
+      this.clock.now(),
+    );
+    if (!started) {
+      return;
+    }
+    void this.router.navigate(['/calls/active'], {
+      queryParams: { from: `/chat/${this.chatId()}` },
+    });
   }
 
   protected onChatAction(id: string): void {

@@ -4,6 +4,8 @@
     (back)="onBack()"
     (identity)="onIdentity()"
     (actions)="onChatActions()"
+    (voiceCall)="onCall('voice')"
+    (videoCall)="onCall('video')"
   />
 
   <div class="chat-window__thread" #thread data-testid="message-thread" role="list" [attr.aria-label]="'Conversation with ' + contact().name">

@@ -24,6 +24,10 @@ $wa-colors: (
   file-meta: rgba(0, 0, 0, 0.4),
   file-dot: rgba(0, 0, 0, 0.2),
   date-chip: #dddde9,
+  // F-045: the in-call screen's dark field. No Figma node exists for an in-call
+  // screen (G1 blocked and not clearable), so this is a PROVISIONAL hypothesis
+  // and is the one token addition this feature required.
+  call-field: #1c1c1e,
 );
 
 $wa-font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,

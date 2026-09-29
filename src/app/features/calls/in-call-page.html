@@ -1,0 +1,133 @@
+<!--
+  F-045. PROVISIONAL chrome: no Figma node exists for an in-call screen (G1 blocked
+  and not clearable). Every control here mutates real CallSession state; none is a
+  display-only affordance.
+-->
+<main class="in-call" data-testid="in-call-page">
+  <div class="in-call__identity">
+    <app-user-avatar [src]="avatarRef()" [name]="name()" [size]="128" />
+    <h1 class="in-call__name" data-testid="in-call-name">{{ name() }}</h1>
+    <p class="in-call__kind" data-testid="in-call-kind">
+      {{ session()?.kind === 'video' ? 'Video call' : 'Voice call' }}
+    </p>
+    <!--
+      role="timer", not role="status": the value changes every second, and
+      role="status" implies aria-live, which would announce it every second (FR-013).
+    -->
+    <p
+      class="in-call__duration"
+      data-testid="in-call-duration"
+      role="timer"
+      [attr.aria-label]="session() === null ? 'No active call' : connected() ? 'Call duration' : 'Connecting'"
+    >
+      {{ statusLabel() }}
+    </p>
+  </div>
+
+  @if (session(); as current) {
+  <div class="in-call__controls">
+    <button
+      class="in-call__control"
+      type="button"
+      data-testid="in-call-mute"
+      aria-label="Mute microphone"
+      [attr.aria-pressed]="current.muted"
+      [class.in-call__control--on]="current.muted"
+      (click)="onMute()"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3Z"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M6 11a6 6 0 0 0 12 0M12 17v3"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+        />
+      </svg>
+      <span class="in-call__control-label">Mute</span>
+    </button>
+
+    <button
+      class="in-call__control"
+      type="button"
+      data-testid="in-call-speaker"
+      aria-label="Speaker"
+      [attr.aria-pressed]="current.speakerOn"
+      [class.in-call__control--on]="current.speakerOn"
+      (click)="onSpeaker()"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M4 9v6h3l5 4V5L7 9H4Z"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M15.5 9.2a4 4 0 0 1 0 5.6M18 6.8a7.5 7.5 0 0 1 0 10.4"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+        />
+      </svg>
+      <span class="in-call__control-label">Speaker</span>
+    </button>
+
+    <button
+      class="in-call__control"
+      type="button"
+      data-testid="in-call-video"
+      aria-label="Camera, unavailable in this build"
+      [attr.aria-pressed]="current.videoOn"
+      [class.in-call__control--on]="current.videoOn"
+      (click)="onVideo()"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2" y="6" width="13" height="12" rx="2" stroke="currentColor" stroke-width="1.7" />
+        <path
+          d="M15 10.5 22 7v10l-7-3.5"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <span class="in-call__control-label">Video</span>
+    </button>
+  </div>
+
+  <button
+    class="in-call__hangup"
+    type="button"
+    data-testid="in-call-hangup"
+    aria-label="End call"
+    (click)="onHangUp()"
+  >
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+      <path
+        d="M8.4 12.2c2.4-2.6 5.5-4 9.6-4s7.2 1.4 9.6 4c.6.6.9 1.3.9 2s-.3 1.4-.9 2c-.7.8-1.7 1.2-2.8 1.2h-1.6c-1 0-1.9-.5-2.5-1.3l-1.3-1.8c-.3-.4-.4-.9-.4-1.4v-.6c-1-.3-2-.4-3-.4s-2 .1-3 .4v.6c0 .5-.1 1-.4 1.4l-1.3 1.8A3.5 3.5 0 0 1 8.8 20H7.2c-1.1 0-2.1-.4-2.8-1.2-.6-.6-.9-1.3-.9-2s.3-1.4.9-2Z"
+        fill="currentColor"
+      />
+    </svg>
+    <span class="in-call__hangup-label">End call</span>
+  </button>
+  } @else {
+    <!-- FR-014: deep link with no session. The controls are hidden rather than
+         rendered dead, and the way out is explicit. -->
+    <div class="in-call__empty" data-testid="in-call-empty" role="status">
+      <p class="in-call__empty-text">No active call</p>
+      <button
+        class="in-call__empty-action"
+        type="button"
+        data-testid="in-call-back-to-calls"
+        (click)="onBackToCalls()"
+      >
+        Back to calls
+      </button>
+    </div>
+  }
+</main>

@@ -25,6 +25,10 @@ export class ChatHeader {
   readonly back = output<void>();
   readonly identity = output<void>();
   readonly actions = output<void>();
+  // F-045: the header call buttons became real. They emit intent; the chat window
+  // decides what to do, so this shared component stays free of routing and stores.
+  readonly voiceCall = output<void>();
+  readonly videoCall = output<void>();
 
   focus(): void {
     this.trigger().nativeElement.focus();

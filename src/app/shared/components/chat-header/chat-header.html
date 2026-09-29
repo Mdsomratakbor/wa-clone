@@ -60,7 +60,13 @@
 
   <span class="chat-header__spacer" aria-hidden="true"></span>
 
-  <button class="chat-header__icon-button" type="button" aria-label="Video call, coming soon">
+  <button
+    class="chat-header__icon-button"
+    type="button"
+    data-testid="chat-header-video-call"
+    aria-label="Video call"
+    (click)="videoCall.emit()"
+  >
     <svg class="chat-header__icon" width="24" height="15" viewBox="0 0 24 15" fill="none" aria-hidden="true">
       <rect x="1" y="1" width="17" height="13" rx="3" stroke="currentColor" stroke-width="1.7" />
       <path
@@ -72,7 +78,13 @@
     </svg>
   </button>
 
-  <button class="chat-header__icon-button" type="button" aria-label="Call, coming soon">
+  <button
+    class="chat-header__icon-button"
+    type="button"
+    data-testid="chat-header-call"
+    aria-label="Call"
+    (click)="voiceCall.emit()"
+  >
     <svg class="chat-header__icon" width="21" height="21" viewBox="0 0 21 21" fill="none" aria-hidden="true">
       <path
         d="M4.5 2.5h3l1.5 4-2 1.5a12.5 12.5 0 0 0 6 6l1.5-2 4 1.5v3a1.5 1.5 0 0 1-1.7 1.5C10 17.7 3.3 11 2 4.7A1.5 1.5 0 0 1 3.5 2.5h1Z"

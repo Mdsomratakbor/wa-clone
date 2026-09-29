@@ -1,0 +1,145 @@
+// F-045. PROVISIONAL chrome: no Figma node exists for an in-call screen, so the
+// layout here is an agent hypothesis (contracts/ui-contracts.md §2). Tokens only -
+// --wa-call-field and --wa-error are the two values this screen needed, and
+// --wa-call-field was added to _tokens.scss in this change.
+.in-call {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 24px 16px 32px;
+  background: var(--wa-call-field);
+  color: var(--wa-on-surface);
+
+  &__identity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-top: 48px;
+    text-align: center;
+  }
+
+  &__name {
+    margin: 16px 0 0;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-nav-title);
+    line-height: var(--wa-lh-nav-title);
+    font-weight: var(--wa-fw-semibold);
+    color: #ffffff;
+    overflow-wrap: anywhere;
+  }
+
+  &__kind {
+    margin: 0;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-preview);
+    line-height: var(--wa-lh-preview);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  &__duration {
+    margin: 8px 0 0;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-status-time);
+    line-height: var(--wa-lh-status-time);
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  &__controls {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding: 0 8px 24px;
+  }
+
+  &__control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 0;
+    border: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-control);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 2px;
+    }
+
+    // The pressed state is real session state, not a hover affordance, so it is
+    // styled from aria-pressed rather than from :active (FR-006).
+    &--on {
+      background: #ffffff;
+      color: var(--wa-call-field);
+    }
+  }
+
+  &__control-label {
+    line-height: 1.2;
+  }
+
+  &__hangup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    align-self: center;
+    padding: 20px 28px;
+    border: none;
+    border-radius: 999px;
+    background: var(--wa-error);
+    color: #ffffff;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-control);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 3px;
+    }
+  }
+
+  &__hangup-label {
+    line-height: 1.2;
+  }
+
+  // FR-014: reached by deep link with no session. Hidden controls, not dead ones.
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding-top: 96px;
+  }
+
+  &__empty-text {
+    margin: 0;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-nav-title);
+    line-height: var(--wa-lh-nav-title);
+    color: #ffffff;
+  }
+
+  &__empty-action {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--wa-call-field);
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-control);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 3px;
+    }
+  }
+}

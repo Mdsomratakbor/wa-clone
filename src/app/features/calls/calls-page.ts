@@ -12,7 +12,8 @@ import { NavigationBar } from '../../shared/components/navigation-bar/navigation
 import { TabBar } from '../../shared/components/tab-bar/tab-bar';
 import { CallStore } from '../../core/call.store';
 import { ChatStore } from '../../core/chat.store';
-import { CallEntry } from './calls.model';
+import { Clock } from '../../core/clock';
+import { CallEntry, CallKind } from './calls.model';
 import { CallInfoModal } from './call-info-modal';
 
 const TAB_KEYS: readonly TabKey[] = ['settings', 'chats', 'camera', 'calls', 'status'];
@@ -35,6 +36,7 @@ export class CallsPage {
   private readonly router = inject(Router);
   private readonly callStore = inject(CallStore);
   private readonly chatStore = inject(ChatStore);
+  private readonly clock = inject(Clock);
 
   protected readonly activeTab = signal<TabKey>('calls');
   protected readonly editing = signal(false);
@@ -96,9 +98,11 @@ export class CallsPage {
       this.callStore.clearCalls();
       return;
     }
-    // F-043: new-call stays inert. Its destination is a contact picker plus an in-call screen
-    // (timer, mute, hangup); F-043 shipped the call-info sheet only, so the calling flow is
-    // still a separate feature (audit B6).
+    // F-045 (supersedes the F-043 note): the calling flow now exists, so this goes
+    // to the contact picker rather than doing nothing.
+    if (id === 'new-call') {
+      void this.router.navigate(['/calls/new']);
+    }
   }
 
   protected onCallSelected(call: CallEntry): void {
@@ -120,6 +124,8 @@ export class CallsPage {
     if (call === null) {
       return;
     }
+    // Close on every action, including the ones with no effect. Doing this per
+    // branch is how Delete ended up leaving the sheet open (F-043 FR-005).
     this.infoCall.set(null);
     if (id === 'message') {
       this.openChatFor(call);
@@ -129,8 +135,33 @@ export class CallsPage {
       this.callStore.removeCall(call.id);
       return;
     }
-    // voice-call / video-call: their destination is the in-call screen, which is out of scope
-    // here. The row is deliberately rendered and focusable (see specs/043-call-info/spec.md).
+    // F-045 (supersedes the F-043 note): voice/video from the call-info sheet now
+    // start a real call against the contact behind the log row.
+    if (id === 'voice-call' || id === 'video-call') {
+      this.startCall(call, id === 'voice-call' ? 'voice' : 'video');
+    }
+  }
+
+  /**
+   * FR-012: the log row already carries the contact name and avatar, so a call starts
+   * even when that contact has no chat. Looking up a chat first (as openChatFor does)
+   * and bailing would make Voice/Video dead again for exactly the rows F-043 left
+   * inert - the failure G4 exists to prevent.
+   */
+  private startCall(call: CallEntry, kind: CallKind): void {
+    const started = this.callStore.startCall(
+      {
+        contactId: this.chatStore.chatIdForContactName(call.contactName) ?? '',
+        contactName: call.contactName,
+        avatarRef: call.avatarRef,
+      },
+      kind,
+      this.clock.now(),
+    );
+    if (!started) {
+      return;
+    }
+    void this.router.navigate(['/calls/active'], { queryParams: { from: '/calls' } });
   }
 
   protected onSheetDismiss(): void {

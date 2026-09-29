@@ -21,6 +21,18 @@ export const routes: Routes = [
     loadComponent: () => import('./features/calls/calls-page').then((m) => m.CallsPage),
   },
   {
+    // F-045: contact picker for `+ new call`.
+    path: 'calls/new',
+    loadComponent: () =>
+      import('./features/calls/call-picker-page').then((m) => m.CallPickerPage),
+  },
+  {
+    // F-045: the in-call screen. `?from=` is the validated return origin.
+    path: 'calls/active',
+    loadComponent: () =>
+      import('./features/calls/in-call-page').then((m) => m.InCallPage),
+  },
+  {
     path: 'camera',
     loadComponent: () => import('./features/camera/camera-page').then((m) => m.CameraPage),
   },
