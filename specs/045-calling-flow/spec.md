@@ -23,7 +23,7 @@ What this means concretely, and it is a real constraint on every decision in thi
   a reload.
 - **Forward-only.** Shipped features are not rewritten. A post-F-045 audit will file what is
   genuinely inert as its own features.
-- **A backend seam is planned, not built here.** Persistence ports land in F-046, after this
+- **A backend seam is planned, not built here.** Persistence ports land in F-047, after this
   feature, so the backend does not require a rewrite later.
 
 ## Clarifications
@@ -139,7 +139,7 @@ originates and terminates on one device.
 - Camera preview or self-view (audit **C**; depends on the camera pipeline).
 - Persisting an in-progress session or its duration across a reload (FR-009).
 - Any change to `ChatStore`, the message model, or the chat window.
-- **The backend seam.** Planned as F-046. This feature must not preclude it, and adds no dependency
+- **The backend seam.** Planned as F-047. This feature must not preclude it, and adds no dependency
   that would block it.
 
 ### Non-Goals
@@ -227,7 +227,7 @@ originates and terminates on one device.
 - **Test hooks**: stable kebab-case `data-testid` on picker rows, in-call controls and the duration.
 - **No wall-clock reads in render paths**, per `AGENTS.md`.
 - **Backend-ready**: the store's public API and the snapshot shape must not assume localStorage is
-  the only persistence. F-046 will introduce ports; this feature must not block that.
+  the only persistence. F-047 will introduce ports; this feature must not block that.
 
 ## Review Gates
 
@@ -327,7 +327,7 @@ originates and terminates on one device.
 - [x] Time comes from an injected clock; no wall-clock read in a render path
 - [x] The blocked G1 gate is recorded, not skipped, and the absence of a design source is stated as
       a permanent property of this screen
-- [x] The store's API does not assume localStorage is the only persistence, so F-046's backend seam
+- [x] The store's API does not assume localStorage is the only persistence, so F-047's backend seam
       can be introduced without a rewrite
 - [x] Drift notes are planned for F-043's spec, the chat-window spec, the gap audit and the design
       map

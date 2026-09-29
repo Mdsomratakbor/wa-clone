@@ -126,7 +126,7 @@ npx ng test --watch=false --reporters=progress   # full suite; playwright runs p
 - `CallEntry.outcome` is optional and normalized at load. The call log is not bumped to `version: 2`,
   which would discard every user's existing log to ship an optional field.
 - The duplicated `readStorage`/`writeStorage` try/catch in all three stores is left alone on purpose.
-  F-046 introduces the backend seam; extracting it here would be a cross-store drive-by refactor.
+  F-047 introduces the backend seam; extracting it here would be a cross-store drive-by refactor.
 
 ## Closure (2026-09-29)
 

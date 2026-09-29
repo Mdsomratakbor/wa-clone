@@ -122,7 +122,7 @@ somewhere. A route cannot carry that implicitly, so the origin is passed as a qu
 (`?from=/chat/chat-001`) and validated against an allow-list on read — an unvalidated param is an
 open redirect into whatever the router resolves.
 
-## 9. Backend seam (F-046, not this feature)
+## 9. Backend seam (F-047, not this feature)
 
 All three stores hand-roll the same `readStorage` / `writeStorage` / `clearStorage` try/catch:
 
@@ -134,14 +134,16 @@ There is no HTTP layer, no `HttpClient`, no repository, and `package.json` has n
 dependency. So "backend later" currently has no seam to land in — the backend would be hand-wired
 into three stores.
 
-The owner chose to land that as **F-046, after this feature**. Therefore this feature must:
+The owner chose to land that as **F-047, after this feature** — it was originally numbered F-046,
+but that number was reassigned on 2026-09-29 to the inert-control sweep, with the owner confirming
+the swap. Therefore this feature must:
 
 - keep `CallStore`'s public API persistence-agnostic (no method that only makes sense against
   localStorage),
 - keep the snapshot shape serializable and versioned, so a port can be swapped beneath it,
 - **not** introduce a dependency that would block the port.
 
-F-046 will introduce a small typed persistence port per store, a localStorage adapter now and an
+F-047 will introduce a small typed persistence port per store, a localStorage adapter now and an
 HTTP adapter later, with no component changes.
 
 ## 10. Test strategy

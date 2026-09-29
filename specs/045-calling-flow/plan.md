@@ -56,7 +56,7 @@ optional field, which is a bad trade for this change.
 
 ### Backend readiness
 
-F-046 will introduce a typed persistence port per store. This feature keeps `CallStore`'s API
+F-047 will introduce a typed persistence port per store. This feature keeps `CallStore`'s API
 persistence-agnostic and its snapshot serializable, and adds no dependency that would block the
 port. The duplicated `readStorage`/`writeStorage` try/catch in all three stores is **deliberately
 left in place** — extracting it here would be a drive-by refactor across three stores, which

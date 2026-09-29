@@ -41,7 +41,7 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 | B7 | 15 Contact info | `Media, photos and links` | media grid — **done (F-044)**, derived from the chat's own `Message.file` entries; only chat-006 is populated, so the empty state is the default, and the grid chrome is PROVISIONAL |
 | B8 | 15 Contact info | `Groups` | shared-groups list — **open**: needs shared-group membership data the store does not hold, so the row stays inert |
 | B9 | 14 Account | `Security`, `Two-step verification`, `Change number`, `Delete my account` | 4 sub-screens |
-| B10 | 17 Notifications | `Sound`, `Vibrate`, `Popup notification` | 3 sub-screens |
+| B10 | 17 Notifications | `Sound`, `Vibrate`, `Popup notification` | **not a gap — the "3 sub-screens" wording was wrong.** All five notification rows ship as flat toggles in F-017, which the owner confirmed on 2026-09-29 is the intended shape. `onRowActivate` is therefore unreachable and F-046 removes it (FR-011) |
 | B11 | 18 Data and storage | `Storage usage`, `Media auto-download`, `Images`, `Audio`, `Videos`, `Documents`, `Network usage` | storage management |
 | B12 | 16 Chats settings | `Keyboard` | keyboard settings |
 
@@ -140,3 +140,14 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   and Calls-page call paths that would have left controls inert for exactly the contacts F-043
   left them inert for. Next: the **forward-only audit** of remaining inert features, then F-046's
   backend seam.
+- **2026-09-29** — A full forward-only inert-control sweep (F-046) was run and verified, and B10's
+  "3 sub-screens" entry was **found to be wrong**: Notifications ships as flat toggles, which the
+  owner confirmed is intended, so B10 is not a gap. The sweep found ~30 inert controls in three
+  shapes — silent no-ops that swallow a tap with the sheet left open (3, on design-verified rows 2
+  and 14), `<button>`s with no handler at all (the 4 composer icons), and empty handlers awaiting a
+  later feature (16 rows across Account, Data-and-storage, Chats settings, Contact info, Status,
+  Camera). It also found the inverse: 3 `ChatStore` methods with no production caller, and 6 of 7
+  `PrefsStore` booleans written by live toggles and read by nothing (`composer.ts:32` reading
+  `enterKeySends` is the only read in the app). F-046's scope was narrowed by the owner to the
+  **honesty fixes**; the large destinations each become their own spec. This sweep also caused the
+  backend seam to be **renumbered F-046 → F-047** (owner-confirmed 2026-09-29).
