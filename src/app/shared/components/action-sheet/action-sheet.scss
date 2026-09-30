@@ -55,6 +55,17 @@
 
   &__row {
     display: block;
+
+    &--disabled .action-sheet__row-button {
+      color: var(--wa-text-tertiary);
+      cursor: default;
+
+      &:hover,
+      &:focus-visible {
+        background: transparent;
+        outline: none;
+      }
+    }
   }
 
   &__row-button {
@@ -76,6 +87,10 @@
     &:focus-visible {
       outline: none;
       background: var(--wa-file-card);
+    }
+
+    &:disabled {
+      cursor: default;
     }
   }
 }

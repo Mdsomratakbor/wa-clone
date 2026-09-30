@@ -19,11 +19,16 @@
       }
       <ul class="action-sheet__rows" data-testid="action-sheet-rows">
         @for (item of actions(); track item.id) {
-          <li class="action-sheet__row">
+          <li
+            class="action-sheet__row"
+            [class.action-sheet__row--disabled]="item.disabled"
+          >
             <button
               class="action-sheet__row-button"
               type="button"
               data-testid="action-sheet-row"
+              [disabled]="item.disabled ?? false"
+              [attr.data-testid-disabled]="item.disabled ? 'true' : null"
               (click)="onAction(item.id)"
             >
               {{ item.label }}

@@ -72,4 +72,58 @@ describe('ActionSheet', () => {
       'Choose action',
     );
   });
+
+  describe('F-046: honestly disabled rows', () => {
+    const MIXED: readonly Action[] = [
+      { id: 'alpha', label: 'Alpha row' },
+      { id: 'beta', label: 'Beta row', disabled: true },
+    ];
+
+    it('renders a disabled action as a natively disabled button', () => {
+      fixture = TestBed.createComponent(ActionSheet);
+      fixture.componentRef.setInput('actions', MIXED);
+      fixture.detectChanges();
+      const rows = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+        '[data-testid="action-sheet-row"]',
+      );
+      expect(rows[0].disabled).toBe(false);
+      expect(rows[1].disabled).toBe(true);
+    });
+
+    it('does not emit when a disabled row is clicked', () => {
+      fixture = TestBed.createComponent(ActionSheet);
+      fixture.componentRef.setInput('actions', MIXED);
+      fixture.detectChanges();
+      const seen: string[] = [];
+      fixture.componentInstance.action.subscribe((id) => seen.push(id));
+      const rows = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+        '[data-testid="action-sheet-row"]',
+      );
+      rows[1].click();
+      expect(seen).toEqual([]);
+    });
+
+    it('keeps a disabled row visible and labelled, so the destination work has a home', () => {
+      fixture = TestBed.createComponent(ActionSheet);
+      fixture.componentRef.setInput('actions', MIXED);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      const rows = el.querySelectorAll('[data-testid="action-sheet-row"]');
+      expect(rows.length).toBe(2);
+      expect(rows[1].textContent?.trim()).toBe('Beta row');
+      expect(
+        el.querySelector('.action-sheet__row--disabled [data-testid="action-sheet-row"]'),
+      ).not.toBeNull();
+    });
+
+    it('treats an action with no disabled flag as enabled', () => {
+      fixture = TestBed.createComponent(ActionSheet);
+      fixture.componentRef.setInput('actions', ACTIONS);
+      fixture.detectChanges();
+      const rows = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+        '[data-testid="action-sheet-row"]',
+      );
+      expect(Array.from(rows).every((r) => !r.disabled)).toBe(true);
+    });
+  });
 });
