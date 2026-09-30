@@ -13,13 +13,22 @@
   >
     <button
       type="button"
-      disabled
-      class="calls-page__filter-item calls-page__filter-item--active"
+      class="calls-page__filter-item"
+      [class.calls-page__filter-item--active]="!isMissedFilter()"
+      [attr.aria-pressed]="!isMissedFilter()"
       data-testid="filter-all"
+      (click)="onFilterSelect('all')"
     >
       All
     </button>
-    <button type="button" disabled class="calls-page__filter-item" data-testid="filter-missed">
+    <button
+      type="button"
+      class="calls-page__filter-item"
+      [class.calls-page__filter-item--active]="isMissedFilter()"
+      [attr.aria-pressed]="isMissedFilter()"
+      data-testid="filter-missed"
+      (click)="onFilterSelect('missed')"
+    >
       Missed
     </button>
   </div>

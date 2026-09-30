@@ -55,6 +55,48 @@ describe('CallListItem', () => {
     ).toBe(false);
   });
 
+  describe('F-046 FR-008: missed styling follows outcome, not direction', () => {
+    // F-045 made these disagree. endCall records direction 'outgoing' for every
+    // call this app places and stores the real result in `outcome`, so the
+    // direction-only check left a genuinely unanswered call styled as a normal
+    // completed one.
+    const UNANSWERED: CallEntry = {
+      id: 'call-missed-1',
+      contactName: 'Unanswered',
+      direction: 'outgoing',
+      date: '10/13/19',
+      avatarRef: null,
+      outcome: 'missed',
+    };
+
+    it('marks a call this app placed and never answered as missed', () => {
+      const el = render(UNANSWERED);
+      expect(
+        el.querySelector('.call-list-item__name')?.classList.contains('call-list-item__name--missed'),
+      ).toBe(true);
+    });
+
+    it('does not mark an answered outgoing call as missed', () => {
+      const el = render({ ...UNANSWERED, outcome: 'completed' });
+      expect(
+        el.querySelector('.call-list-item__name')?.classList.contains('call-list-item__name--missed'),
+      ).toBe(false);
+    });
+
+    it('falls back to direction when a snapshot has no outcome yet', () => {
+      // hydrate() normalizes outcome for anything loaded from storage, but the
+      // helper is pure and also sees hand-built entries, so the legacy signal
+      // still has to work on its own.
+      const el = render({ ...UNANSWERED, outcome: undefined });
+      expect(
+        el.querySelector('.call-list-item__name')?.classList.contains('call-list-item__name--missed'),
+      ).toBe(false);
+      expect(
+        render(MISSED).querySelector('.call-list-item__name')?.classList.contains('call-list-item__name--missed'),
+      ).toBe(true);
+    });
+  });
+
   it('exposes button semantics with a descriptive label', () => {
     const el = render(CALL);
     const row = el.querySelector('.call-list-item');

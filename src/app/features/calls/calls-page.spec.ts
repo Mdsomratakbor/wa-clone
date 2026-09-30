@@ -27,7 +27,7 @@ describe('CallsPage', () => {
     expect(el.querySelectorAll('app-call-list-item').length).toBe(CALL_SEED.length);
   });
 
-  it('renders the header: Edit leading, static filter, new-call trailing, no title', () => {
+  it('renders the header: Edit leading, filter pills, new-call trailing, no title', () => {
     const el = render();
     const actions = [
       ...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action'),
@@ -39,9 +39,11 @@ describe('CallsPage', () => {
     expect(
       el.querySelector('[data-testid="calls-filter"]')?.hasAttribute('data-nav-center'),
     ).toBe(true);
-    expect((el.querySelector('[data-testid="filter-all"]') as HTMLButtonElement).disabled).toBe(true);
+    expect((el.querySelector('[data-testid="filter-all"]') as HTMLButtonElement).disabled).toBe(
+      false,
+    );
     expect((el.querySelector('[data-testid="filter-missed"]') as HTMLButtonElement).disabled).toBe(
-      true,
+      false,
     );
   });
 
@@ -116,7 +118,10 @@ describe('CallsPage', () => {
     expect(actions.at(-1)?.textContent?.trim()).toBe('Clear');
     expect(el.querySelectorAll('[data-testid="call-remove"]').length).toBe(CALL_SEED.length);
     expect(el.querySelectorAll('[data-testid="call-info"]').length).toBe(0);
-    expect((el.querySelector('[data-testid="filter-all"]') as HTMLButtonElement).disabled).toBe(true);
+    // F-046 FR-008: the filter stays usable in edit mode. The pills choose which
+    // calls you act on, which is more useful while editing, not less - and a
+    // disabled control here is the inert defect this feature exists to remove.
+    expect((el.querySelector('[data-testid="filter-all"]') as HTMLButtonElement).disabled).toBe(false);
   });
 
   it('Done exits edit mode and restores the 004 header with info buttons', () => {
@@ -540,5 +545,158 @@ describe('CallsPage', () => {
     expect(router.navigate).not.toHaveBeenCalled();
     expect(el.querySelector('[data-testid="call-list"]')).not.toBeNull();
     expect(el.querySelector('[data-testid="tab-stub"]')).toBeNull();
+  });
+
+  describe('F-046 FR-008: the All/Missed filter', () => {
+    const MISSED_SEED = CALL_SEED.filter((c) => c.direction === 'missed');
+
+    function pills(el: HTMLElement): HTMLButtonElement[] {
+      return [
+        el.querySelector<HTMLButtonElement>('[data-testid="filter-all"]') as HTMLButtonElement,
+        el.querySelector<HTMLButtonElement>('[data-testid="filter-missed"]') as HTMLButtonElement,
+      ];
+    }
+
+    function names(el: HTMLElement): string[] {
+      return [...el.querySelectorAll('.call-list-item__name')].map(
+        (n) => n.textContent?.trim() ?? '',
+      );
+    }
+
+    it('starts on All: pressed, unfiltered, and both pills enabled', () => {
+      const el = render();
+      const [all, missed] = pills(el);
+      expect(all?.disabled).toBe(false);
+      expect(missed?.disabled).toBe(false);
+      expect(all?.getAttribute('aria-pressed')).toBe('true');
+      expect(missed?.getAttribute('aria-pressed')).toBe('false');
+      expect(all?.classList.contains('calls-page__filter-item--active')).toBe(true);
+      expect(missed?.classList.contains('calls-page__filter-item--active')).toBe(false);
+      expect(el.querySelectorAll('app-call-list-item').length).toBe(CALL_SEED.length);
+    });
+
+    it('Missed shows only missed calls and marks itself pressed', () => {
+      const el = render();
+      pills(el)[1]?.click();
+      fixture.detectChanges();
+
+      expect(el.querySelectorAll('app-call-list-item').length).toBe(MISSED_SEED.length);
+      expect(names(el)).toEqual(MISSED_SEED.map((c) => c.contactName));
+      const [all, missed] = pills(el);
+      expect(missed?.getAttribute('aria-pressed')).toBe('true');
+      expect(all?.getAttribute('aria-pressed')).toBe('false');
+      expect(all?.classList.contains('calls-page__filter-item--active')).toBe(false);
+    });
+
+    it('All restores the full log after a filtered view', () => {
+      const el = render();
+      pills(el)[1]?.click();
+      fixture.detectChanges();
+      expect(el.querySelectorAll('app-call-list-item').length).toBe(MISSED_SEED.length);
+
+      pills(el)[0]?.click();
+      fixture.detectChanges();
+      expect(el.querySelectorAll('app-call-list-item').length).toBe(CALL_SEED.length);
+      expect(names(el)).toEqual(CALL_SEED.map((c) => c.contactName));
+    });
+
+    it('shows a call this app placed that was never answered (FR-008 regression)', () => {
+      // The whole reason isMissedCall changed. endCall records direction
+      // 'outgoing' and puts the truth in `outcome`, so a filter built on
+      // `direction === 'missed'` would hide exactly this row - enabled, styled as
+      // working, and empty.
+      const store = TestBed.inject(CallStore);
+      store.startCall(
+        { contactId: null, contactName: 'Unanswered', avatarRef: null },
+        'voice',
+        1000,
+      );
+      const ended = store.endCall(1000);
+      expect(ended?.direction).toBe('outgoing');
+      expect(ended?.outcome).toBe('missed');
+
+      const el = render();
+      pills(el)[1]?.click();
+      fixture.detectChanges();
+
+      expect(names(el)).toContain('Unanswered');
+    });
+
+    it('a completed call is not in the Missed list', () => {
+      const store = TestBed.inject(CallStore);
+      store.startCall(
+        { contactId: null, contactName: 'Answered', avatarRef: null },
+        'voice',
+        0,
+      );
+      store.advance(6000);
+      const ended = store.endCall(6000);
+      expect(ended?.outcome).toBe('completed');
+
+      const el = render();
+      pills(el)[1]?.click();
+      fixture.detectChanges();
+      expect(names(el)).not.toContain('Answered');
+    });
+
+    it('Missed with nothing missed shows the empty state, not the full log', () => {
+      const store = TestBed.inject(CallStore);
+      // Clear the log, then record one answered call so the log is non-empty
+      // while the missed slice is empty.
+      store.calls().forEach((c) => store.removeCall(c.id));
+      store.startCall(
+        { contactId: null, contactName: 'Answered', avatarRef: null },
+        'voice',
+        0,
+      );
+      store.advance(6000);
+      store.endCall(6000);
+
+      const el = render();
+      pills(el)[1]?.click();
+      fixture.detectChanges();
+
+      expect(el.querySelectorAll('app-call-list-item').length).toBe(0);
+      expect(el.querySelector('[data-testid="empty-state"]')).not.toBeNull();
+    });
+
+    it('Clear stays enabled while the log is non-empty but the filter is empty', () => {
+      // Offering to wipe the entire log from an empty filtered slice is a
+      // destructive action the user did not ask for.
+      const store = TestBed.inject(CallStore);
+      store.calls().forEach((c) => store.removeCall(c.id));
+      store.startCall(
+        { contactId: null, contactName: 'Answered', avatarRef: null },
+        'voice',
+        0,
+      );
+      store.advance(6000);
+      store.endCall(6000);
+
+      const el = render();
+      pills(el)[1]?.click();
+      fixture.detectChanges();
+
+      const edit = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+        (b) => b.textContent?.trim() === 'Edit',
+      );
+      edit?.click();
+      fixture.detectChanges();
+      const clear = [...el.querySelectorAll<HTMLButtonElement>('.navigation-bar__action')].find(
+        (b) => b.textContent?.trim() === 'Clear',
+      );
+      expect(clear?.disabled).toBe(false);
+    });
+
+    it('an unknown filter id falls back to All rather than stranding the view', () => {
+      const el = render();
+      const page = fixture.componentInstance as unknown as {
+        onFilterSelect(id: string): void;
+      };
+      page.onFilterSelect('archived');
+      fixture.detectChanges();
+      expect(el.querySelectorAll('app-call-list-item').length).toBe(CALL_SEED.length);
+      expect(pills(el)[0]?.getAttribute('aria-pressed')).toBe('true');
+    });
   });
 });

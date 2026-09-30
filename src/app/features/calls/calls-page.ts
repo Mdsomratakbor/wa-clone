@@ -13,8 +13,11 @@ import { TabBar } from '../../shared/components/tab-bar/tab-bar';
 import { CallStore } from '../../core/call.store';
 import { ChatStore } from '../../core/chat.store';
 import { Clock } from '../../core/clock';
-import { CallEntry, CallKind } from './calls.model';
+import { CallEntry, CallKind, isMissedCall } from './calls.model';
 import { CallInfoModal } from './call-info-modal';
+
+/** F-046 FR-008: the two filter pills in the nav centre. */
+type CallFilter = 'all' | 'missed';
 
 const TAB_KEYS: readonly TabKey[] = ['settings', 'chats', 'camera', 'calls', 'status'];
 const TAB_LABELS: Record<TabKey, string> = {
@@ -40,8 +43,26 @@ export class CallsPage {
 
   protected readonly activeTab = signal<TabKey>('calls');
   protected readonly editing = signal(false);
-  protected readonly items = computed(() => this.callStore.calls());
+  protected readonly filter = signal<CallFilter>('all');
   protected readonly infoCall = signal<CallEntry | null>(null);
+
+  /**
+   * F-046 FR-008. Filtered rather than reassigned, so the "no calls" empty state
+   * keys off the same list the user is looking at: selecting Missed with nothing
+   * missed must say so, not keep showing the full log.
+   */
+  protected readonly items = computed(() => {
+    const calls = this.callStore.calls();
+    return this.filter() === 'missed' ? calls.filter(isMissedCall) : calls;
+  });
+
+  /**
+   * A filter with no rows is a dead end, so `Clear` must not offer to wipe the
+   * whole log while the user is looking at an empty filtered slice of it.
+   */
+  protected readonly hasAnyCall = computed(() => this.callStore.calls().length > 0);
+
+  protected readonly isMissedFilter = computed(() => this.filter() === 'missed');
 
   protected readonly tabs = computed<TabItem[]>(() =>
     TAB_KEYS.map((key) => ({ key, label: TAB_LABELS[key], active: key === this.activeTab() })),
@@ -55,9 +76,19 @@ export class CallsPage {
 
   protected readonly trailingActions = computed<readonly NavAction[]>(() =>
     this.editing()
-      ? [{ id: 'clear', label: 'Clear', disabled: this.items().length === 0 }]
+      ? [{ id: 'clear', label: 'Clear', disabled: !this.hasAnyCall() }]
       : [{ id: 'new-call', label: 'New call', icon: 'new-call' }],
   );
+
+  protected onFilterSelect(id: string): void {
+    if (id !== 'all' && id !== 'missed') {
+      // F-046: an unrecognised pill id must not leave the user on a filter they
+      // cannot see the state of. 'all' is the only safe unknown.
+      this.filter.set('all');
+      return;
+    }
+    this.filter.set(id);
+  }
 
   protected onTabSelect(key: TabKey): void {
     if (this.editing()) {

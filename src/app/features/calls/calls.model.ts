@@ -64,7 +64,23 @@ export const CALL_OUTCOME_LABELS: Record<CallOutcome, string> = {
   missed: 'cancelled call',
 };
 
-export const isMissedCall = (call: CallEntry): boolean => call.direction === 'missed';
+/**
+ * F-046 FR-008: a call is missed if it was never completed.
+ *
+ * This used to read `direction === 'missed'`, which F-045 quietly invalidated:
+ * `endCall` records every call this app places as `direction: 'outgoing'` and
+ * puts the real result in `outcome` (call.store.ts:130-137). So a call that
+ * rang out unanswered - the one call the user most wants to find - reported
+ * `false` here. Wiring the Missed filter to that helper would have produced a
+ * filter that was enabled, styled as working, and showed nothing.
+ *
+ * `outcome` is consulted when present because `hydrate()` normalizes it from
+ * `direction` for pre-F-045 snapshots (call.store.ts:53). The fallback keeps
+ * the helper correct for an un-normalized entry, where `direction: 'missed'` is
+ * the only signal available.
+ */
+export const isMissedCall = (call: CallEntry): boolean =>
+  call.outcome !== undefined ? call.outcome === 'missed' : call.direction === 'missed';
 
 /** A call is "active" until it has ended; `ended` is a terminal state. */
 export const isActiveCall = (session: CallSession | null): session is CallSession =>
