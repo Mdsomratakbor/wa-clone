@@ -72,3 +72,20 @@ map-external; rows are no-ops here.
 
 Until T001 lands, `notifications-page` renders structural rows (stable testids/aria-labels) —
 replaced at G1 with the captured design.
+
+## Drift note (F-046, inert control sweep)
+
+The "sub-targets are a later feature" non-goal is **retired as not intended**. The flat-toggle shape
+this screen actually ships is correct; the gap audit's B10 "3 sub-screens" entry described a shape
+that was never wanted, and it is not a destination for anything.
+
+What changed:
+
+- `NotificationsPage.onRowActivate` and the `<button>` block it could never reach are **removed**.
+  The old "row activation is a no-op" test clicked a `<div>` wrapper, so it never exercised the
+  handler it was named after; it is replaced with a test of the toggle behaviour that ships.
+- The final `@else` is kept as a **disabled switch** rather than omitted. Omitting it would let the
+  next row added to the seed fall through to the empty handler this feature just deleted.
+- `showPreviews` is the one wired row. `sound`, `vibrate`, `popup`, and `light` are honestly disabled
+  and their storage keys deleted — see the drift note in `specs/016-chats-settings/spec.md` for why
+  the keys went with the switches.

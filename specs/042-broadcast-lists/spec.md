@@ -175,3 +175,21 @@ guard, collision-free id, empty thread, `read: true`, persist, return id).
 - [x] Accessibility: `role="status"` empty state, semantic list, keyboard-reachable rows
 - [x] The store method ships without a UI caller on purpose, and the spec says so (Non-Goals)
 - [x] The blocked G1 gate is recorded, not skipped
+
+## Drift note (F-046, inert control sweep)
+
+The checklist line "the store method ships without a UI caller on purpose" was audited and
+**partly reversed**:
+
+- `ChatStore.createBroadcast` is **retained**. It was flagged for deletion as a caller-less method,
+  but counting callers was not the same as knowing whether it was load-bearing: it is this spec's own
+  FR-002 deliverable, the only way to put a broadcast into the store, and 15 test call sites depend
+  on it. Deleting it would have rewritten an unrelated suite to reach past the store's public API
+  while fixing nothing a user can see. The missing piece remains the create **UI**, named in
+  `specs/046-inert-control-sweep/disposition.md` as the B3 create form.
+- `ChatStore.broadcastRecipients` is **removed** — a byte-identical duplicate of `groupParticipants`
+  with no caller. Its two tests now target `groupParticipants`, which is the same behaviour under
+  the name that was always the real one.
+- `ChatStore.setConversations` is **removed** — a test seam that had become public API.
+
+So the store capability stands as specified; only the duplicate and the seam are gone.

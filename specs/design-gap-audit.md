@@ -35,15 +35,15 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 | B1 | 13 Settings | `Contacts` row | Contacts list — **done (F-039)** |
 | B2 | 1/3 Chats + 9 Add modal | `New Group` | group creation (name + participants) — **done (F-040)** |
 | B3 | 1 Chats | `Broadcast Lists` | broadcast list screen — **done (F-042)**, list + entry only; create form still missing, chrome PROVISIONAL |
-| B4 | 2 Chat window + 16 Chats settings | `Wallpaper` | wallpaper picker |
+| B4 | 2 Chat window + 16 Chats settings | `Wallpaper` | wallpaper picker — **still open, and now a named deferral.** F-046 honestly disabled both copies; the picker remains capture-blocked until 2026-10-02 18:38 UTC |
 | B5 | 16 Chats settings | `Font size` | size control (persisted, applied app-wide) — **done (F-041)** |
-| B6 | 4/5 Calls | `New call`, row tap, call info | call screen / call-info sheet — **DONE (F-045)**: row tap (F-038), the call-info sheet (F-043), and now the calling flow — picker at `/calls/new`, in-call screen at `/calls/active`, and all three previously inert controls wired. The new chrome is PROVISIONAL by construction (no Figma node exists) |
+| B6 | 4/5 Calls | `New call`, row tap, call info | call screen / call-info sheet — **DONE (F-045)**: row tap (F-038), the call-info sheet (F-043), and now the calling flow — picker at `/calls/new`, in-call screen at `/calls/active`, and all three previously inert controls wired. The new chrome is PROVISIONAL by construction (no Figma node exists). F-046 additionally wired the `All`/`Missed` filter and fixed `isMissedCall`, which had been reporting unanswered calls as answered since F-045 |
 | B7 | 15 Contact info | `Media, photos and links` | media grid — **done (F-044)**, derived from the chat's own `Message.file` entries; only chat-006 is populated, so the empty state is the default, and the grid chrome is PROVISIONAL |
-| B8 | 15 Contact info | `Groups` | shared-groups list — **open**: needs shared-group membership data the store does not hold, so the row stays inert |
-| B9 | 14 Account | `Security`, `Two-step verification`, `Change number`, `Delete my account` | 4 sub-screens |
-| B10 | 17 Notifications | `Sound`, `Vibrate`, `Popup notification` | **not a gap — the "3 sub-screens" wording was wrong.** All five notification rows ship as flat toggles in F-017, which the owner confirmed on 2026-09-29 is the intended shape. `onRowActivate` is therefore unreachable and F-046 removes it (FR-011) |
-| B11 | 18 Data and storage | `Storage usage`, `Media auto-download`, `Images`, `Audio`, `Videos`, `Documents`, `Network usage` | storage management |
-| B12 | 16 Chats settings | `Keyboard` | keyboard settings |
+| B8 | 15 Contact info | `Groups` | shared-groups list — **open, and now a named deferral**: needs shared-group membership data the store does not hold. F-046 left the row untouched and recorded it; the row is still live-looking and still inert, which is a tracked gap rather than a fix |
+| B9 | 14 Account | `Security`, `Two-step verification`, `Change number`, `Delete my account` | 4 sub-screens — **still open, now a named deferral.** F-046 left all 4 rows untouched and recorded them |
+| B10 | 17 Notifications | `Sound`, `Vibrate`, `Popup notification` | **not a gap — the "3 sub-screens" wording was wrong.** All five notification rows ship as flat toggles in F-017, which the owner confirmed on 2026-09-29 is the intended shape. **F-046 completed this**: `onRowActivate` and its dead `<button>` branch are removed, and `sound`/`vibrate`/`popup`/`light`/`mediaVisibility` — five live switches that persisted values nothing read — are now honestly disabled with their storage keys deleted |
+| B11 | 18 Data and storage | `Storage usage`, `Media auto-download`, `Images`, `Audio`, `Videos`, `Documents`, `Network usage` | storage management — **still open, now a named deferral.** F-046 left all 7 rows untouched and recorded them |
+| B12 | 16 Chats settings | `Keyboard` | keyboard settings — **still open, now a named deferral.** F-046 left the row untouched and recorded it |
 
 ## Tier C — capture-gated (cannot be built faithfully yet)
 

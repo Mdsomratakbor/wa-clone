@@ -116,5 +116,14 @@ To be filled from the `0:9778` payload (mirrors 008 research format):
 ## Closing note (deliberately incomplete)
 
 Until T001 lands, `settings.seed.ts` provides provisional/hypothesis rows (stable ids, PENDING
-labels/glyphs) — a documented placeholder, replaced at G1 with captured content. No exact design
+labels/glyphs) - a documented placeholder, replaced at G1 with captured content. No exact design
 values are claimed anywhere.
+
+## Drift note (F-046, inert control sweep)
+
+The `More` overflow row is no longer a live row that navigates nowhere. It is now an **honestly
+disabled** action — native `disabled`, not activatable, out of the tab order. Its destination is the
+B-tier overflow destination list, named in `specs/046-inert-control-sweep/disposition.md`.
+
+An unrecognised settings action id now dismisses the sheet rather than falling through to an empty
+handler.

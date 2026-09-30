@@ -13,7 +13,7 @@ are independent of each other and of T1. T10 is the closure gate and depends on 
 
 ## Phase 1: Enabling change
 
-- [ ] **T1** `Action.disabled?: boolean` + native `[disabled]` on `ActionSheet` rows
+- [x] **T1** `Action.disabled?: boolean` + native `[disabled]` on `ActionSheet` rows
   - **Spec**: FR-001/002/003 (enabling prerequisite), `plan.md` "The three honest files"
   - **Files**: `src/app/shared/components/action-sheet/action-sheet.model.ts`,
     `action-sheet.html`, `action-sheet.scss`
@@ -28,7 +28,7 @@ are independent of each other and of T1. T10 is the closure gate and depends on 
 
 ## Phase 2: The three silent no-ops
 
-- [ ] **T2** FR-001 — chat-actions `Wallpaper` honestly disabled, sheet never left open
+- [x] **T2** FR-001 — chat-actions `Wallpaper` honestly disabled, sheet never left open
   - **Spec**: FR-001
   - **Files**: `src/app/features/chat-window/chat-actions.seed.ts`,
     `src/app/features/chat-window/chat-window-page.ts`
@@ -39,7 +39,7 @@ are independent of each other and of T1. T10 is the closure gate and depends on 
   - **Verify**: build; suite green.
   - **Commit**: `feat`.
 
-- [ ] **T3** FR-002 / FR-003 — add-modal `New community` and settings `More` honestly disabled
+- [x] **T3** FR-002 / FR-003 — add-modal `New community` and settings `More` honestly disabled
   - **Spec**: FR-002, FR-003
   - **Files**: `src/app/features/new-chat-modal/new-chat-modal.seed.ts`,
     `src/app/features/chat-list/chats-page.ts`,
@@ -55,7 +55,7 @@ are independent of each other and of T1. T10 is the closure gate and depends on 
 
 ## Phase 3: The composer
 
-- [ ] **T4** FR-004 — four composer controls wired or honestly disabled
+- [x] **T4** FR-004 — four composer controls wired or honestly disabled
   - **Spec**: FR-004
   - **Files**: `src/app/shared/components/composer/composer.ts`, `composer.html`
   - **Do**: `Camera` (`:28`) navigates to `/camera` — the route exists at `app.routes.ts:36` and the
@@ -69,7 +69,7 @@ are independent of each other and of T1. T10 is the closure gate and depends on 
 
 ## Phase 4: The prefs
 
-- [ ] **T5** FR-006 — `showPreviews` wired to chat-list preview visibility
+- [x] **T5** FR-006 — `showPreviews` wired to chat-list preview visibility
   - **Spec**: FR-006
   - **Files**: `src/app/features/chat-list/chats-page.ts`, `chats-page.html`, chat-list item template
   - **Do**: gate the preview line on `prefs().showPreviews`. This is the only pref whose label
@@ -79,7 +79,7 @@ are independent of each other and of T1. T10 is the closure gate and depends on 
   - **Verify**: build; suite green.
   - **Commit**: `feat`.
 
-- [ ] **T6** FR-006 — the 5 consumer-less prefs disabled, then removed from the store
+- [x] **T6** FR-006 — the 5 consumer-less prefs disabled, then removed from the store
   - **Spec**: FR-006
   - **Files**: `src/app/core/prefs.store.ts`,
     `src/app/features/settings/chats-settings-page.ts`,
@@ -97,7 +97,7 @@ are independent of each other and of T1. T10 is the closure gate and depends on 
 
 ## Phase 5: Dead store methods, the filter, and Notifications
 
-- [ ] **T7** FR-007 — remove the 2 genuinely dead `ChatStore` methods, keep `createBroadcast`
+- [x] **T7** FR-007 — remove the 2 genuinely dead `ChatStore` methods, keep `createBroadcast`
   - **Spec**: FR-007 (as corrected by Clarification 4), research.md §3a
   - **Files**: `src/app/core/chat.store.ts`, `src/app/core/chat.store.spec.ts`,
     `src/app/features/chat-list/chats-page.spec.ts`
@@ -114,7 +114,7 @@ are independent of each other and of T1. T10 is the closure gate and depends on 
   - **Verify**: build; suite green; no non-spec caller remains for the two deleted methods.
   - **Commit**: `feat`.
 
-- [ ] **T8** FR-008 — the Calls `All` / `Missed` filter actually filters
+- [x] **T8** FR-008 — the Calls `All` / `Missed` filter actually filters
   - **Spec**: FR-008, Clarification 5, research.md §5a
   - **Files**: `calls-page.ts`, `calls-page.html`, `calls-page.spec.ts`, `calls.model.ts`,
     `../../shared/components/call-list-item/call-list-item.spec.ts`
@@ -134,7 +134,7 @@ are independent of each other and of T1. T10 is the closure gate and depends on 
     Build; suite green.
   - **Commit**: `feat`.
 
-- [ ] **T9** FR-011 — remove Notifications' unreachable handler and dead `<button>` branch
+- [x] **T9** FR-011 — remove Notifications' unreachable handler and dead `<button>` branch
   - **Spec**: FR-011 (owner clarification 3)
   - **Files**: `src/app/features/settings/notifications-page.ts`, `notifications-page.html`,
     `notifications-page.spec.ts`
@@ -151,7 +151,7 @@ are independent of each other and of T1. T10 is the closure gate and depends on 
 
 ## Phase 6: Closure
 
-- [ ] **T10** FR-005 / FR-009 / FR-010 — disposition table, the 11 deferred settings rows, drift notes, closure
+- [x] **T10** FR-005 / FR-009 / FR-010 — disposition table, the 11 deferred settings rows, drift notes, closure
   - **Spec**: FR-005, FR-009, FR-010, G3, G4
   - **Files**: **new** `specs/046-inert-control-sweep/disposition.md`; drift notes in all eight
     superseded artifacts listed in `plan.md` "Drift Policy"
@@ -178,6 +178,48 @@ are independent of each other and of T1. T10 is the closure gate and depends on 
     G4 does not cover them, and `disposition.md` is what tracks them.
   - **Commit**: `test` for the spec rewrites, then `docs(spec)` for the closure — split per
     `AGENTS.md` §2 cadence.
+
+## Closure: FR → test traceability
+
+Every FR has at least one named assertion. "Vacuous" means the test named in the spec has been
+rewritten to a stronger form; each is called out rather than quietly replaced.
+
+| FR | Requirement | Test(s) |
+| -- | ----------- | ------- |
+| FR-001 | `Wallpaper` honestly disabled; unknown chat action dismisses | `chat-window-page.spec.ts` "F-046 FR-001: the Wallpaper row is honestly disabled, not a silent no-op" + "F-046 FR-001: an unknown chat action dismisses the sheet" |
+| FR-002 | `New community` honestly disabled; unknown add-modal action dismisses | `chats-page.spec.ts` "F-046 FR-002: New community is honestly disabled, not a silent no-op" + unknown-id dismissal test |
+| FR-003 | Settings `More` honestly disabled; unknown action dismisses | `settings-page.spec.ts` "F-046 FR-003: the More row is honestly disabled, not a silent no-op" + unknown-id dismissal test |
+| FR-004 | Composer: `Camera` wired, other 3 disabled | `composer.spec.ts` "F-046 FR-004: Camera navigates and the other three controls are honestly disabled" |
+| FR-005 | 11 Account/Data-storage rows recorded as deferred | `account-page.spec.ts` "Account rows are still inert: deferred to the Account & privacy feature (F-046 G4)"; `data-storage-page.spec.ts` "Data & storage rows are still inert: deferred to the storage feature (F-046 G4)"; plus `disposition.md` |
+| FR-006 | `showPreviews` wired; 5 consumer-less prefs disabled + keys removed | `chat-list-item.spec.ts` "F-046 FR-006: showPreviews gates the preview text" (4 tests); `notifications-page.spec.ts` "F-046 FR-006: four rows have no consumer and are disabled"; `chats-settings-page.spec.ts` media-visibility test; `prefs.store.spec.ts` v4-snapshot normalization + surviving-key tests |
+| FR-007 | 2 dead `ChatStore` methods removed, `createBroadcast` kept | `chat.store.spec.ts` "groupParticipants resolves current names and drops deleted contacts (F-046 FR-007)" + "groupParticipants is empty for an unknown chat (F-046 FR-007)"; `chats-page.spec.ts` "renders an empty placeholder when the store has no conversations" (now via `deleteConversation`) |
+| FR-008 | Calls `All`/`Missed` filter actually filters | `calls-page.spec.ts` "F-046 FR-008: the All/Missed filter" (8 tests, incl. the unanswered-call regression); `call-list-item.spec.ts` "F-046 FR-008: missed styling follows outcome, not direction" (3 tests) |
+| FR-009 | Disposition table complete, every deferral names a destination | `disposition.md` (G3 artifact; no unit test — it is a record, not behaviour) |
+| FR-010 | Inertness tests rewritten, not deleted | 5 retitled with an explicit deferral note: `contact-page.spec.ts`, `chats-settings-page.spec.ts`, `font-size-page.spec.ts`, `account-page.spec.ts`, `data-storage-page.spec.ts`; plus the two rewritten Notifications tests. Zero tests deleted to make a suite pass |
+| FR-011 | Notifications dead handler + `<button>` branch removed | `notifications-page.spec.ts` "renders a live switch for Show previews and a disabled switch for the rest" (replaces the vacuous "row activation is a no-op") |
+
+### Gates
+
+- **G1** — not applicable. F-046 wires no new chrome; every control that became live targets an
+  existing node. No Figma node ID was invented.
+- **G2** — `npm run build` green; full unit suite **588/588** green, run twice to confirm no
+  dependence on test order. Counts by task: 549 → 553 (T1) → 554 (T2) → 556 (T3) → 562 (T4) →
+  566 (T5) → 578 (T6) → 577 (T7, one test deleted with its subject) → 588 (T8) → 588 (T10, no
+  new tests: record and retitles).
+- **G3** — `disposition.md` complete; every deferral names a destination feature; all 8 drift notes
+  written. **Done.**
+- **G4** — scoped to this feature's disposition set. Every control F-046 touches is wired or
+  genuinely disabled. The ~20 empty-handler rows in Account, Data & storage, Contact info, Status,
+  and Camera are **expected to remain inert** (owner Clarification 2) and are tracked in
+  `disposition.md`, not claimed as covered. **Done, within scope.**
+
+### Blocked
+
+- **Playwright** — paused by owner directive 2026-09-26. E2E specs are authored and updated, never
+  executed. No e2e file changed in this feature; no control it targets moved.
+- **Figma capture** — `design-gap-audit.md` holds the authoritative reset timestamp, 2026-10-02
+  18:38 UTC. The Wallpaper picker (B4) and Camera capture remain blocked behind it. Neither is in
+  this feature's scope; both are recorded as deferrals.
 
 ## Explicitly not in these tasks
 

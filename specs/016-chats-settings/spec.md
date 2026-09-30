@@ -82,3 +82,19 @@ selection are later features / map-external; rows are no-ops here.
 
 Until T001 lands, `chats-settings-page` renders structural rows (stable testids/aria-labels) —
 replaced at G1 with the captured design.
+
+## Drift note (F-046, inert control sweep)
+
+"Behaviors beyond Enter key sends are later targets" is now explicit rather than aspirational:
+
+- **Wired**: `enterKeySends` (unchanged) and `showPreviews`, which now gates the chat-list preview.
+- **Honestly disabled**: `mediaVisibility`, plus the four Notifications delivery prefs
+  (`sound`, `vibrate`, `popup`, `light`). Each was a live switch that persisted a value nothing ever
+  read — a user could turn off "Popup notification" and their phone would ring anyway.
+- **Keys deleted**: those five pref keys are removed from `PrefsStore` and normalized away on load,
+  so the runtime state can no longer be wider than `PrefsSnapshot`. `PREFS_VERSION` is deliberately
+  **not** bumped: `hydrate()` already accepts v1–v4, and discarding every user's stored prefs to drop
+  five booleans is a bad trade.
+- **Deferred, still inert**: `Wallpaper` and `Keyboard`, named in
+  `specs/046-inert-control-sweep/disposition.md`. The wallpaper picker remains capture-blocked until
+  2026-10-02 18:38 UTC.

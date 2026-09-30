@@ -67,8 +67,9 @@ invites a reviewer to trust it, so the citations have to survive being checked.
 | `showPreviews` | **wired** → chat-list preview visibility | — |
 | `sound`, `vibrate`, `popup`, `light` | **honestly disabled** | Notification delivery pipeline |
 | `mediaVisibility` | **honestly disabled** | Media-privacy filtering of message bubbles |
-| Calls `All` / `Missed` | **wired** → real filter | — |
-| `createBroadcast`, `broadcastRecipients`, `setConversations` | **removed** | Broadcast create feature re-adds what it needs |
+| Calls `All` / `Missed` | **wired** → real filter | — (required fixing `isMissedCall`; Clarification 5) |
+| `broadcastRecipients`, `setConversations` | **removed** | genuinely dead; see Clarification 4 |
+| `createBroadcast` | **retained**, contrary to this table's original plan | B3 create form — the missing *caller* is the UI, not the method (Clarification 4) |
 | Notifications `onRowActivate` + dead `<button>` | **removed** | none — toggles confirmed intended |
 | Account 4 rows, B11 7 rows, `chats-wallpaper`, `chats-keyboard`, `contact-groups`, Status `Send`, Camera `Shutter`/`Flip` | **deferred, disabled, destination named** | each row names its destination in the spec's FR-009 table |
 
@@ -129,8 +130,9 @@ enabling change for FR-001/002/003 — three separate screens need exactly this 
 | `src/app/features/chat-list/chats-page.{ts,html}` | `showPreviews` gates the preview line (FR-006) |
 | `src/app/features/settings/chats-settings-page.ts` / `notifications-page.ts` | disable the 4 delivery prefs + `mediaVisibility` (FR-006) |
 | `src/app/core/prefs.store.ts` | drop the 5 keys that gain no consumer (FR-006) |
-| `src/app/core/chat.store.ts` | delete the 3 caller-less methods (FR-007) |
-| `src/app/features/calls/calls-page.{ts,html}` | real `All` / `Missed` filter (FR-008) |
+| `src/app/core/chat.store.ts` | delete `broadcastRecipients` and `setConversations`; **keep** `createBroadcast` (FR-007, Clarification 4) |
+| `src/app/features/calls/calls-page.{ts,html}` | real `All` / `Missed` filter, not persisted (FR-008) |
+| `src/app/features/calls/calls.model.ts` | `isMissedCall` reads `outcome`, falls back to `direction` (Clarification 5) |
 | `specs/046-inert-control-sweep/disposition.md` | **new** — the FR-009 table |
 
 **Removing a pref key is additive-safe, not a version bump.** `hydrate()` already merges
@@ -144,16 +146,22 @@ kept, because it is wired.
 
 | Superseded | What drifts |
 | ---------- | ----------- |
-| `specs/009-new-chat/spec.md` | its "New community is a later feature" non-goal is now an *honestly disabled* control with a named destination |
-| `specs/011-settings/spec.md` | the `More` overflow row is disabled rather than a silent no-op |
-| `specs/027-chats-settings/spec.md` | "behaviors beyond Enter key sends are later targets" becomes explicit: 1 of 7 wired here, 5 removed, `showPreviews` wired |
+| `specs/009-new-chat-modal/spec.md` | its "New community is a later feature" non-goal is now an *honestly disabled* control with a named destination |
+| `specs/011-settings-modal/spec.md` | the `More` overflow row is disabled rather than a silent no-op |
+| `specs/016-chats-settings/spec.md` | "behaviors beyond Enter key sends are later targets" becomes explicit: `enterKeySends` + `showPreviews` wired, the 5 consumer-less delivery/media prefs disabled and their keys deleted |
 | `specs/017-notifications/spec.md` | the sub-target non-goal is retired as **not intended**; flat toggles confirmed, dead branch removed |
-| `specs/004-calls/spec.md` | "static in feature 004" filter is retired — the filter now works |
-| `specs/042-broadcast-lists/spec.md` | `createBroadcast` / `broadcastRecipients` removed from the store; the create UI is a named future feature |
+| `specs/004-calls/spec.md` | "static in feature 004" filter is retired — the filter now works, and `isMissedCall` is corrected |
+| `specs/042-broadcast-lists/spec.md` | `broadcastRecipients` removed as a duplicate; **`createBroadcast` is retained**, and the missing piece is the create UI, named as a future feature |
 | `specs/design-gap-audit.md` | B10 corrected (already done); B4/B8/B9/B11/B12 disposition recorded |
 | `figma/design-map.md` | rows 2 and 14 gain the honesty note |
 
 No earlier spec is edited to change its own requirements; each note records what moved and why.
+
+**Directory names corrected during T10.** This table originally cited `009-new-chat`,
+`011-settings`, and `027-chats-settings`, none of which exist. The real directories are
+`009-new-chat-modal`, `011-settings-modal`, and `016-chats-settings` (`027` is
+`settings-toggles`). Recorded rather than quietly fixed: a drift table pointing at files nobody
+opened is the same class of error as the controls this feature audits.
 
 ## Review Gates
 

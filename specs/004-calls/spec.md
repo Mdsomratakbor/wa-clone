@@ -181,3 +181,22 @@ As a user I can read every control of the Calls header without triggering flows 
   matches the entry (no match ⇒ stays put). `New call` and the call-info button stay no-ops because
   they need a call surface (audit tier B6). The first run hydrates the identical 12 seeded entries,
   so `0-10395-calls.png` is unaffected. See `specs/038-call-log/`.
+
+## Drift note (F-046, inert control sweep)
+
+Two of the no-ops recorded above are retired:
+
+- **"Static in feature 004" filter** — the `All` / `Missed` pills are now enabled `aria-pressed`
+  toggles and actually filter. They are **not persisted**; persistence is F-047's scope and this
+  feature had no such requirement.
+- **"`New call` stays a no-op"** — already retired by F-045, which routes it to `/calls/new`.
+
+The filter required a bug fix to be honest. `isMissedCall` read `direction === 'missed'`, but F-045
+made `outcome` authoritative: `endCall` records `direction: 'outgoing'` for every call the app places
+and stores the real result in `outcome`. So a call that rang out unanswered read as *not* missed —
+the one row the filter most needs to find. The helper now consults `outcome` first, falling back to
+`direction` for an un-normalized entry. This also repairs `call-list-item`'s missed styling, which
+has been wrong for every call the app places itself since F-045.
+
+`row activation is a no-op when the contact has no chat (F-038)` is **unchanged and still correct**:
+a log row for a name with no conversation still has nowhere to go.

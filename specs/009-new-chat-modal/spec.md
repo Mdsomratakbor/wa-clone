@@ -105,3 +105,13 @@ To be filled from the `0:9072` / `0:9075` payload (mirrors 008 research format):
   feature.`) → replaces the TODO comment with modal-open logic.
 - Confirm no existing unit/e2e asserts the FAB has no action (smoke spec).
 - `navigation-bar`/`tab-bar`/`app-shell` are untouched.
+
+## Drift note (F-046, inert control sweep)
+
+The "New community is a later feature" non-goal above is still true, but it no longer ships as a
+control that looks live and does nothing. `new-community` is now an **honestly disabled** row:
+a native `disabled` action that cannot be activated and is out of the tab order. The destination is
+the broadcast/communities create flow (gap-audit B3), named in
+`specs/046-inert-control-sweep/disposition.md`.
+
+An unrecognised action id now dismisses the sheet instead of falling through to an empty handler.
