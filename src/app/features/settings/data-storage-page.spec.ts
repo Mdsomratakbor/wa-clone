@@ -50,11 +50,16 @@ describe('DataStoragePage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/settings']);
   });
 
-  it('row activation is a no-op', () => {
+  // F-046: recorded deferral, not a decision. All 7 Data & storage rows still
+  // swallow activation; `disposition.md` names the storage-usage / auto-download
+  // feature as the destination. Assertion unchanged, name corrected.
+  it('Data & storage rows are still inert: deferred to the storage feature (F-046 G4)', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
-    el.querySelectorAll<HTMLButtonElement>('[data-testid="data-storage-row"]')[0]?.click();
+    const rows = el.querySelectorAll<HTMLButtonElement>('[data-testid="data-storage-row"]');
+    expect(rows.length).toBeGreaterThan(0);
+    rows[0]?.click();
     fixture.detectChanges();
     expect(router.navigate).not.toHaveBeenCalled();
   });

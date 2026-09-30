@@ -134,7 +134,11 @@ describe('ChatsSettingsPage font size row', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/settings/chats/font-size']);
   });
 
-  it('the other chevron rows stay inert (FR-007)', () => {
+  // F-046: Wallpaper is a recorded deferral, not a decision. The assertion is
+  // unchanged because the row genuinely is still inert; only the name changed,
+  // so a reader does not take "stays inert" for an intended behaviour. See
+  // `specs/046-inert-control-sweep/disposition.md`.
+  it('the Wallpaper row is still inert: deferred to the wallpaper picker (F-046 G4)', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.resolveTo(true);
     const fixture = TestBed.createComponent(ChatsSettingsPage);
@@ -143,6 +147,7 @@ describe('ChatsSettingsPage font size row', () => {
     const wall = [...el.querySelectorAll<HTMLButtonElement>('[data-testid="chats-settings-row"]')].find(
       (r) => r.getAttribute('aria-label') === 'Wallpaper',
     );
+    expect(wall).toBeDefined();
     wall?.click();
     fixture.detectChanges();
     expect(router.navigate).not.toHaveBeenCalled();

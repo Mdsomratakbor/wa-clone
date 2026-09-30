@@ -54,11 +54,18 @@ describe('ChatsSettingsPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/settings']);
   });
 
-  it('row activation is a no-op', () => {
+  // F-046: row 0 is `Wallpaper`, which F-046 deliberately left alone as a
+  // recorded deferral (wallpaper picker, capture-blocked until 2026-10-02). It
+  // is still inert, so the assertion is unchanged - only the name, which
+  // described the defect as though it were the intent. `disposition.md` owns the
+  // tracking. FR-006's real work is asserted separately below.
+  it('the Wallpaper row is still inert: deferred to the wallpaper picker (F-046 G4)', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
-    el.querySelectorAll<HTMLButtonElement>('[data-testid="chats-settings-row"]')[0]?.click();
+    const first = el.querySelectorAll<HTMLButtonElement>('[data-testid="chats-settings-row"]')[0];
+    expect(first?.getAttribute('aria-label') ?? first?.textContent?.trim()).toContain('Wallpaper');
+    first?.click();
     fixture.detectChanges();
     expect(router.navigate).not.toHaveBeenCalled();
   });

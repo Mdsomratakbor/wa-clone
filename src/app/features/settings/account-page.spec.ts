@@ -53,9 +53,15 @@ describe('AccountPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/settings']);
   });
 
-  it('row activation is a no-op (targets not in the design map)', () => {
+  // F-046: recorded deferral, not a decision. The Account rows still swallow
+  // activation; `disposition.md` names the Account & privacy screens as the
+  // destination. The assertion is unchanged, the name is not: "is a no-op"
+  // read like the intended behaviour of a finished screen.
+  it('Account rows are still inert: deferred to the Account & privacy feature (F-046 G4)', () => {
     const el = render();
-    el.querySelectorAll<HTMLButtonElement>('[data-testid="account-row"]')[0]?.click();
+    const rows = el.querySelectorAll<HTMLButtonElement>('[data-testid="account-row"]');
+    expect(rows.length).toBeGreaterThan(0);
+    rows[0]?.click();
     fixture.detectChanges();
     expect(el.querySelector('[data-testid="account-page"]')).not.toBeNull();
   });

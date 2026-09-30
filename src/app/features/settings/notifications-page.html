@@ -10,9 +10,11 @@
       <li class="notifications__row">
         @if (row.unavailable) {
           <!--
-            F-046 FR-006 and FR-011: a setting with no consumer. Not a chevron
-            button - that would fall through to onRowActivate and be a new silent
-            no-op. `Show previews` is the one wired row, and it is not unavailable.
+            F-046 FR-006 and FR-011: a setting with no consumer. Deliberately not
+            a chevron button - this screen used to route those to an
+            onRowActivate handler that navigated nowhere, and that is the silent
+            no-op this feature exists to remove. `Show previews` is the one wired
+            row, and it is not unavailable.
           -->
           <div
             class="notifications__switch-row notifications__row--unavailable"
