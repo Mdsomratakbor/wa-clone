@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 import { Composer } from './composer';
 import { PrefsStore } from '../../../core/prefs.store';
 
@@ -9,6 +10,7 @@ describe('Composer', () => {
     localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [Composer],
+      providers: [provideRouter([])],
     }).compileComponents();
     TestBed.inject(PrefsStore).reset();
   });
@@ -142,5 +144,72 @@ describe('Composer', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('.composer')?.getAttribute('role')).toBe('toolbar');
     expect(el.querySelector('.composer')?.getAttribute('aria-label')).toBe('Message composer');
+  });
+
+  describe('F-046 FR-004: every control is wired or honestly disabled', () => {
+    function control(fixture: ComponentFixture<Composer>, label: string): HTMLButtonElement {
+      return (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+        `[aria-label="${label}"]`,
+      )!;
+    }
+
+    it('routes Camera to the existing camera screen', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+      fixture = TestBed.createComponent(Composer);
+      fixture.detectChanges();
+      const camera = control(fixture, 'Camera');
+      expect(camera.disabled).toBe(false);
+      camera.click();
+      fixture.detectChanges();
+      expect(navSpy).toHaveBeenCalledWith(['/camera']);
+    });
+
+    ['Add attachment', 'Emoji stickers', 'Record audio'].forEach((label) => {
+      it(`renders ${label} as a genuinely disabled control`, () => {
+        fixture = TestBed.createComponent(Composer);
+        fixture.detectChanges();
+        const button = control(fixture, label);
+        // Visible and labelled, so the destination feature has a home...
+        expect(button).not.toBeNull();
+        expect(button.textContent).toBe('');
+        expect(button.getAttribute('aria-label')).toBe(label);
+        // ...but not activatable, so there is no tap left to swallow.
+        expect(button.disabled).toBe(true);
+      });
+    });
+
+    it('emits nothing when a disabled control is activated by mouse or keyboard', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+      fixture = TestBed.createComponent(Composer);
+      fixture.detectChanges();
+      let sent: string | undefined;
+      fixture.componentInstance.send.subscribe((v: string) => (sent = v));
+      ['Add attachment', 'Emoji stickers', 'Record audio'].forEach((label) => {
+        const button = control(fixture, label);
+        button.click();
+        button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+        button.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      });
+      fixture.detectChanges();
+      expect(sent).toBeUndefined();
+      expect(navSpy).not.toHaveBeenCalled();
+    });
+
+    it('leaves the live Send path working alongside the disabled controls', () => {
+      fixture = TestBed.createComponent(Composer);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      const input = el.querySelector<HTMLInputElement>('input.composer__input')!;
+      input.value = 'hello';
+      input.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      let sent: string | undefined;
+      fixture.componentInstance.send.subscribe((v: string) => (sent = v));
+      el.querySelector<HTMLButtonElement>('[aria-label="Send message"]')?.click();
+      fixture.detectChanges();
+      expect(sent).toBe('hello');
+    });
   });
 });

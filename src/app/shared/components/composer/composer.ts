@@ -6,6 +6,7 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { PrefsStore } from '../../../core/prefs.store';
 
 @Component({
@@ -18,6 +19,7 @@ export class Composer {
   readonly send = output<string>();
 
   private readonly prefs = inject(PrefsStore);
+  private readonly router = inject(Router);
 
   protected readonly draft = signal('');
 
@@ -42,5 +44,13 @@ export class Composer {
     }
     this.send.emit(body);
     this.draft.set('');
+  }
+
+  // F-046 FR-004: the camera screen already exists and is reachable from the tab
+  // bar, so this is real navigation rather than a stub. Capturing a photo and
+  // sending it back to the composer is the attachment pipeline's work, which
+  // this feature does not build.
+  protected onCamera(): void {
+    void this.router.navigate(['/camera']);
   }
 }

@@ -51,6 +51,18 @@
       box-shadow: inset 0 0 0 2px var(--wa-accent);
       border-radius: 6px;
     }
+
+    // F-046 FR-004: a disabled control must not still read as live. It keeps the
+    // accent hue so the design-verified row 2 layout is unchanged, but drops to
+    // the tertiary text colour and loses the pointer cursor and focus ring.
+    &:disabled {
+      color: var(--wa-text-tertiary);
+      cursor: default;
+    }
+
+    &:disabled:focus-visible {
+      box-shadow: none;
+    }
   }
 
   &__icon {
