@@ -4,6 +4,7 @@
   role="switch"
   [attr.aria-checked]="checked()"
   [attr.aria-label]="label()"
+  [disabled]="disabled()"
   (click)="onActivate()"
 >
   <span class="toggle__track" [class.toggle__track--on]="checked()">

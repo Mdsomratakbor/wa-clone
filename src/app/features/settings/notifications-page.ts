@@ -7,10 +7,6 @@ import { PrefsKey, PrefsStore } from '../../core/prefs.store';
 import { NOTIFICATIONS_ROWS, SettingsRowSeed } from './settings.seed';
 
 const TOGGLE_PREFS: Readonly<Record<string, PrefsKey>> = {
-  'notifications-sound': 'sound',
-  'notifications-vibrate': 'vibrate',
-  'notifications-popup': 'popup',
-  'notifications-light': 'light',
   'notifications-previews': 'showPreviews',
 };
 
@@ -38,7 +34,8 @@ export class NotificationsPage {
   }
 
   protected onToggle(key: PrefsKey, value: boolean): void {
-    // F-027: persisted toggles; notification consumer effects are later targets.
+    // F-027: persisted toggle. F-046 FR-006 makes this the only pref on this
+    // screen with a consumer - showPreviews gates the chat-list preview.
     this.store.set(key, value);
   }
 
@@ -46,9 +43,5 @@ export class NotificationsPage {
     if (id === 'back') {
       void this.router.navigate(['/settings']);
     }
-  }
-
-  protected onRowActivate(_row: SettingsRowSeed): void {
-    // F-017: sound/vibrate/popup sub-targets are later features.
   }
 }

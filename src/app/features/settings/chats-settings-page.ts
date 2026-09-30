@@ -8,7 +8,6 @@ import { CHATS_SETTINGS_ROWS, SettingsRowSeed } from './settings.seed';
 
 const TOGGLE_PREFS: Readonly<Record<string, PrefsKey>> = {
   'chats-enter-sends': 'enterKeySends',
-  'chats-media-visibility': 'mediaVisibility',
 };
 
 @Component({
@@ -35,7 +34,8 @@ export class ChatsSettingsPage {
   }
 
   protected onToggle(key: PrefsKey, value: boolean): void {
-    // F-027: persisted toggle; behaviors beyond Enter key sends are later targets.
+    // F-027: persisted toggle, and F-046 FR-006 makes this the only pref on this
+    // screen with a real consumer (composer.ts reads enterKeySends).
     this.store.set(key, value);
   }
 

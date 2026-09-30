@@ -41,8 +41,8 @@ describe('PrefsStore', () => {
   });
 
   it('reset clears storage and restores defaults', () => {
-    store.toggle('mediaVisibility');
-    store.toggle('sound');
+    store.toggle('showPreviews');
+    store.toggle('enterKeySends');
     store.setChatSort('name');
     store.reset();
     expect(store.prefs()).toEqual(DEFAULT_PREFS);
@@ -62,13 +62,57 @@ describe('PrefsStore', () => {
   it('accepts a v1 envelope, keeping the default chat sort', () => {
     localStorage.setItem(
       PREFS_KEY,
-      JSON.stringify({ version: 1, prefs: { ...DEFAULT_PREFS, sound: false } }),
+      JSON.stringify({ version: 1, prefs: { ...DEFAULT_PREFS, showPreviews: false } }),
     );
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({});
     const reloaded = TestBed.inject(PrefsStore);
-    expect(reloaded.prefs().sound).toBe(false);
+    expect(reloaded.prefs().showPreviews).toBe(false);
     expect(reloaded.chatSort()).toBe(DEFAULT_CHAT_SORT);
+  });
+
+  describe('F-046 FR-006: removed keys normalize away on load', () => {
+    it('drops the five removed keys from a persisted v4 snapshot without throwing', () => {
+      // A user who used the app before this feature has these keys on disk. The
+      // envelope version is deliberately not bumped, so hydrate() must normalize.
+      localStorage.setItem(
+        PREFS_KEY,
+        JSON.stringify({
+          version: 4,
+          prefs: {
+            ...DEFAULT_PREFS,
+            sound: false,
+            vibrate: false,
+            popup: false,
+            light: false,
+            mediaVisibility: false,
+          },
+          chatSort: 'name',
+        }),
+      );
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({});
+      const reloaded = TestBed.inject(PrefsStore);
+      expect(reloaded.prefs()).toEqual(DEFAULT_PREFS);
+      // And the rest of the envelope is still honoured, not discarded.
+      expect(reloaded.chatSort()).toBe('name');
+    });
+
+    it('keeps the two surviving prefs across the same reload', () => {
+      localStorage.setItem(
+        PREFS_KEY,
+        JSON.stringify({
+          version: 4,
+          prefs: { ...DEFAULT_PREFS, showPreviews: false, enterKeySends: false, sound: true },
+          chatSort: 'recent',
+        }),
+      );
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({});
+      const reloaded = TestBed.inject(PrefsStore);
+      expect(reloaded.prefs().showPreviews).toBe(false);
+      expect(reloaded.prefs().enterKeySends).toBe(false);
+    });
   });
 
   it('starts with the default profile (F-036)', () => {

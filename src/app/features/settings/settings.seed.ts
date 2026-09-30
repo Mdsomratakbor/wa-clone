@@ -16,6 +16,10 @@ export interface SettingsProfileSeed {
 export interface SettingsRowSeed {
   id: string;
   label: string;
+  // F-046: a preference with no consumer behind it. Distinct from a chevron row,
+  // because a chevron implies "opens a screen" while an unavailable setting is a
+  // switch that currently does nothing - and the two need different markup.
+  unavailable?: boolean;
 }
 
 export const SETTINGS_PROFILE: SettingsProfileSeed = {
@@ -43,14 +47,20 @@ export const CHATS_SETTINGS_ROWS: readonly SettingsRowSeed[] = [
   { id: 'chats-font-size', label: 'Font size' },
   { id: 'chats-keyboard', label: 'Keyboard' },
   { id: 'chats-enter-sends', label: 'Enter key sends' },
-  { id: 'chats-media-visibility', label: 'Media visibility' },
+  // F-046 FR-006: mediaVisibility had a live switch and no consumer. Marked
+  // unavailable and the key removed from PrefsStore.
+  { id: 'chats-media-visibility', label: 'Media visibility', unavailable: true },
 ];
 
 export const NOTIFICATIONS_ROWS: readonly SettingsRowSeed[] = [
-  { id: 'notifications-sound', label: 'Sound' },
-  { id: 'notifications-vibrate', label: 'Vibrate' },
-  { id: 'notifications-popup', label: 'Popup notification' },
-  { id: 'notifications-light', label: 'Light' },
+  // F-046 FR-006: sound, vibrate, popup and light had live switches and no
+  // consumer - there is no notification delivery in the app at all. Marked
+  // unavailable and the keys removed from PrefsStore. `notifications-previews`
+  // is NOT unavailable: it is wired to the chat-list preview (F-046 FR-006).
+  { id: 'notifications-sound', label: 'Sound', unavailable: true },
+  { id: 'notifications-vibrate', label: 'Vibrate', unavailable: true },
+  { id: 'notifications-popup', label: 'Popup notification', unavailable: true },
+  { id: 'notifications-light', label: 'Light', unavailable: true },
   { id: 'notifications-previews', label: 'Show previews' },
 ];
 

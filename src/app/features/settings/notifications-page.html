@@ -8,8 +8,22 @@
   <ul class="notifications__list" data-testid="notifications-list">
     @for (row of rows; track row.id) {
       <li class="notifications__row">
-        @let prefsKey = toggleKey(row.id);
-        @if (prefsKey) {
+        @if (row.unavailable) {
+          <!--
+            F-046 FR-006 and FR-011: a setting with no consumer. Not a chevron
+            button - that would fall through to onRowActivate and be a new silent
+            no-op. `Show previews` is the one wired row, and it is not unavailable.
+          -->
+          <div
+            class="notifications__switch-row notifications__row--unavailable"
+            data-testid="notifications-row"
+            [attr.data-testid-unavailable]="'true'"
+            [attr.aria-label]="row.label"
+          >
+            <span class="notifications__row-label">{{ row.label }}</span>
+            <app-toggle [label]="row.label" [disabled]="true" />
+          </div>
+        } @else if (toggleKey(row.id); as prefsKey) {
           <div
             class="notifications__switch-row"
             data-testid="notifications-row"
@@ -23,18 +37,21 @@
             />
           </div>
         } @else {
-          <button
-            type="button"
-            class="notifications__row-button"
+          <!--
+            Unreachable with the current seed: every Notifications row is either
+            unavailable or has a pref key. Rendered as a disabled switch rather
+            than omitted or, worse, a chevron, so that adding a row to the seed
+            can never recreate the silent no-op this feature removes.
+          -->
+          <div
+            class="notifications__switch-row notifications__row--unavailable"
             data-testid="notifications-row"
+            [attr.data-testid-unavailable]="'true'"
             [attr.aria-label]="row.label"
-            (click)="onRowActivate(row)"
           >
             <span class="notifications__row-label">{{ row.label }}</span>
-            <svg class="notifications__chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
-              <path d="M1.5 1 6.5 6.5 1.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </button>
+            <app-toggle [label]="row.label" [disabled]="true" />
+          </div>
         }
       </li>
     }

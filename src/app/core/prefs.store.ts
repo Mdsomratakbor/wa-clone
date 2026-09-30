@@ -2,22 +2,21 @@ import { Injectable, signal } from '@angular/core';
 
 export type PrefsKey =
   | 'enterKeySends'
-  | 'mediaVisibility'
-  | 'sound'
-  | 'vibrate'
-  | 'popup'
-  | 'light'
   | 'showPreviews';
 
 export type PrefsSnapshot = Record<PrefsKey, boolean>;
 
+// F-046 FR-006: sound, vibrate, popup, light and mediaVisibility were removed
+// because they had live toggles and no consumer - displaying a value in a switch's
+// own [checked] is not consuming it. `enterKeySends` (composer.ts) and
+// `showPreviews` (chat-list-item) are the two with a real behaviour behind them.
+//
+// The envelope version is deliberately NOT bumped. hydrate() merges
+// { ...DEFAULT_PREFS, ...envelope.prefs }, so a persisted snapshot still carrying
+// the removed keys normalizes to the defaults, and dropping five booleans is not
+// worth discarding every user's stored prefs.
 export const DEFAULT_PREFS: PrefsSnapshot = {
   enterKeySends: true,
-  mediaVisibility: true,
-  sound: true,
-  vibrate: true,
-  popup: true,
-  light: true,
   showPreviews: true,
 };
 
@@ -76,6 +75,24 @@ function clearStorage(key: string): void {
   } catch {
     // Ignore: storage unavailable.
   }
+}
+
+// F-046 FR-006: a blind { ...DEFAULT_PREFS, ...envelope.prefs } spread would carry
+// removed keys into the live snapshot, leaving the runtime state wider than the
+// PrefsSnapshot type. Keys not in DEFAULT_PREFS are dropped and missing ones take
+// the default, so a snapshot written before this feature still loads cleanly.
+function normalizePrefs(raw: Partial<PrefsSnapshot> | undefined): PrefsSnapshot {
+  const normalized = { ...DEFAULT_PREFS };
+  if (!raw) {
+    return normalized;
+  }
+  for (const key of Object.keys(DEFAULT_PREFS) as PrefsKey[]) {
+    const value = raw[key];
+    if (typeof value === 'boolean') {
+      normalized[key] = value;
+    }
+  }
+  return normalized;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -154,7 +171,7 @@ export class PrefsStore {
     if (envelope?.version !== 1 && envelope?.version !== 2 && envelope?.version !== 3 && envelope?.version !== PREFS_VERSION) {
       return;
     }
-    this.prefs.set({ ...DEFAULT_PREFS, ...envelope.prefs });
+    this.prefs.set(normalizePrefs(envelope.prefs));
     this.chatSort.set(envelope.chatSort ?? DEFAULT_CHAT_SORT);
     this.fontScale.set(isFontScale(envelope.fontScale) ? envelope.fontScale : DEFAULT_FONT_SCALE);
     this.profile.set({ ...DEFAULT_PROFILE, ...envelope.profile });

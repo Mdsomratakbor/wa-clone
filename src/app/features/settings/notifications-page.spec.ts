@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { NotificationsPage } from './notifications-page';
 import { NOTIFICATIONS_ROWS } from './settings.seed';
-import { PrefsStore } from '../../core/prefs.store';
+import { DEFAULT_PREFS, PrefsStore } from '../../core/prefs.store';
 
 describe('NotificationsPage', () => {
   let fixture: ComponentFixture<NotificationsPage>;
@@ -53,29 +53,71 @@ describe('NotificationsPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/settings']);
   });
 
-  it('row activation is a no-op', () => {
-    const router = TestBed.inject(Router);
-    spyOn(router, 'navigate').and.resolveTo(true);
+  it('F-046 FR-011: no row is a chevron button any more', () => {
     const el = render();
-    el.querySelectorAll<HTMLButtonElement>('[data-testid="notifications-row"]')[0]?.click();
-    fixture.detectChanges();
-    expect(router.navigate).not.toHaveBeenCalled();
+    // The @else branch that rendered a <button> is gone, so there is no longer a
+    // row that could fall through to an empty handler.
+    expect(el.querySelector('button[data-testid="notifications-row"]')).toBeNull();
+    expect(el.querySelector('.notifications__chevron')).toBeNull();
   });
 
-  it('renders every row as a switch bound to the store', () => {
+  it('renders every row as a switch, with only Show previews live', () => {
     const el = render();
     const rows = el.querySelectorAll<HTMLElement>('[data-testid="notifications-row"]');
     expect(rows.length).toBe(NOTIFICATIONS_ROWS.length);
-    expect(rows[0]?.querySelector('button[role="switch"]')).not.toBeNull();
     expect(el.querySelectorAll('button[role="switch"]').length).toBe(NOTIFICATIONS_ROWS.length);
-    expect(el.querySelector('button[role="switch"]')?.getAttribute('aria-checked')).toBe('true');
+    const switches = Array.from(
+      el.querySelectorAll<HTMLButtonElement>('button[role="switch"]'),
+    );
+    // F-046 FR-006: four rows have no consumer and are disabled; only the wired
+    // one is a live switch, and it is the one whose label matches the pref.
+    const live = switches.filter((s) => !s.disabled);
+    expect(live.length).toBe(1);
+    expect(live[0]?.getAttribute('aria-label')).toBe('Show previews');
   });
 
   it('toggling Show previews persists the change', () => {
     const el = render();
     const switches = el.querySelectorAll<HTMLButtonElement>('button[role="switch"]');
-    switches[4]?.click();
+    const previews = Array.from(switches).find(
+      (s) => s.getAttribute('aria-label') === 'Show previews',
+    );
+    previews?.click();
     fixture.detectChanges();
     expect(TestBed.inject(PrefsStore).prefs().showPreviews).toBe(false);
+  });
+
+  describe('F-046 FR-006: the four consumer-less settings are honestly disabled', () => {
+    ['Sound', 'Vibrate', 'Popup notification', 'Light'].forEach((label) => {
+      it(`renders ${label} as a disabled switch`, () => {
+        const el = render();
+        const sw = Array.from(
+          el.querySelectorAll<HTMLButtonElement>('button[role="switch"]'),
+        ).find((s) => s.getAttribute('aria-label') === label);
+        expect(sw).toBeDefined();
+        expect(sw?.disabled).toBe(true);
+      });
+    });
+
+    it('emits nothing when any of them is activated', () => {
+      const el = render();
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate').and.resolveTo(true);
+      el.querySelectorAll<HTMLButtonElement>('button[role="switch"]:disabled').forEach((s) => {
+        s.click();
+        s.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      });
+      fixture.detectChanges();
+      expect(TestBed.inject(PrefsStore).prefs()).toEqual(DEFAULT_PREFS);
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('keeps all five rows visible and labelled', () => {
+      const el = render();
+      const text = el.querySelector('[data-testid="notifications-list"]')?.textContent ?? '';
+      ['Sound', 'Vibrate', 'Popup notification', 'Light', 'Show previews'].forEach((label) => {
+        expect(text).toContain(label);
+      });
+    });
   });
 });

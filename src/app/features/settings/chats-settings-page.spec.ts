@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { provideRouter } from '@angular/router';
 import { ChatsSettingsPage } from './chats-settings-page';
 import { CHATS_SETTINGS_ROWS } from './settings.seed';
-import { PrefsStore } from '../../core/prefs.store';
+import { DEFAULT_PREFS, PrefsStore } from '../../core/prefs.store';
 
 describe('ChatsSettingsPage', () => {
   let fixture: ComponentFixture<ChatsSettingsPage>;
@@ -63,7 +63,7 @@ describe('ChatsSettingsPage', () => {
     expect(router.navigate).not.toHaveBeenCalled();
   });
 
-  it('renders Enter key sends and Media visibility as switches bound to the store', () => {
+  it('renders Enter key sends as a store-bound switch and Media visibility as a disabled one', () => {
     const el = render();
     const labelled = [
       ...el.querySelectorAll<HTMLElement>('[data-testid="chats-settings-row"]'),
@@ -75,8 +75,12 @@ describe('ChatsSettingsPage', () => {
 
     const switches = el.querySelectorAll<HTMLButtonElement>('button[role="switch"]');
     expect(switches.length).toBe(2);
+    // Enter key sends is the live, store-bound switch...
     expect(switches[0]?.getAttribute('aria-checked')).toBe('true');
-    expect(switches[1]?.getAttribute('aria-checked')).toBe('true');
+    expect(switches[0]?.disabled).toBe(false);
+    // ...and Media visibility is a switch-shaped row with no store behind it, so
+    // F-046 makes it disabled rather than a live toggle over nothing.
+    expect(switches[1]?.disabled).toBe(true);
   });
 
   it('keeps Wallpaper/Font size/Keyboard as chevron rows', () => {
@@ -94,6 +98,39 @@ describe('ChatsSettingsPage', () => {
     switches[0]?.click();
     fixture.detectChanges();
     expect(TestBed.inject(PrefsStore).prefs().enterKeySends).toBe(false);
-    expect(TestBed.inject(PrefsStore).prefs().mediaVisibility).toBe(true);
+  });
+
+  describe('F-046 FR-006: Media visibility is honestly disabled', () => {
+    it('renders it as a disabled switch, not a live toggle', () => {
+      const el = render();
+      const row = el.querySelector('[data-testid-unavailable="true"]');
+      expect(row?.textContent).toContain('Media visibility');
+      const sw = row?.querySelector<HTMLButtonElement>('button[role="switch"]');
+      expect(sw?.disabled).toBe(true);
+    });
+
+    it('is not a chevron button, so it cannot become a silent no-op', () => {
+      const el = render();
+      const row = el.querySelector('[data-testid-unavailable="true"]');
+      expect(row?.querySelector('.chats-settings__chevron')).toBeNull();
+    });
+
+    it('emits nothing when activated', () => {
+      const el = render();
+      const sw = el
+        .querySelector('[data-testid-unavailable="true"]')
+        ?.querySelector<HTMLButtonElement>('button[role="switch"]');
+      sw?.click();
+      sw?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      fixture.detectChanges();
+      expect(TestBed.inject(PrefsStore).prefs()).toEqual(DEFAULT_PREFS);
+    });
+
+    it('stays visible and labelled so the destination feature has a home', () => {
+      const el = render();
+      expect(
+        el.querySelector('[data-testid="chats-settings-list"]')?.textContent,
+      ).toContain('Media visibility');
+    });
   });
 });

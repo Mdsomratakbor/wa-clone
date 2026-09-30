@@ -15,9 +15,17 @@ describe('ChatListItem', () => {
   let fixture: ComponentFixture<ChatListItem>;
 
   beforeEach(async () => {
+    // F-046: the item now reads a pref, and Jasmine randomizes order, so the
+    // snapshot must be reset here or a sibling spec's pref leaks into these.
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [ChatListItem],
     }).compileComponents();
+    TestBed.inject(PrefsStore).reset();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   it('renders name, preview and timestamp', () => {
@@ -146,11 +154,6 @@ describe('ChatListItem', () => {
   });
 
   describe('F-046 FR-006: showPreviews gates the preview text', () => {
-    beforeEach(() => {
-      localStorage.clear();
-      TestBed.inject(PrefsStore).reset();
-    });
-
     function previewText(fixture: ComponentFixture<ChatListItem>): string {
       return (
         (fixture.nativeElement as HTMLElement).querySelector(
