@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideRouter, Router } from '@angular/router';
 import { ChatsPage } from './chats-page';
+import { AddModal } from '../new-chat-modal/add-modal';
 import { ChatStore } from '../../core/chat.store';
 import { PrefsStore } from '../../core/prefs.store';
 import { CHAT_SEED } from './chat-list.seed';
@@ -648,18 +650,36 @@ const options = [
       });
     });
 
-    it('keeps the sheet open when New community is activated (target is a later feature)', () => {
+    it('F-046 FR-002: New community is honestly disabled, not a silent no-op', () => {
       const router = TestBed.inject(Router);
       const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
       const el = fixture.nativeElement as HTMLElement;
       openModal(el);
+      const before = TestBed.inject(ChatStore).conversations().length;
       const newCommunity = Array.from(
         el.querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]'),
       ).find((b) => b.textContent?.trim() === 'New community');
+      // It stays visible and labelled, but the user cannot activate it at all.
+      expect(newCommunity).toBeDefined();
+      expect(newCommunity?.disabled).toBe(true);
       newCommunity?.click();
       fixture.detectChanges();
+      expect(navSpy).not.toHaveBeenCalled();
+      expect(TestBed.inject(ChatStore).conversations().length).toBe(before);
+    });
+
+    it('F-046 FR-002: an unhandled add action dismisses the modal rather than leaving it open', () => {
+      const router = TestBed.inject(Router);
+      const navSpy = spyOn(router, 'navigate').and.resolveTo(true);
+      const el = fixture.nativeElement as HTMLElement;
+      openModal(el);
       expect(el.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
-      expect(el.querySelector('[data-testid="chat-list"]')).not.toBeNull();
+      const modal = fixture.debugElement
+        .query(By.directive(AddModal))
+        .componentInstance as AddModal;
+      modal.action.emit('new-action-that-does-not-exist');
+      fixture.detectChanges();
+      expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
       expect(navSpy).not.toHaveBeenCalled();
     });
 

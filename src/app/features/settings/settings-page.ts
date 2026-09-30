@@ -129,7 +129,9 @@ export class SettingsPage {
       void this.router.navigate(['/settings/data-storage']);
       return;
     }
-    // F-011: the remaining target (More) is a later feature.
+    // F-046 FR-003: an unhandled id must never leave the sheet open with nothing
+    // having happened. Same safety as calls-page.ts: unknown -> dismiss.
+    this.onDismissSettings();
   }
 
   protected onDismissSettings(): void {

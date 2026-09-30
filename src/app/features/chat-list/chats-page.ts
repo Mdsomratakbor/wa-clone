@@ -203,7 +203,9 @@ export class ChatsPage {
       void this.router.navigate(['/new-group']);
       return;
     }
-    // F-009: new community is a later feature (spec Non-Goals).
+    // F-046 FR-002: an unhandled id must never leave the modal open with nothing
+    // having happened. Same safety as calls-page.ts: unknown -> dismiss.
+    this.onDismissModal();
   }
 
   protected onDismissModal(): void {

@@ -3,7 +3,9 @@ import { Action } from '../../shared/components/action-sheet/action-sheet.model'
 export const SETTINGS_ACTIONS: readonly Action[] = [
   { id: 'settings-notifications', label: 'Notifications' },
   { id: 'settings-storage', label: 'Storage' },
-  { id: 'settings-more', label: 'More' },
+  // F-046 FR-003: the overflow destination list does not exist. F-011 deferred
+  // it, so this row swallowed a tap with the sheet open. Disabled instead.
+  { id: 'settings-more', label: 'More', disabled: true },
 ];
 
 export interface SettingsProfileSeed {

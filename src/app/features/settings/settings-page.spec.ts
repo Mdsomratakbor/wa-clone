@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideRouter, Router } from '@angular/router';
 import { PrefsStore } from '../../core/prefs.store';
 import { SettingsPage } from './settings-page';
+import { ActionSheet } from '../../shared/components/action-sheet/action-sheet';
 import { SETTINGS_ROWS } from './settings.seed';
 
 describe('SettingsPage', () => {
@@ -201,16 +203,35 @@ describe('SettingsPage', () => {
     expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
   });
 
-  it('keeps the sheet open with no navigation for the More row', () => {
+  it('F-046 FR-003: the More row is honestly disabled, not a silent no-op', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
     el.querySelector<HTMLButtonElement>('[data-testid="settings-options"]')?.click();
     fixture.detectChanges();
-    el.querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[2]?.click();
+    const more = el.querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[2];
+    // It stays visible and labelled, but the user cannot activate it at all.
+    expect(more?.textContent?.trim()).toBe('More');
+    expect(more?.disabled).toBe(true);
+    more?.click();
     fixture.detectChanges();
     expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('F-046 FR-003: an unhandled overflow action dismisses the sheet rather than leaving it open', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+    el.querySelector<HTMLButtonElement>('[data-testid="settings-options"]')?.click();
+    fixture.detectChanges();
     expect(el.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
+    const sheet = fixture.debugElement
+      .query(By.directive(ActionSheet))
+      .componentInstance as ActionSheet;
+    sheet.action.emit('settings-action-that-does-not-exist');
+    fixture.detectChanges();
+    expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
+    expect(router.navigate).not.toHaveBeenCalled();
   });
 
   it('dismisses on backdrop and restores focus to the trigger', () => {
