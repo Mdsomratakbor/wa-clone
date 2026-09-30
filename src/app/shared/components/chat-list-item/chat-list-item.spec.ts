@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ChatListItem } from './chat-list-item';
 import { ChatPreview } from '../../../features/chat-list/chat.model';
+import { PrefsStore } from '../../../core/prefs.store';
 
 const CHAT: ChatPreview = {
   id: 'chat-001',
@@ -142,5 +143,60 @@ describe('ChatListItem', () => {
     fixture.detectChanges();
     el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('[data-testid^="read-tick-"]')).toBeNull();
+  });
+
+  describe('F-046 FR-006: showPreviews gates the preview text', () => {
+    beforeEach(() => {
+      localStorage.clear();
+      TestBed.inject(PrefsStore).reset();
+    });
+
+    function previewText(fixture: ComponentFixture<ChatListItem>): string {
+      return (
+        (fixture.nativeElement as HTMLElement).querySelector(
+          '[data-testid="preview-text-chat-001"]',
+        )?.textContent?.trim() ?? ''
+      );
+    }
+
+    it('shows the preview by default', () => {
+      fixture = TestBed.createComponent(ChatListItem);
+      fixture.componentRef.setInput('chat', CHAT);
+      fixture.detectChanges();
+      expect(previewText(fixture)).toBe('Bro, I have a good idea!');
+    });
+
+    it('hides the preview text when showPreviews is off', () => {
+      TestBed.inject(PrefsStore).set('showPreviews', false);
+      fixture = TestBed.createComponent(ChatListItem);
+      fixture.componentRef.setInput('chat', CHAT);
+      fixture.detectChanges();
+      expect(previewText(fixture)).toBe('');
+    });
+
+    it('keeps the name, timestamp and read ticks while the preview is hidden', () => {
+      TestBed.inject(PrefsStore).set('showPreviews', false);
+      fixture = TestBed.createComponent(ChatListItem);
+      fixture.componentRef.setInput('chat', { ...CHAT, read: true });
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      // Read state is not message content, so the ticks stay visible...
+      expect(el.querySelector('[data-testid="read-tick-chat-001"]')).not.toBeNull();
+      // ...and the row is still identifiable.
+      expect(el.querySelector('.chat-list-item__name')?.textContent).toBe('Maximillian Jacobson');
+      expect(el.querySelector('.chat-list-item__timestamp')?.textContent).toBe('10/30/19');
+    });
+
+    it('restores the preview when the pref is turned back on', () => {
+      const prefs = TestBed.inject(PrefsStore);
+      prefs.set('showPreviews', false);
+      fixture = TestBed.createComponent(ChatListItem);
+      fixture.componentRef.setInput('chat', CHAT);
+      fixture.detectChanges();
+      expect(previewText(fixture)).toBe('');
+      prefs.set('showPreviews', true);
+      fixture.detectChanges();
+      expect(previewText(fixture)).toBe('Bro, I have a good idea!');
+    });
   });
 });

@@ -99,7 +99,11 @@
           stroke-linejoin="round"
         />
       </svg>
-      <span class="chat-list-item__preview-text">{{ chat().preview }}</span>
+      <span class="chat-list-item__preview-text" [attr.data-testid]="'preview-text-' + chat().id">
+        @if (showPreviewText()) {
+          {{ chat().preview }}
+        }
+      </span>
     </p>
   </div>
 </div>
