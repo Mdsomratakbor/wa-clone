@@ -82,7 +82,7 @@ Grepped across `src/`, excluding specs:
 
 | Method | Location | Callers |
 | ------ | -------- | ------- |
-| `ChatStore.createBroadcast` | `chat.store.ts:143` | specs only |
+| `ChatStore.createBroadcast` | `chat.store.ts:143` | specs only — **see the correction below** |
 | `ChatStore.broadcastRecipients` | `chat.store.ts:276` | specs only |
 | `ChatStore.setConversations` | `chat.store.ts:370` | specs only |
 
@@ -90,7 +90,21 @@ Grepped across `src/`, excluding specs:
 and nothing in the app ever asks it to, so `/broadcasts` shows its empty state permanently. The gap
 audit already records this ("createBroadcast() ships without a UI caller").
 
-`setConversations` is more concerning: it looks like a test seam that became public API.
+**Correction, made during T7 implementation.** The "specs only" column was not enough to act on.
+`createBroadcast` has ~15 call sites across `chat.store.spec.ts`, `broadcasts-page.spec.ts` and
+`chats-page.spec.ts`, because it is the only way to get a broadcast into the store — and it is
+F-042's own mandated deliverable (its FR-002). Deleting it would have meant rewriting an unrelated
+suite to reach past the store's public API, while fixing nothing a user can see: the empty state
+stays empty either way, because the real gap is the create *form* (B3), already deferred. It is
+retained, with the reason recorded in the store and in `disposition.md`.
+
+The other two are genuinely dead and were deleted: `broadcastRecipients` was a **byte-identical
+duplicate** of `groupParticipants` (`return this.resolveContactNames(chatId)` in both), and
+`setConversations` overwrote the whole list and persisted — a test seam that had become public API.
+Its one test-fixture use was repointed at the public `deleteConversation`.
+
+The lesson generalises: "no production caller" is a signal to look, not a conclusion. Counting
+callers is not the same as knowing whether a method is load-bearing.
 
 ### 3b. Prefs written but read by nothing — verified
 
@@ -112,6 +126,9 @@ message preview, no notification, no ring, no flash consults them. A user who di
 `Popup notification` has been told their phone will be quiet and it will not be.
 `chats-settings-page.ts:37` and `notifications-page.ts:41` are honest in comments ("behaviors beyond
 Enter key sends are later targets"), but a comment is not a consumer.
+
+`showPreviews` was subsequently wired to the chat-list preview (FR-006); the other five were
+disabled and their keys removed.
 
 This is the same defect class as the inert rows: a control that looks functional, is functional in
 the narrow sense that it updates a signal, and changes nothing observable.

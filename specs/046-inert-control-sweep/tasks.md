@@ -97,16 +97,21 @@ are independent of each other and of T1. T10 is the closure gate and depends on 
 
 ## Phase 5: Dead store methods, the filter, and Notifications
 
-- [ ] **T7** FR-007 — remove the 3 caller-less `ChatStore` methods
-  - **Spec**: FR-007
-  - **Files**: `src/app/core/chat.store.ts`
-  - **Do**: delete `createBroadcast` (`:143`), `broadcastRecipients` (`:276`), `setConversations`
-    (`:370`). All three have zero non-spec callers, re-verified with a recursive search. The
-    broadcast create feature re-adds what it needs; `research.md` §3a records why the empty state
-    shows permanently.
-  - **Tests**: the calls specs that currently exercise these must be **deleted with the methods**,
-    not left failing; add no replacement. The broadcasts screen's empty state must still render.
-  - **Verify**: build; suite green; `npm run build` shows no unused-import error.
+- [ ] **T7** FR-007 — remove the 2 genuinely dead `ChatStore` methods, keep `createBroadcast`
+  - **Spec**: FR-007 (as corrected by Clarification 4), research.md §3a
+  - **Files**: `src/app/core/chat.store.ts`, `src/app/core/chat.store.spec.ts`,
+    `src/app/features/chat-list/chats-page.spec.ts`
+  - **Do**: delete `broadcastRecipients` (a byte-identical duplicate of `groupParticipants`) and
+    `setConversations` (a test seam masquerading as public API). **Keep** `createBroadcast` — it is
+    F-042 FR-002's mandated capability, the only way to put a broadcast in the store, and 15 test
+    call sites depend on it. The missing *UI* caller is recorded in `disposition.md` as the B3
+    create-form gap.
+  - **Tests**: repoint the two `broadcastRecipients` assertions at `groupParticipants` — the
+    behaviour is real, only the duplicate name is gone. Replace `setConversations([])` in
+    `chats-page.spec.ts` with the public `deleteConversation` loop, which exercises real store code
+    rather than reaching past it. Delete `setConversations overrides the list` outright: its subject
+    no longer exists, which is not the FR-010 case (that rule covers tests pinning *inertness*).
+  - **Verify**: build; suite green; no non-spec caller remains for the two deleted methods.
   - **Commit**: `feat`.
 
 - [ ] **T8** FR-008 — the Calls `All` / `Missed` filter actually filters

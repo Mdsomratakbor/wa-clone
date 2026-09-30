@@ -49,6 +49,16 @@ gap audit and the shipped code.
    that the gap audit's B10 wording is wrong. The "3 sub-screens" destination is therefore **not**
    real work and is dropped from the disposition table.
 
+4. **Q (raised during implementation, T7): FR-007 said all three caller-less `ChatStore` methods
+   must be deleted. `createBroadcast` turned out to have ~15 call sites across 3 spec files and to be
+   F-042's own mandated capability. Delete it or keep it?**
+   A (**implementation, ratified**): **keep `createBroadcast`, delete the other two.** The audit's
+   "no production caller" finding was true but too thin to act on: the method is F-042 FR-002's
+   deliverable and the only way to put a broadcast into the store, so deleting it would have meant
+   rewriting an unrelated suite to reach past the store's API. The real defect is the missing
+   *create form* (B3), which the owner already deferred. FR-007 was corrected to cover only the two
+   genuinely dead methods, with the reason recorded in the store.
+
 ## Problem
 
 After F-035…F-045, a forward-only sweep of the shipped surface found that most screens are clean
@@ -193,8 +203,11 @@ destination or an owner."
 - **FR-006** Each of the six consumer-less `PrefsStore` booleans must gain a real consumer, or its
   control must become honestly disabled, or the key must be removed. A live toggle over state that
   nothing reads is not an acceptable end state.
-- **FR-007** `ChatStore.createBroadcast`, `ChatStore.broadcastRecipients`, and
-  `ChatStore.setConversations` must each gain a production caller or be deleted.
+- **FR-007** `ChatStore.broadcastRecipients` and `ChatStore.setConversations` must be deleted.
+  `broadcastRecipients` was a byte-identical duplicate of `groupParticipants`; `setConversations`
+  overwrote the whole list and looked like a test seam that had become public API.
+  `ChatStore.createBroadcast` is **retained, not deleted** — see Clarification 4, which corrected
+  this requirement after implementation showed the audit's evidence was too thin.
 - **FR-008** The Calls `All` / `Missed` filter must either filter the list for real, or be rendered
   honestly disabled. `Missed` must not be permanently disabled with no path to enabled.
 - **FR-009** The feature must produce a disposition table covering every control the audit found,
