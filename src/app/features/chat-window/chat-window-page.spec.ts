@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatWindowPage } from './chat-window-page';
+import { ChatActionsModal } from './chat-actions-modal';
 import { CallStore } from '../../core/call.store';
 import { ChatStore } from '../../core/chat.store';
 import { PrefsStore } from '../../core/prefs.store';
@@ -350,18 +352,39 @@ describe('ChatWindowPage', () => {
     expect(rows.map((r) => r.textContent?.trim())).toEqual(['Mute', 'Wallpaper', 'More']);
   });
 
-  it('keeps the sheet open when a row is activated (targets are later features)', () => {
+  it('F-046 FR-001: the Wallpaper row is honestly disabled, not a silent no-op', () => {
     fixture = TestBed.createComponent(ChatWindowPage);
     fixture.detectChanges();
-    (fixture.nativeElement as HTMLElement)
-      .querySelector<HTMLButtonElement>('[data-testid="chat-header__more"]')
-      ?.click();
+    openSheet(fixture);
+    const wallpaper = sheetRows(fixture)[1] as HTMLButtonElement;
+    // It stays visible and labelled, so the wallpaper feature has somewhere to land...
+    expect(wallpaper.textContent?.trim()).toBe('Wallpaper');
+    // ...but the user cannot activate it at all, so there is no tap left to swallow.
+    expect(wallpaper.disabled).toBe(true);
+
+    const store = TestBed.inject(ChatStore);
+    navSpy.calls.reset();
+    wallpaper.click();
     fixture.detectChanges();
-    (fixture.nativeElement as HTMLElement)
-      .querySelectorAll<HTMLButtonElement>('[data-testid="action-sheet-row"]')[1]
-      ?.click();
-    fixture.detectChanges();
+    expect(navSpy).not.toHaveBeenCalled();
+    expect(store.isMuted('chat-006')).toBe(false);
     expect(fixture.nativeElement.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
+  });
+
+  it('F-046 FR-001: an unhandled chat action dismisses the sheet rather than leaving it open', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    openSheet(fixture);
+    expect(fixture.nativeElement.querySelector('[data-testid="action-sheet"]')).not.toBeNull();
+    // Driven through the modal's public output because a disabled row cannot be
+    // clicked, so the fall-through is unreachable from the DOM. This is the real
+    // production binding: the modal emits, the page's handler decides.
+    const modal = fixture.debugElement
+      .query(By.directive(ChatActionsModal))
+      .componentInstance as ChatActionsModal;
+    modal.action.emit('chat-action-that-does-not-exist');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[data-testid="action-sheet"]')).toBeNull();
   });
 
   it('dismisses on backdrop and restores focus to the More options trigger', () => {

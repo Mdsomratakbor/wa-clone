@@ -137,7 +137,11 @@ export class ChatWindowPage {
     if (id === 'chat-more') {
       this.chatActionsOpen.set(false);
       this.chatMoreOpen.set(true);
+      return;
     }
+    // F-046 FR-001: an unhandled id must never leave the sheet open with nothing
+    // having happened. Same safety as calls-page.ts: unknown -> dismiss.
+    this.onDismissChatActions();
   }
 
   protected onMoreAction(id: string): void {
