@@ -36,7 +36,7 @@ actually disabled — never a click-through no-op"); these are exactly that viol
 | Control | Location | Why inert |
 | ------- | -------- | --------- |
 | Chat actions `Wallpaper` | `chat-window-page.ts:132-141` | `onChatAction` branches on `chat-mute` and `chat-more` only; `chat-wallpaper` (in `CHAT_ACTIONS`, `chat-actions.seed.ts:5`) matches neither, and the sheet is not dismissed. **On design-verified row 2.** |
-| Add modal `New community` | `chats-page.ts:193-207` | Handles `new-contact` and `new-group`, then falls through with a comment. Unlike `calls-page.ts`, it does **not** dismiss the modal, so the sheet stays open. |
+| Add modal `New community` | `chat-list/chats-page.ts:194-208` | Handles `new-contact` and `new-group`, then falls through with a comment. Unlike `calls-page.ts`, it does **not** dismiss the modal, so the sheet stays open. |
 | Settings overflow `More` | `settings-page.ts:119-133` | Handles `settings-notifications` and `settings-storage`; `settings-more` (in `SETTINGS_ACTIONS`) matches neither, sheet stays open. |
 
 Contrast `calls-page.ts:127-129`, which carries an explicit comment explaining why it closes the
@@ -94,18 +94,24 @@ audit already records this ("createBroadcast() ships without a UI caller").
 
 ### 3b. Prefs written but read by nothing — verified
 
-`DEFAULT_PREFS` (`prefs.store.ts`) has 7 booleans. A grep for `prefs().` across every non-spec file
-in `src/app` returns **exactly one** hit:
+`DEFAULT_PREFS` (`prefs.store.ts:14-22`) has 7 booleans. A recursive search of every non-spec file
+under `src/` for `prefs()` returns 4 hits:
 
 ```
-composer.ts:32: if (!this.prefs.prefs().enterKeySends) {
+prefs.store.ts:128                     // persist(): writing the envelope
+chats-settings-page.html:20            // [checked]="prefs()[prefsKey]"
+notifications-page.html:20             // [checked]="prefs()[prefsKey]"
+composer.ts:32                         // if (!this.prefs.prefs().enterKeySends)
 ```
 
-So `mediaVisibility`, `sound`, `vibrate`, `popup`, `light`, and `showPreviews` are set by live
-toggles, persisted across reload, and read by nothing. A user who disables `Popup notification` has
-been told their phone will be quiet and it will not be. `chats-settings-page.ts:37` and
-`notifications-page.ts:40` are honest in comments ("behaviors beyond Enter key sends are later
-targets"), but a comment is not a consumer.
+So `enterKeySends` is the **only** pref whose value is consulted by behaviour. The other two template
+hits read the value only to render the switch's own `checked` state — that is displaying the
+setting, not acting on it. `mediaVisibility`, `sound`, `vibrate`, `popup`, `light`, and
+`showPreviews` are set by live toggles, persisted across reload, and change nothing anywhere: no
+message preview, no notification, no ring, no flash consults them. A user who disables
+`Popup notification` has been told their phone will be quiet and it will not be.
+`chats-settings-page.ts:37` and `notifications-page.ts:41` are honest in comments ("behaviors beyond
+Enter key sends are later targets"), but a comment is not a consumer.
 
 This is the same defect class as the inert rows: a control that looks functional, is functional in
 the narrow sense that it updates a signal, and changes nothing observable.
@@ -131,7 +137,30 @@ work and is not a destination for any deferral. The cleanup is FR-011: remove th
 handler and its dead template block, and replace the vacuous test with one covering the toggle
 behaviour that actually ships.
 
-## 5. Tests that pin the current inertness
+## 5. `ActionSheet` cannot currently express "disabled" — the enabling gap
+
+The obvious way to make an inert sheet row honest is to mark it disabled. That is **not possible
+today**:
+
+```
+src/app/shared/components/action-sheet/action-sheet.model.ts
+  export interface Action { id: string; label: string; icon?: string; }
+```
+
+No `disabled` field. And `action-sheet.html:23-30` renders every row as an unconditionally
+activatable `<button>` with `(click)="onAction(item.id)"`.
+
+A tempting wrong inference is that sheet actions already support `disabled`, because
+`calls-page.ts:58` does contain `{ id: 'clear', label: 'Clear', disabled: this.items().length === 0 }`.
+That is **`NavAction`** — the navigation bar's model — not `Action`. The two are unrelated despite
+similar names, and only the navigation bar honours the flag. Verified by reading
+`action-sheet.model.ts` and `action-sheet.html` directly.
+
+Consequence: FR-001/002/003 need `Action.disabled?: boolean` added, plus native `[disabled]` on the
+row button, **once**, before any row can be made honest. This is the feature's only shared-component
+change and it is an *extension*, not a new component.
+
+## 6. Tests that pin the current inertness
 
 These assert the status quo and must be **rewritten to the new disposition**, not deleted:
 
@@ -146,17 +175,27 @@ They are legitimate regression guards for the decisions they encode, and this fe
 those decisions. Rewriting them records the new decision; deleting them would just erase the
 evidence.
 
-## 6. Controls that are hard-disabled rather than inert
+## 7. Controls that are hard-disabled rather than inert
 
 | Control | Location | Note |
 | ------- | -------- | ---- |
 | Calls `All` / `Missed` filter | `calls-page.html:14-24` | Both carry literal `disabled`, no handler, and `Missed` never becomes enabled. This satisfies `AGENTS.md`'s "actually disabled" rule literally, but the control set can never filter. `specs/004-calls/spec.md:21` called it "static in feature 004" and nothing revisited it. |
 
+Wiring the Calls filter is cheaper than it looks: `isMissedCall` (`calls.model.ts:67`) is already
+exported and **already live** — `call-list-item.ts` uses it to render the missed icon. It simply has
+no consumer on the list itself, so the filter is a `computed` over the existing `items()` plus the
+active-filter signal, with no store change.
+
+An earlier draft of this section claimed `isMissedCall` had zero callers. That came from a PowerShell
+`src\app\**\*.ts` search that did not recurse, and it was wrong; `call-list-item.ts:2,19` are live
+callers. The same unreliable glob made the add-modal citation above wrong. Both were re-derived with
+`Get-ChildItem -Recurse`.
+
 `MediaPage.onTileActivate` (`media-page.ts:58-62`) is also empty, but it is **F-044's declared
 FR-006 behaviour** — a focusable tile with no viewer behind it because the design has no media
 viewer. Treated as accepted, not a defect, and out of scope here.
 
-## 7. Verified already-functional (so the sweep does not redo it)
+## 8. Verified already-functional (so the sweep does not redo it)
 
 Each was re-read, not assumed:
 
@@ -177,7 +216,7 @@ Each was re-read, not assumed:
   create, chats edit-mode actions, sort, search, starred rows, auth keypad + `Continue`, camera
   `Close`.
 
-## 8. Sequencing rationale
+## 9. Sequencing rationale
 
 Two questions went to the owner on 2026-09-29:
 

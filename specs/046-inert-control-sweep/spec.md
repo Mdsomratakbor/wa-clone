@@ -58,8 +58,8 @@ Three shapes of defect, in increasing severity:
 1. **The silent no-op.** A handler with a chain of `if (id === …)` branches that no branch matches,
    and which does not dismiss the sheet. The user taps, nothing happens, and the sheet stays open.
    The click is swallowed with no feedback at all. Examples: chat-actions `Wallpaper`
-   (`chat-window-page.ts:132`), add-modal `New community` (`chats-page.ts:193`), settings-overflow
-   `More` (`settings-page.ts:119`).
+   (`chat-window-page.ts:132`), add-modal `New community` (`chat-list/chats-page.ts:194`),
+   settings-overflow `More` (`settings-page.ts:119`).
 2. **The unbound button.** A real `<button>` with no `(click)` attribute and no corresponding
    component method — so it is focusable and keyboard-activatable but swallows activation.
    Example: the four composer icons (`composer.html:2,18,28,49`).
@@ -231,9 +231,13 @@ destination or an owner."
 - **G2** — `npm run build` green; **full** unit suite green with the exact count reported.
 - **G3** — Closure with the disposition table complete, and every deferral naming a destination
   feature.
-- **G4** — The functional directive: **no control in the shipped surface swallows activation
-  silently.** This is this feature's own definition of done, and it is verified by reading state, not
-  by checking that a label changed.
+- **G4** — The functional directive, **scoped to this feature's disposition set**: every control F-046
+  touches must end in one of exactly two states — wired to real state, or genuinely disabled. There
+  is no third state, and no control may be left swallowing activation while still looking live.
+  This gate deliberately does **not** claim the whole surface is clean: per Clarification 2 the
+  ~20 empty-handler rows (Account, Data-and-storage, Chats settings, Contact info, Status, Camera)
+  are left for their own features and will still be inert. They are recorded in `disposition.md`
+  with a named destination so the remainder is tracked work, not a forgotten gap.
 
 ## Out of Scope Changes
 
