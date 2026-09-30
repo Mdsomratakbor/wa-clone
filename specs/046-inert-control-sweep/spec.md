@@ -2,7 +2,11 @@
 
 **Feature Branch**: `feature/inert-control-sweep`
 **Created**: 2026-09-29
-**Status**: Draft — requires `/speckit.clarify` before planning
+**Status**: **Complete** — clarified (5 passes), planned, implemented, closed. G2/G3/G4 done within
+their stated scope; G1 not applicable. Evidence in `tasks.md` "Closure" and `disposition.md`.
+Two requirements changed during implementation, both recorded as clarifications rather than quiet
+edits: FR-007 was narrowed to 2 methods (Clarification 4) and FR-008's means were corrected
+(Clarification 5).
 **Input**: Forward-only inert-control audit of the shipped surface, per the owner project directive
 of 2026-09-29 ("every control must be functional, not display-only"). Evidence and citations in
 `research.md`.
