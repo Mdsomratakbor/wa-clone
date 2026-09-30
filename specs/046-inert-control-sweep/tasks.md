@@ -115,16 +115,23 @@ are independent of each other and of T1. T10 is the closure gate and depends on 
   - **Commit**: `feat`.
 
 - [ ] **T8** FR-008 — the Calls `All` / `Missed` filter actually filters
-  - **Spec**: FR-008
-  - **Files**: `src/app/features/calls/calls-page.ts`, `calls-page.html`
-  - **Do**: remove the literal `disabled` from both buttons; add an active-filter signal and a
-    `computed` over `items()` that filters on the existing, already-live `isMissedCall`
-    (`calls.model.ts:67`, used by `call-list-item.ts:2,19`). `Missed` must have a path to enabled —
-    that is the point of the requirement. Apply the active class to the selected filter.
-  - **Tests**: `All` shows every entry; `Missed` shows only missed ones; a list with no missed
-    entries shows the existing empty state; the filter survives a reload; clicking the active filter
-    is idempotent.
-  - **Verify**: build; suite green.
+  - **Spec**: FR-008, Clarification 5, research.md §5a
+  - **Files**: `calls-page.ts`, `calls-page.html`, `calls-page.spec.ts`, `calls.model.ts`,
+    `../../shared/components/call-list-item/call-list-item.spec.ts`
+  - **Do**: remove the literal `disabled` from both buttons; add a `filter` signal
+    (`'all' | 'missed'`) and derive `items` from it. **Do not persist the filter** — F-046 has no
+    persistence scope, so the original "the filter survives a reload" line was wrong and is not
+    implemented. Fix `isMissedCall` to consult `outcome` first, falling back to `direction`
+    (Clarification 5). Unknown filter id falls back to `all`. `Clear` keys off the unfiltered log,
+    so it stays available from an empty filtered slice instead of offering to wipe calls the user is
+    not currently looking at.
+  - **Tests**: rewrite the two tests asserting `disabled === true` (spec:42, spec:119) to assert the
+    pills are enabled and track `aria-pressed`. New: All default; Missed narrows; All restores;
+    **a call this app placed that was never answered appears under Missed**; an answered one does
+    not; an empty filtered slice shows the empty state; unknown id falls back. Add a
+    `call-list-item` guard for outcome-driven missed styling.
+  - **Verify**: revert `isMissedCall` and confirm exactly the 2 outcome tests fail, then restore.
+    Build; suite green.
   - **Commit**: `feat`.
 
 - [ ] **T9** FR-011 — remove Notifications' unreachable handler and dead `<button>` branch

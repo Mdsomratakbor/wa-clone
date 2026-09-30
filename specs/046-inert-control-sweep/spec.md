@@ -58,6 +58,19 @@ gap audit and the shipped code.
    rewriting an unrelated suite to reach past the store's API. The real defect is the missing
    *create form* (B3), which the owner already deferred. FR-007 was corrected to cover only the two
    genuinely dead methods, with the reason recorded in the store.
+5. **Q (raised during implementation, T8): `plan.md` said to build the Calls filter on the
+   existing `isMissedCall`. That helper reads `direction === 'missed'`, but F-045's `endCall`
+   records `direction: 'outgoing'` for every call this app places and stores the real result in
+   `outcome` (`call.store.ts:130-137`). Is `isMissedCall` correct as written?**
+   A (**implementation, ratified**): **no — it is stale, and it is fixed here.** A call placed
+   from this app and never answered is stored as `outgoing` + `outcome: 'missed'`, so the helper
+   returned `false` for precisely the row the Missed filter exists to find. Building the filter on
+   it would have shipped a control that was enabled, styled as working, and showed nothing — the
+   same class of defect this feature exists to remove, one commit later. `isMissedCall` now consults
+   `outcome` when present and falls back to `direction` for an un-normalized entry
+   (`hydrate()` normalizes it for loaded snapshots, `call.store.ts:53`). FR-008's requirement is
+   unchanged; only the means were wrong. The fix also repairs `call-list-item`'s missed styling,
+   which was wrong for these rows since F-045.
 
 ## Problem
 

@@ -130,6 +130,33 @@ Enter key sends are later targets"), but a comment is not a consumer.
 `showPreviews` was subsequently wired to the chat-list preview (FR-006); the other five were
 disabled and their keys removed.
 
+### 5a. `isMissedCall` was live but semantically stale — found while wiring the filter
+
+`plan.md` called `isMissedCall` "live" evidence that missed-call styling already worked, and
+instructed T8 to build the filter on it. Live, yes — but wrong, and checking call sites would not
+have shown it. The two `CallDirection` and `CallOutcome` fields had been allowed to disagree:
+
+| Source | `direction` | `outcome` | `isMissedCall` (old) |
+| ------ | ----------- | --------- | -------------------- |
+| `calls.seed.ts` missed rows | `missed` | absent | `true` ✓ |
+| `endCall` after connecting | `outgoing` | `completed` | `false` ✓ |
+| `endCall` hung up before connect | `outgoing` | `missed` | **`false` ✗** |
+
+The last row is the defect: a call this app placed that rang out unanswered — the single call the
+Missed filter most needs to surface — was reported as not missed, because `endCall` writes
+`direction: 'outgoing'` unconditionally (`call.store.ts:130-137`) and puts the truth in `outcome`.
+Wiring the filter to the old helper would have produced an enabled, correctly-styled control that
+displayed nothing, which is a worse failure than the disabled one it replaced: the disabled filter
+was at least honest about being unfinished.
+
+The same staleness had been silently degrading `call-list-item`'s missed styling since F-045, for
+every call the app placed itself.
+
+Fixed in FR-008, with a fallback to `direction` for un-normalized entries (`hydrate()` sets
+`outcome` from `direction` for pre-F-045 snapshots, `call.store.ts:53`). Both new tests were
+verified to fail against the old implementation before being committed — a green test that cannot
+fail proves nothing.
+
 This is the same defect class as the inert rows: a control that looks functional, is functional in
 the narrow sense that it updates a signal, and changes nothing observable.
 
