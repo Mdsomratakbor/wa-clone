@@ -140,6 +140,12 @@ export class ChatStore {
     return id;
   }
 
+  // F-046 FR-007: createBroadcast was flagged as caller-less, but the audit's
+  // evidence was too thin to act on. It has no production UI caller, which is
+  // the deferred B3 create form - but it is F-042's mandated store capability
+  // (FR-002) and the only way to get a broadcast into the store, so the
+  // broadcasts-page suite seeds through it in 15 places. Retained deliberately;
+  // the missing caller is recorded in disposition.md as the create-form gap.
   createBroadcast(name: string, recipientIds: readonly string[] = []): string {
     const trimmed = name.trim();
     if (trimmed.length === 0) {
@@ -273,9 +279,8 @@ export class ChatStore {
     return this.resolveContactNames(chatId);
   }
 
-  broadcastRecipients(chatId: string): readonly string[] {
-    return this.resolveContactNames(chatId);
-  }
+  // F-046 FR-007: broadcastRecipients was a byte-identical duplicate of
+  // groupParticipants with no caller. Removed.
 
   conversationKind(chatId: string): ChatKind {
     return this.conversations().find((c) => c.id === chatId)?.kind ?? 'direct';
@@ -367,10 +372,9 @@ export class ChatStore {
     ids.forEach((id) => this.deleteConversation(id));
   }
 
-  setConversations(list: readonly ChatPreview[]): void {
-    this.conversations.set(list);
-    this.persist();
-  }
+  // F-046 FR-007: setConversations looked like a test seam that had become public
+  // API - it overwrites the whole list and persists, with no production caller.
+  // Removed; specs seed through the store's own methods.
 
   openConversation(chatId: string): void {
     this.conversations.update((chats) =>

@@ -70,11 +70,6 @@ describe('ChatStore', () => {
     expect(store.conversations().every((chat) => chat.read === true)).toBe(true);
   });
 
-  it('setConversations overrides the list', () => {
-    store.setConversations([]);
-    expect(store.conversations().length).toBe(0);
-  });
-
   it('createConversation appends an empty-thread conversation with a unique id', () => {
     const id1 = store.createConversation();
     const id2 = store.createConversation();
@@ -554,22 +549,22 @@ describe('ChatStore', () => {
     expect(second).toBe(`broadcast-${Number(suffix) + 2}`);
   });
 
-  it('broadcastRecipients resolves current names and drops deleted contacts (F-042 FR-002b)', () => {
+  it('groupParticipants resolves current names and drops deleted contacts (F-046 FR-007)', () => {
     const first = store.contactConversations()[0];
     const second = store.contactConversations()[1];
     const id = store.createBroadcast('Live recipients', [first.id, second.id, 'chat-missing']);
 
-    expect(store.broadcastRecipients(id)).toEqual([first.contactName, second.contactName]);
+    expect(store.groupParticipants(id)).toEqual([first.contactName, second.contactName]);
 
     store.updateContact(first.id, 'Renamed Recipient');
-    expect(store.broadcastRecipients(id)).toEqual(['Renamed Recipient', second.contactName]);
+    expect(store.groupParticipants(id)).toEqual(['Renamed Recipient', second.contactName]);
 
     store.deleteConversation(second.id);
-    expect(store.broadcastRecipients(id)).toEqual(['Renamed Recipient']);
+    expect(store.groupParticipants(id)).toEqual(['Renamed Recipient']);
   });
 
-  it('broadcastRecipients is empty for an unknown chat (F-042 FR-002b)', () => {
-    expect(store.broadcastRecipients('broadcast-404')).toEqual([]);
+  it('groupParticipants is empty for an unknown chat (F-046 FR-007)', () => {
+    expect(store.groupParticipants('broadcast-404')).toEqual([]);
   });
 
   it('broadcasts lists only broadcasts, in insertion order (F-042 FR-004)', () => {
@@ -621,7 +616,7 @@ describe('ChatStore', () => {
 
     expect(broadcast?.kind).toBe('broadcast');
     expect(broadcast?.participantIds).toEqual([contact.id]);
-    expect(reloaded.broadcastRecipients(id)).toEqual([contact.contactName]);
+    expect(reloaded.groupParticipants(id)).toEqual([contact.contactName]);
     expect(reloaded.broadcasts().map((chat) => chat.id)).toEqual([id]);
   });
 

@@ -114,7 +114,11 @@ describe('ChatsPage', () => {
   });
 
   it('renders an empty placeholder when the store has no conversations', () => {
-    TestBed.inject(ChatStore).setConversations([]);
+    // F-046 FR-007: setConversations is gone. deleteConversation is the public
+    // path to an empty list, and it exercises the real store code rather than
+    // reaching past it to overwrite the signal.
+    const store = TestBed.inject(ChatStore);
+    store.conversations().forEach((chat) => store.deleteConversation(chat.id));
     fixture = TestBed.createComponent(ChatsPage);
     fixture.detectChanges();
     const empty = fixture.nativeElement.querySelector('[data-testid="empty-state"]');
