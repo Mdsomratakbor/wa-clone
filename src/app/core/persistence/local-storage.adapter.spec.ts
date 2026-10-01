@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
+import { appConfig } from '../../app.config';
 import { LocalStorageAdapter } from './local-storage.adapter';
+import { PersistencePort } from './persistence.port';
 import { PERSISTENCE_KEY } from '../chat.store';
 
 describe('LocalStorageAdapter', () => {
@@ -7,7 +9,10 @@ describe('LocalStorageAdapter', () => {
 
   beforeEach(() => {
     localStorage.clear();
-    TestBed.configureTestingModule({});
+    // The real appConfig, so this suite cannot pass on a binding the app does not
+    // have. Configuring once here also means `TestBed.inject` below is the first
+    // injector access — TestBed refuses providers added after that point.
+    TestBed.configureTestingModule({ providers: appConfig.providers });
     adapter = TestBed.inject(LocalStorageAdapter);
   });
 
@@ -73,6 +78,21 @@ describe('LocalStorageAdapter', () => {
       expect(raw).not.toBeNull();
       expect(JSON.parse(raw as string)).toEqual(snapshot);
       expect(adapter.read(PERSISTENCE_KEY)).toBe(raw);
+    });
+  });
+
+  describe('F-047 FR-009: the port itself resolves at the root', () => {
+    // `providedIn: 'root'` on LocalStorageAdapter registers LocalStorageAdapter.
+    // `extends PersistencePort` is a *compile-time* relationship that Angular's
+    // injector knows nothing about, so on its own it registers no binding for the
+    // abstract token. This test is the only thing that notices: written against
+    // the real appConfig, it failed with NG0201 before the provider was added.
+    it('resolves PersistencePort to a working LocalStorageAdapter', () => {
+      const port = TestBed.inject(PersistencePort);
+
+      expect(port).toBeInstanceOf(LocalStorageAdapter);
+      port.write('k', 'v');
+      expect(port.read('k')).toBe('v');
     });
   });
 });

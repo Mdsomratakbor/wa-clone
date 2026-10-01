@@ -5,7 +5,9 @@ unit tests, build green.
 
 ## Phase 1: Cover the untested failure paths (before touching anything)
 
-- [ ] **T001** FR-007a — write the two missing failure-path tests against the **current** code
+- [x] **T001** FR-007a — write the two missing failure-path tests against the **current** code
+  - **Commit**: `142ef06`. **Verified**: written and passing against the *unmodified* stores; suite
+    **598/598** across three randomized runs (no order dependence).
   - **Spec**: FR-007a, FR-006, FR-007; research §7
   - **Files**: `src/app/core/prefs.store.spec.ts` (new corrupt-JSON test),
     `src/app/core/chat.store.spec.ts` / `call.store.spec.ts` / `prefs.store.spec.ts`
@@ -26,7 +28,9 @@ unit tests, build green.
 
 ## Phase 2: The port and its adapter (no store changes yet)
 
-- [ ] **T002** FR-001, FR-002, FR-009, FR-012 — add `PersistencePort` + `LocalStorageAdapter`
+- [x] **T002** FR-001, FR-002, FR-009, FR-012 — add `PersistencePort` + `LocalStorageAdapter`
+  - **Commit**: `5281b97` (port + adapter), plus the T002 follow-up below. **Verified**: build green,
+    **607/607** twice.
   - **Spec**: FR-001, FR-002, FR-009, FR-012; plan "Approach"
   - **Files**: **new** `src/app/core/persistence/persistence.port.ts`,
     **new** `src/app/core/persistence/local-storage.adapter.ts`
@@ -43,6 +47,15 @@ unit tests, build green.
     `getItem`/`setItem` cases return `null` / no-op without throwing.
   - **Verify**: build; suite green with the count **unchanged at 588** plus the new adapter tests.
   - **Commit**: `feat`.
+  - **Follow-up, same task (FR-009 was not actually met by `5281b97`)**: the FR-009 binding test was
+    written **first** and failed with `ɵNotFound: NG0201: No provider found for PersistencePort`. The
+    cause: Angular's injector has no notion of inheritance, so `extends PersistencePort` registers no
+    binding for the abstract token and `providedIn: 'root'` binds only the concrete class. Every store
+    would have injected `null` and thrown at runtime, while the build stayed green. Fixed with
+    `{ provide: PersistencePort, useClass: LocalStorageAdapter }` in `app.config.ts` — which is what
+    FR-009 actually asks for and is not an FR-008 violation (`app.config.ts` is not under `features/`
+    or `shared/`). `plan.md`'s "Why no `app.config.ts` change" section was **factually wrong** and has
+    been corrected in place with the failing-test evidence, rather than quietly left to mislead.
 
 ## Phase 3: Point the stores at the port
 

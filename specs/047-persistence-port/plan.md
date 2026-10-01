@@ -38,11 +38,31 @@ export abstract class PersistencePort {
 changing, not of where bytes are stored. Moving it behind the port would also make the port
 model-aware, and a port that understands envelopes is not a transport.
 
-### Why no `app.config.ts` change
+### Why `app.config.ts` **does** need a provider entry
 
-`LocalStorageAdapter` is `@Injectable({ providedIn: 'root' })`. Angular's root injector satisfies the
-abstract-class dependency without a provider list, so FR-009 is met with zero bootstrap changes and
-zero component changes (FR-008).
+> **Corrected during implementation (F-047 T002).** This section originally read "Why no
+> `app.config.ts` change" and claimed that `providedIn: 'root'` alone lets the root injector satisfy the
+> abstract-class dependency. **That was wrong**, and the claim was only ever plausible-looking: Angular's
+> injector has no notion of inheritance, and `class LocalStorageAdapter extends PersistencePort` is a
+> compile-time relationship the runtime never sees. `providedIn: 'root'` registers exactly one token —
+> `LocalStorageAdapter`. The `PersistencePort` token got no binding, and every store constructor would
+> have injected `null` and thrown `NG0201` on its first `read`, in the browser, at runtime.
+>
+> The failure was found by writing the test first
+> (`local-storage.adapter.spec.ts` → "the port itself resolves at the root", asserting against the real
+> `appConfig.providers`): `ɵNotFound: NG0201: No provider found for PersistencePort`. The fix is the
+> explicit binding `{ provide: PersistencePort, useClass: LocalStorageAdapter }`.
+>
+> **FR-009 is unchanged and still met** — the port is provided at the app root with `LocalStorageAdapter`
+> as the default, no store lists a provider, and no component changes (FR-008 holds; `app.config.ts` is
+> not under `features/` or `shared/`). Only the *mechanism* the plan mispredicted changed. Left in place
+> uncorrected, the false claim would have read as a decision rather than an error.
+
+`LocalStorageAdapter` keeps `providedIn: 'root'` **as well as** the `app.config.ts` binding. The two are
+not redundant and the difference is load-bearing: `providedIn: 'root'` is what lets any test ask for the
+concrete adapter directly, while the `PersistencePort` binding is what lets a store ask for the seam. A
+test that swaps the port does so by overriding *one* token, and `LocalStorageAdapter` remains resolvable
+for the FR-006 byte-compatibility test without a second provider.
 
 ## File plan
 
@@ -50,7 +70,8 @@ zero component changes (FR-008).
 | ---- | ------ |
 | `src/app/core/persistence/persistence.port.ts` | **new** — `PersistencePort` abstract class, with the HTTP caveat in its doc comment (FR-012) |
 | `src/app/core/persistence/local-storage.adapter.ts` | **new** — `LocalStorageAdapter`, `@Injectable({ providedIn: 'root' })`; the only `window.localStorage` reference in `core` (FR-002) |
-| `src/app/core/persistence/local-storage.adapter.spec.ts` | **new** — adapter behaviour incl. the throwing-`localStorage` cases |
+| `src/app/core/persistence/local-storage.adapter.spec.ts` | **new** — adapter behaviour incl. the throwing-`localStorage` cases, plus the FR-009 root-binding test |
+| `src/app/app.config.ts` | **edit** — bind `PersistencePort` → `LocalStorageAdapter` (FR-009; the "why no change" claim above was corrected after NG0201) |
 | `src/app/core/persistence/in-memory.port.ts` | **new** — test double implementing the port, for proving the seam (FR-010) |
 | `src/app/core/chat.store.ts` | inject the port; delete `readStorage`/`writeStorage`/`clearStorage` (`:58,66,74`) (FR-003, FR-004) |
 | `src/app/core/call.store.ts` | inject the port; delete `readStorage`/`writeStorage` (`:25,33`) (FR-003, FR-004) |
@@ -81,6 +102,11 @@ production bundle by path convention is a fake that eventually ships.
 5. **`prefs.store.spec.ts` has no corrupt-JSON test** (research §7). FR-007a requires writing one
    against current code. If it fails, that is a live defect in `prefs.store.ts:158-163` and gets
    reported, not absorbed.
+6. **`extends PersistencePort` reads like a provider binding and is not one** (realised during T002 —
+   see the corrected section above). This one earned a risk entry of its own because the failure mode is
+   invisible to the compiler: `providedIn: 'root'` compiles, the build is green, and the defect only
+   surfaces as `NG0201` in a running app. The general lesson — an abstract class chosen *precisely
+   because* it fails loudly when unsatisfied provides no such guarantee for the token that extends it.
 
 ## Drift Policy
 
