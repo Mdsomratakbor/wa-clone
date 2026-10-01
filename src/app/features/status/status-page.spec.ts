@@ -1,11 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { StatusPage } from './status-page';
+import { StatusStore } from '../../core/status.store';
 
 describe('StatusPage', () => {
   let fixture: ComponentFixture<StatusPage>;
 
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [StatusPage],
       providers: [provideRouter([])],
@@ -39,11 +41,49 @@ describe('StatusPage', () => {
     expect(el.querySelector('[data-testid="status-note"]')).not.toBeNull();
   });
 
-  it('renders the tip with the no-recent-updates message', () => {
+  it('renders the tip with the no-recent-updates message when nothing is published', () => {
     const el = render();
     const tip = el.querySelector('[data-testid="status-tip"]');
     expect(tip).not.toBeNull();
     expect(tip?.textContent).toContain('No recent updates to show right now.');
+    expect(el.querySelector('[data-testid="status-mine"]')).toBeNull();
+  });
+
+  it('the published status replaces the tip in a live region (FR-009)', () => {
+    const store = TestBed.inject(StatusStore);
+    store.publish('at the beach', 1);
+    const el = render();
+
+    const mine = el.querySelector('[data-testid="status-mine"]');
+    expect(mine).not.toBeNull();
+    expect(mine?.getAttribute('role')).toBe('status');
+    expect(mine?.textContent).toContain('at the beach');
+    expect(el.querySelector('[data-testid="status-tip"]')).toBeNull();
+  });
+
+  it('the My Status subtitle follows the published status (FR-010)', () => {
+    const store = TestBed.inject(StatusStore);
+    const el = render();
+    expect(el.querySelector('[data-testid="status-my-subtitle"]')?.textContent?.trim()).toBe(
+      'Add to my status',
+    );
+    fixture.destroy();
+
+    store.publish('on the move', 1);
+    const second = render();
+    expect(
+      second.querySelector('[data-testid="status-my-subtitle"]')?.textContent?.trim(),
+    ).toBe('on the move');
+  });
+
+  it('renders a status containing markup as that literal text (FR-011)', () => {
+    const store = TestBed.inject(StatusStore);
+    store.publish('<img src=x onerror=alert(1)>', 1);
+    const el = render();
+
+    const text = el.querySelector('[data-testid="status-mine"]')?.textContent;
+    expect(text).toContain('<img src=x onerror=alert(1)>');
+    expect(el.querySelector('[data-testid="status-mine"] img')).toBeNull();
   });
 
   it('renders the tab bar with Status active and no FAB', () => {

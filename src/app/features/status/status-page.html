@@ -36,7 +36,7 @@
         </div>
         <div class="status-page__copy">
           <p class="status-page__name">My Status</p>
-          <p class="status-page__subtitle">Add to my status</p>
+          <p class="status-page__subtitle" data-testid="status-my-subtitle">{{ subtitle() }}</p>
         </div>
         <div class="status-page__actions">
           <button
@@ -74,9 +74,15 @@
         </div>
       </div>
 
-      <div class="status-page__tip" data-testid="status-tip" role="status">
-        <p class="status-page__tip-text">No recent updates to show right now.</p>
-      </div>
+      @if (myStatus(); as status) {
+        <div class="status-page__mine" data-testid="status-mine" role="status">
+          <p class="status-page__mine-text">{{ status.text }}</p>
+        </div>
+      } @else {
+        <div class="status-page__tip" data-testid="status-tip" role="status">
+          <p class="status-page__tip-text">No recent updates to show right now.</p>
+        </div>
+      }
     </div>
   } @else {
     <div class="status-page__stub" role="status" data-testid="tab-stub">

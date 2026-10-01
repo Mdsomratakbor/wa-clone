@@ -4,6 +4,7 @@ import { NavAction, TabItem, TabKey } from '../chat-list/chat.model';
 import { NavigationBar } from '../../shared/components/navigation-bar/navigation-bar';
 import { TabBar } from '../../shared/components/tab-bar/tab-bar';
 import { UserAvatar } from '../../shared/components/avatar/user-avatar';
+import { StatusStore } from '../../core/status.store';
 
 const TAB_KEYS: readonly TabKey[] = ['settings', 'chats', 'camera', 'calls', 'status'];
 const TAB_LABELS: Record<TabKey, string> = {
@@ -23,8 +24,16 @@ const TAB_LABELS: Record<TabKey, string> = {
 })
 export class StatusPage {
   private readonly router = inject(Router);
+  private readonly status = inject(StatusStore);
 
   protected readonly activeTab = signal<TabKey>('status');
+
+  // F-049: the design only shows the empty variant of this row, so the published
+  // subtitle is provisional. Not truncated: a truncation rule is unsourced, and a
+  // truncated status is one the user cannot read in full.
+  protected readonly myStatus = this.status.myStatus;
+
+  protected readonly subtitle = computed(() => this.myStatus()?.text ?? 'Add to my status');
 
   protected readonly tabs = computed<TabItem[]>(() =>
     TAB_KEYS.map((key) => ({ key, label: TAB_LABELS[key], active: key === this.activeTab() })),

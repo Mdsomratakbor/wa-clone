@@ -133,6 +133,30 @@
     color: var(--wa-text-secondary);
   }
 
+  // F-049: mirrors &__tip's treatment exactly. The design contains no published
+  // status, so reusing the element it replaces invents no new value.
+  &__mine {
+    min-height: 43px;
+    margin-top: 35px;
+    display: flex;
+    align-items: center;
+    padding-left: 67px;
+    box-sizing: border-box;
+    background: var(--wa-surface-variant);
+    border-top: 0.33px solid rgba(60, 60, 67, 0.29);
+    border-bottom: 0.33px solid rgba(60, 60, 67, 0.29);
+  }
+
+  &__mine-text {
+    margin: 0;
+    font-family: var(--wa-font-family);
+    font-size: var(--wa-fs-preview);
+    font-weight: var(--wa-fw-regular);
+    line-height: 16px;
+    color: var(--wa-text-secondary);
+    overflow-wrap: anywhere;
+  }
+
   &__stub {
     height: 100%;
     display: flex;
