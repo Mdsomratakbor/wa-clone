@@ -21,7 +21,8 @@
         data-testid="compose-send-text"
         type="button"
         aria-label="Type status"
-        (click)="onSendAlt()"
+        aria-describedby="compose-send-text-reason"
+        disabled
       >
         <svg width="19" height="23" viewBox="265.4 0.5 18.6 23" fill="none" aria-hidden="true">
           <path
@@ -38,6 +39,7 @@
         data-testid="compose-send"
         type="button"
         aria-label="Send status"
+        [disabled]="!canSend()"
         (click)="onSend()"
       >
         <svg width="24" height="24" viewBox="313.98 0 24.04 23.63" fill="none" aria-hidden="true">
@@ -50,11 +52,21 @@
         </svg>
       </button>
     </div>
+    <p class="compose__sr-only" id="compose-send-text-reason">
+      Sending a status to chosen contacts is not available in this app.
+    </p>
   </div>
 
-  <div class="compose__type" data-testid="compose-type" aria-hidden="true">
-    <p class="compose__placeholder">Type a status</p>
-    <span class="compose__caret"></span>
+  <div class="compose__type" data-testid="compose-type">
+    <input
+      class="compose__input"
+      data-testid="compose-input"
+      type="text"
+      placeholder="Type a status"
+      aria-label="Type a status"
+      [value]="value()"
+      (input)="onValue($event)"
+    />
   </div>
 
   <img

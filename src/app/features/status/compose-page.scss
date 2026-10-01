@@ -49,6 +49,18 @@
       border-radius: 6px;
       box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
     }
+
+    // F-049: the design shows no disabled variant, so this opacity is a
+    // provisional value - but a control that is disabled and looks enabled is its
+    // own small lie, and F-046 exists to stop those.
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+
+      &:focus-visible {
+        box-shadow: none;
+      }
+    }
   }
 
   &__type {
@@ -63,24 +75,45 @@
     justify-content: center;
   }
 
-  &__placeholder {
+  // F-049: carries the former placeholder's typography unchanged, so no new value
+  // enters the stylesheet. The real caret replaces the decorative .compose__caret.
+  &__input {
+    width: 100%;
     margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: center;
     font-family: 'Helvetica Neue', Arial, sans-serif;
     font-size: 38px;
     font-weight: 500;
     line-height: 1.2;
     letter-spacing: -0.0026em;
-    white-space: nowrap;
-    color: rgba(255, 255, 255, 0.74);
+    color: #fff;
+    caret-color: #fff;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.74);
+    }
+
+    &:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
   }
 
-  &__caret {
+  // F-049: the reason Send-alt is unavailable, available to assistive technology
+  // rather than living only in a source comment.
+  &__sr-only {
     position: absolute;
-    top: 2px;
-    left: 115px;
-    width: 2px;
-    height: 48px;
-    background: #fff;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
 
   &__keyboard {
