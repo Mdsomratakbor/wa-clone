@@ -222,4 +222,70 @@ describe('PrefsStore', () => {
     expect(store.fontScale()).toBe(DEFAULT_FONT_SCALE);
     expect(localStorage.getItem(PREFS_KEY)).toBeNull();
   });
+
+  describe('F-047 FR-007a: the failure paths, covered before anything is moved', () => {
+    // Written against the current implementation, and required to pass before
+    // the storage helpers move behind a port. See research.md section 7: chat and
+    // call both guarded JSON.parse, prefs did not, and no store tested an
+    // unavailable localStorage at all - so every branch those helpers exist for
+    // was untested.
+
+    // Jasmine restores a spyOn after each spec, so no manual teardown is needed.
+
+    function unavailableStorage(): void {
+      jasmine.getEnv().allowRespy(true);
+      spyOn(localStorage, 'getItem').and.throwError('SecurityError');
+      spyOn(localStorage, 'setItem').and.throwError('QuotaExceededError');
+      spyOn(localStorage, 'removeItem').and.throwError('SecurityError');
+    }
+
+    it('a corrupt payload falls back to defaults instead of throwing (chat and call already guard this)', () => {
+      localStorage.setItem(PREFS_KEY, 'not json at all{');
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({});
+
+      let recovered: PrefsStore | undefined;
+      expect(() => {
+        recovered = TestBed.inject(PrefsStore);
+      }).not.toThrow();
+      expect(recovered?.prefs()).toEqual(DEFAULT_PREFS);
+      expect(recovered?.chatSort()).toBe(DEFAULT_CHAT_SORT);
+      expect(recovered?.fontScale()).toBe(DEFAULT_FONT_SCALE);
+      expect(recovered?.profile()).toEqual(DEFAULT_PROFILE);
+    });
+
+    it('boots to defaults when localStorage is unavailable', () => {
+      unavailableStorage();
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({});
+
+      let recovered: PrefsStore | undefined;
+      expect(() => {
+        recovered = TestBed.inject(PrefsStore);
+      }).not.toThrow();
+      expect(recovered?.prefs()).toEqual(DEFAULT_PREFS);
+      expect(recovered?.profile()).toEqual(DEFAULT_PROFILE);
+    });
+
+    it('still applies changes in memory when persisting throws', () => {
+      // The distinction that matters: storage failure must not roll back or block
+      // the user's action. The value is held for this session and silently not
+      // persisted, which is the correct degradation.
+      store.set('showPreviews', false);
+      unavailableStorage();
+      expect(() => store.set('showPreviews', false)).not.toThrow();
+      expect(() => store.toggle('enterKeySends')).not.toThrow();
+      expect(() => store.setChatSort('name')).not.toThrow();
+      expect(() => store.updateProfile('Ada', 'hi')).not.toThrow();
+      expect(store.prefs().enterKeySends).toBe(false);
+      expect(store.chatSort()).toBe('name');
+      expect(store.profile()).toEqual({ name: 'Ada', about: 'hi' });
+    });
+
+    it('reset does not throw when removeItem is unavailable', () => {
+      unavailableStorage();
+      expect(() => store.reset()).not.toThrow();
+      expect(store.prefs()).toEqual(DEFAULT_PREFS);
+    });
+  });
 });

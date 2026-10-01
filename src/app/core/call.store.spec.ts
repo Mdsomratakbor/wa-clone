@@ -301,4 +301,46 @@ describe('CallStore', () => {
       expect(entry?.contactName).toBe('Nobody');
     });
   });
+
+  describe('F-047 FR-007a: storage-unavailable fallback', () => {
+    // CallStore is the store with no clearStorage and no reset() - research.md
+    // section 3. Its two helpers were still completely untested on the failure
+    // branch, which is the only branch these helpers exist for.
+
+    function unavailableStorage(): void {
+      jasmine.getEnv().allowRespy(true);
+      spyOn(localStorage, 'getItem').and.throwError('SecurityError');
+      spyOn(localStorage, 'setItem').and.throwError('QuotaExceededError');
+    }
+
+    it('boots to the seed when localStorage cannot be read', () => {
+      unavailableStorage();
+      let recovered: CallStore | undefined;
+      expect(() => {
+        recovered = new CallStore();
+      }).not.toThrow();
+      expect(recovered?.calls().length).toBe(CALL_SEED.length);
+      expect(recovered?.session()).toBeNull();
+    });
+
+    it('records the call in memory when persisting throws', () => {
+      unavailableStorage();
+      expect(() => store.startCall(MARTHA, 'voice', 0)).not.toThrow();
+      store.advance(CONNECT_AFTER_MS);
+      let ended: unknown;
+      expect(() => {
+        ended = store.endCall(CONNECT_AFTER_MS);
+      }).not.toThrow();
+      expect(ended).not.toBeNull();
+      expect(store.calls().length).toBe(CALL_SEED.length + 1);
+    });
+
+    it('removeCall and clearCalls do not throw when persisting throws', () => {
+      unavailableStorage();
+      expect(() => store.removeCall(CALL_SEED[0]!.id)).not.toThrow();
+      expect(store.calls().length).toBe(CALL_SEED.length - 1);
+      expect(() => store.clearCalls()).not.toThrow();
+      expect(store.calls()).toEqual([]);
+    });
+  });
 });

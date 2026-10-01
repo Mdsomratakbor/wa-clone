@@ -662,4 +662,41 @@ describe('ChatStore', () => {
     const id = store.createBroadcast('Status updates');
     expect(store.contact(id)?.name).toBe('Status updates');
   });
+
+  describe('F-047 FR-007a: storage-unavailable fallback', () => {
+    // No store tested this branch before F-047. Every one of the 8 storage
+    // helpers being consolidated exists to survive this, and none of them was
+    // ever exercised here. Written against the current implementation.
+
+    function unavailableStorage(): void {
+      jasmine.getEnv().allowRespy(true);
+      spyOn(localStorage, 'getItem').and.throwError('SecurityError');
+      spyOn(localStorage, 'setItem').and.throwError('QuotaExceededError');
+      spyOn(localStorage, 'removeItem').and.throwError('SecurityError');
+    }
+
+    it('boots to the seed when localStorage cannot be read', () => {
+      unavailableStorage();
+      let recovered: ChatStore | undefined;
+      expect(() => {
+        recovered = new ChatStore();
+      }).not.toThrow();
+      expect(recovered?.conversations().length).toBe(CHAT_SEED.length);
+    });
+
+    it('applies changes in memory when persisting throws', () => {
+      const before = store.conversations().length;
+      unavailableStorage();
+      expect(() => store.createConversation()).not.toThrow();
+      expect(() => store.sendMessage(THREADED_CONTACT_ID, 'offline')).not.toThrow();
+      expect(() => store.toggleStarred(THREADED_CONTACT_ID, 'msg-1')).not.toThrow();
+      expect(store.conversations().length).toBe(before + 1);
+      expect(store.conversationMessages(THREADED_CONTACT_ID).length).toBeGreaterThan(0);
+    });
+
+    it('reset does not throw when removeItem is unavailable', () => {
+      unavailableStorage();
+      expect(() => store.reset()).not.toThrow();
+    });
+  });
 });
