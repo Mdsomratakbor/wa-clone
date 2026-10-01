@@ -1,0 +1,21 @@
+<app-navigation-bar
+  title="Groups"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="groups" data-testid="groups-page" [attr.data-font-scale]="fontScale()">
+  @if (groups().length === 0) {
+    <div class="groups__empty" role="status" data-testid="groups-empty">
+      <p class="groups__empty-text">No groups</p>
+    </div>
+  } @else {
+    <ul class="groups__list" data-testid="groups-list" aria-label="Groups in common">
+      @for (group of groups(); track group.id) {
+        <li class="groups__row">
+          <app-chat-list-item [chat]="group" (selected)="onOpenChat(group.id)" />
+        </li>
+      }
+    </ul>
+  }
+</main>

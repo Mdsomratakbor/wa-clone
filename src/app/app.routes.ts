@@ -99,6 +99,13 @@ export const routes: Routes = [
       import('./features/contact-info/media-page').then((m) => m.MediaPage),
   },
   {
+    // F-048: shared-Groups sub-screen. Chrome is PROVISIONAL - no node exists
+    // for it in the design file.
+    path: 'contact/:id/groups',
+    loadComponent: () =>
+      import('./features/contact-info/groups-page').then((m) => m.GroupsPage),
+  },
+  {
     path: 'contact/:id/edit',
     loadComponent: () =>
       import('./features/contact-info/edit-contact-page').then((m) => m.EditContactPage),

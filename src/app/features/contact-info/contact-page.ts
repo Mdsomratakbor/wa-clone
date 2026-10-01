@@ -63,7 +63,11 @@ export class ContactPage {
       void this.router.navigate(['/starred-messages']);
       return;
     }
-    // contact-groups stays inert: it needs shared-group membership data the store
-    // does not have (gap audit B8, non-goal of specs/044-media-screen).
+    if (row.id === 'contact-groups') {
+      // F-048: shared-Groups sub-screen. The list is derived from the contact's
+      // group membership; the screen's own chrome is provisional while the
+      // capture is blocked.
+      void this.router.navigate(['/contact', this.chatId(), 'groups']);
+    }
   }
 }
