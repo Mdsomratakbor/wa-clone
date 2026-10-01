@@ -51,11 +51,8 @@ test.describe('Media, photos and links (feature 044)', () => {
     await expect(page.getByTestId('contact-page')).toBeVisible();
   });
 
-  test('the Groups row is still inert', async ({ page }) => {
-    await page.goto(`/contact/${WITH_MEDIA}`);
-    await page.getByRole('button', { name: 'Groups' }).click();
-
-    await expect(page).toHaveURL(new RegExp(`/contact/${WITH_MEDIA}$`));
-    await expect(page.getByTestId('contact-page')).toBeVisible();
-  });
+  // F-048: the "Groups row is still inert" assertion that used to live here is
+  // no longer true. The row now opens /contact/:id/groups, and that flow is
+  // covered in tests/e2e/contact-groups.spec.ts. It is deliberately not
+  // duplicated here: a second copy would only be a second place to update.
 });
