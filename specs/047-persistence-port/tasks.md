@@ -59,24 +59,34 @@ unit tests, build green.
 
 ## Phase 3: Point the stores at the port
 
-- [ ] **T003** FR-004, FR-010 — the test double, and the seam proof
-  - **Spec**: FR-010, FR-004
+- [x] **T003** FR-010 — the in-memory port double
+  - **Commit**: (this commit). **Verified**: build green, **613/613** (+6 double-contract tests).
+  - **Spec**: FR-010
   - **Files**: **new** `src/app/core/persistence/in-memory.port.ts`, `*.spec.ts`
-  - **Do**: an in-memory `PersistencePort` double. Per `research.md` §7, a **spy is not sufficient** —
-    prove (a) a store writes through the port, (b) a fresh store instance hydrates from that payload,
-    and (c) `LocalStorageAdapter` still writes the **same key and same bytes** as the pre-port code.
-    (c) is the FR-006 regression guard.
+  - **Do**: an in-memory `PersistencePort` double, plus a spec proving the double itself honours the
+    port contract. Per `research.md` §7, a **spy is not sufficient** — a spy asserts that a call
+    happened, not that the bytes round-trip, so it cannot catch a store that writes a payload a fresh
+    instance cannot read back.
   - **Verify**: build; suite green.
   - **Commit**: `feat`.
+  - **Reordered during implementation — see the note below.** The store-level seam proof (FR-010's
+    acceptance criterion) was originally assigned here, but it cannot be written in this task: a store
+    is not on the port until T004. That is a dependency inversion in the task plan, not a discovery
+    about the code. The proof moved to T004 rather than being written against something that does not
+    exist yet. No requirement was dropped — FR-010 still gets its assertion, from `chat.store.spec.ts`.
 
-- [ ] **T004** FR-003, FR-004, FR-005, FR-013 — `ChatStore` onto the port
-  - **Spec**: FR-003, FR-004, FR-005, FR-013
+- [ ] **T004** FR-003, FR-004, FR-005, FR-010, FR-013 — `ChatStore` onto the port
+  - **Spec**: FR-003, FR-004, FR-005, FR-010, FR-013
   - **Files**: `src/app/core/chat.store.ts`, `chat.store.spec.ts`
   - **Do**: inject `PersistencePort`; delete `readStorage`/`writeStorage`/`clearStorage` (`:58,66,74`);
     route `persist`/`hydrate`/`reset` through it. **Keep** snapshot shape, the `version !== 1` guard,
     and `normalizeChats` in the store (FR-005). `reset()` must still leave the key **removed**
     (FR-013). Update every `new ChatStore()` in the spec to pass a port.
-  - **Tests**: the existing 588 keep passing **unchanged**. No expectation edits.
+  - **Tests**: the existing 588 keep passing **unchanged**. No expectation edits. **Plus the FR-010 seam
+    proof, moved here from T003**: with an `InMemoryPersistencePort`, assert (a) a store action writes
+    the snapshot through the port, and (b) a payload already in the port hydrates a **fresh** store
+    instance. (b) is the assertion a spy cannot make. Also re-assert the FR-006 byte/key guard from
+    T002 to show the port and the adapter agree.
   - **Verify**: build; suite green at 588 **or higher**.
   - **Commit**: `feat`.
 
