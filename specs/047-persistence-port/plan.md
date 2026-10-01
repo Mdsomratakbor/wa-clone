@@ -96,7 +96,7 @@ were wrong. Left uncorrected, the original claim would have read as a decision r
 | `src/app/core/call.store.ts` | inject the port; delete `readStorage`/`writeStorage` (`:25,33`) (FR-003, FR-004) |
 | `src/app/core/prefs.store.ts` | inject the port; delete `readStorage`/`writeStorage`/`clearStorage` (`:56,64,72`) (FR-003, FR-004) |
 | `src/app/core/*.spec.ts` | supply a port at every `new XStore()` site; add the FR-007a gap tests |
-| `src/app/features/**`, `src/app/shared/**` | **untouched** (FR-008) — and this is load-bearing: the root binding lives on the token precisely so these 12 spec files need no provider |
+| `src/app/features/**`, `src/app/shared/**` | **untouched**, except `calls/calls-page.spec.ts` — one test-harness line plus its import, ratified by Clarification Q4 (FR-008 as amended). No component, template or style changed; the diff is load-bearing: the root binding lives on the token precisely so these spec files need no provider |
 
 `in-memory.port.ts` lives in `src/app/core/persistence/` rather than under a test folder because
 Angular's build does not special-case test helpers, and a fake that has to be excluded from the
@@ -131,6 +131,13 @@ production bundle by path convention is a fake that eventually ships.
    shipped app is invisible to all 12 page specs under `features/`, which FR-008 forbids editing. Any
    seam a component-level test reaches must be self-provisioning; "it works in the app" is not evidence
    that a test can reach it.
+8. **Risk 1 was right about the churn and the spec forbade the fix** (realised during T005). Risk 1
+   predicted `new XStore()` would stop compiling everywhere; FR-008's empty-diff clause forbade touching
+   the files where that happened. The plan and the spec were in direct disagreement before any code
+   existed, and neither was checked against the other. Escalated under Clarification Q4 and resolved by
+   amending FR-008 rather than weakening the seam. Worth carrying forward: a plan risk that describes a
+   necessary edit and a spec clause that forbids it is a contradiction to settle in `spec.md` **before**
+   the task that triggers it, not during.
 
 ## Drift Policy
 

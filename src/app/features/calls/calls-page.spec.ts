@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { CallStore } from '../../core/call.store';
 import { ChatStore } from '../../core/chat.store';
+import { LocalStorageAdapter } from '../../core/persistence/local-storage.adapter';
 import { CallsPage } from './calls-page';
 import { CALL_SEED } from './calls.seed';
 
@@ -324,7 +325,11 @@ describe('CallsPage', () => {
       expect(el.querySelectorAll('app-call-list-item').length).toBe(before - 1);
       expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
 
-      const reloaded = new CallStore();
+      // F-047 Clarification Q4: the mandatory PersistencePort parameter makes a bare
+      // `new CallStore()` uncompilable. Real adapter, not the in-memory double - this
+      // reload is asserting that the delete survived to storage, so it must read the
+      // same localStorage the page wrote through.
+      const reloaded = new CallStore(new LocalStorageAdapter());
       expect(reloaded.calls().some((call) => call.id === target.id)).toBe(false);
     });
 

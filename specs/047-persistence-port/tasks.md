@@ -110,7 +110,20 @@ unit tests, build green.
   - **Verify**: build; suite green at 588 **or higher**.
   - **Commit**: `feat`.
 
-- [ ] **T005** FR-003, FR-004, FR-005 — `CallStore` onto the port
+- [x] **T005** FR-003, FR-004, FR-005 — `CallStore` onto the port
+  - **Commit**: (this commit). **Verified**: build green, **620/620**. `CallStore`'s two helpers are
+    gone; it has no `reset()` and none was added. `clearCalls()` still writes an empty snapshot.
+  - **This task is where FR-004 and FR-008 turned out to be jointly unsatisfiable.**
+    `src/app/features/calls/calls-page.spec.ts:327` did `new CallStore()`, so the mandatory port
+    parameter was a build failure. Escalated rather than worked around, and **owner-answered**
+    (2026-10-01, Clarification Q4): amend FR-008 to exempt `*.spec.ts` files, keep the port mandatory.
+    `spec.md` FR-008 now retains its component/template/style prohibition and carries the superseded
+    wording as visible history rather than quietly reinterpreting it. One file changed under
+    `features/`: the import plus the one call site, using the **real** adapter, since that reload
+    asserts a delete survived to storage and must read the `localStorage` the page wrote through.
+    The rejected alternative was an optional `storage: PersistencePort = new LocalStorageAdapter()`
+    default — free in the diff, but it would route a bare `new CallStore()` to real `localStorage`,
+    which is the trap `plan.md` risk 1 names, and would forfeit FR-004's compile-time guarantee.
   - **Spec**: FR-003, FR-004, FR-005
   - **Files**: `src/app/core/call.store.ts`, `call.store.spec.ts`
   - **Do**: inject the port; delete `readStorage`/`writeStorage` (`:25,33`). **There is no
@@ -135,7 +148,10 @@ unit tests, build green.
   - **Files**: `tasks.md`, `spec.md`, `plan.md`, drift notes
   - **Do**:
     1. `grep -rE '^function (read|write|clear)Storage' src/app/core` returns **nothing** (FR-003).
-    2. `git diff --stat` over `src/app/features` and `src/app/shared` is **empty** (FR-008).
+    2. `git diff --stat` over `src/app/features` and `src/app/shared` contains **no non-`.spec.ts`
+     file**, and every `*.spec.ts` entry is a ratified test-harness fix listed by file and line
+     (FR-008 **as amended by Clarification Q4**; the original "must be empty" wording would not be
+     satisfiable — see the spec's superseded-wording block).
     3. One `window.localStorage` reference remains in `core`, inside the adapter (FR-002).
     4. Drift notes in all four artifacts in `plan.md` "Drift Policy".
     5. FR → test traceability table and gate evidence.

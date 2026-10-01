@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { CALL_PERSISTENCE_KEY, CallStore } from './call.store';
+import { LocalStorageAdapter } from './persistence/local-storage.adapter';
 import { CALL_SEED } from '../features/calls/calls.seed';
 import { CallTarget, CONNECT_AFTER_MS, DIALING_MS, RINGING_MS } from '../features/calls/calls.model';
 
@@ -317,7 +318,7 @@ describe('CallStore', () => {
       unavailableStorage();
       let recovered: CallStore | undefined;
       expect(() => {
-        recovered = new CallStore();
+        recovered = new CallStore(new LocalStorageAdapter());
       }).not.toThrow();
       expect(recovered?.calls().length).toBe(CALL_SEED.length);
       expect(recovered?.session()).toBeNull();

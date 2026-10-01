@@ -47,6 +47,25 @@ are relying on. Any of the three can be reopened without disturbing the rest of 
    disguised as a refactor, which is the thing FR-006 and the closing non-functional rule exist to
    prevent. The divergence is documented in research §3 instead.
 
+4. **Q4 — FR-004 and FR-008 are jointly unsatisfiable. How does the seam ship?**
+   **Owner-answered 2026-10-01: amend FR-008 to exempt spec files; keep the port mandatory.**
+   Found in T005, and it is structural rather than incidental. FR-004 makes the port a required
+   constructor parameter, so every `new XStore()` must pass one. `calls-page.spec.ts:327` does
+   `new CallStore()` directly, which meant a build failure. The two requirements could not both hold: the
+   strict reading of FR-008 forbids any edit under `src/app/features/**`, including the very edit FR-004
+   forces. `plan.md` risk 1 predicted this in advance — "`new ChatStore()` stops compiling everywhere...
+   it touches many spec files" — while FR-008 forbade exactly those files, so the plan and the spec
+   disagreed before a line of code was written.
+   The owner's ruling resolves it in FR-008's favour on intent and against its letter: **FR-008's stated
+   purpose is "No component may change"**, and a `.spec.ts` is not a component. The `git diff` clause was
+   an enforcement proxy for that intent, and it is the proxy, not the intent, that breaks. So FR-008 is
+   amended to keep its prohibition on components, templates and styles, and to exempt test-only changes.
+   Rejected alternative: an optional `storage: PersistencePort = new LocalStorageAdapter()` default,
+   which would have left `features/` untouched at no diff cost — but it silently routes a bare
+   `new CallStore()` to **real** `localStorage`, which is exactly the trap `plan.md` risk 1 warns about,
+   and it would give up the compile-time guarantee FR-004 was written to obtain. A one-line test-harness
+   fix is a smaller violation than a permanent weakening of the seam.
+
 ### Requirement consequences
 
 - **FR-012** (was NEEDS CLARIFICATION Q1) — the port is synchronous. Its doc comment must state that
@@ -133,8 +152,22 @@ a reader comparing the two documents should see which is right and why.
   — so the 8 functions being consolidated have an entirely untested failure path. Those tests are
   written **against the current implementation first, and must pass before the port lands**. A test
   that fails against today's code is a live defect to report, not an expectation to adjust.
-- **FR-008** No component may change. `git diff --stat` over `src/app/features` and
-  `src/app/shared` must be empty for this feature.
+- **FR-008** No component may change. No template, style, or non-test source file under
+  `src/app/features` or `src/app/shared` may change. `git diff --stat` over those two directories must
+  contain **no non-`.spec.ts` file**; a `*.spec.ts` change is permitted only where a required
+  constructor dependency made the existing call site uncompilable, and each such edit is listed by file
+  and line at closure. **Amended 2026-10-01 by Clarification Q4** (owner-answered): the original
+  wording — "`git diff --stat` must be empty" — is retained below as history, because it is the clause
+  that turned out to be unsatisfiable and a later reader needs to see that it was relaxed for a reason
+  rather than quietly reinterpreted.
+
+  > **Superseded wording (F-047 original FR-008):** "No component may change. `git diff --stat` over
+  > `src/app/features` and `src/app/shared` must be empty for this feature."
+
+  Rationale for the amendment: the requirement exists to protect components, templates and styles. The
+  empty-diff clause was a proxy for that intent, and it is the proxy that broke, because it made an edit
+  to a *test file* indistinguishable from a UI change. See Clarification Q4 for the contradiction this
+  uncovered and the rejected alternative.
 - **FR-009** The port must be provided at the app root with the `LocalStorageAdapter` as the default,
   so no store needs to list a provider and no test needs one for a happy path.
 - **FR-010** The adapter must be swappable in a test with a stub, and **at least one** store test

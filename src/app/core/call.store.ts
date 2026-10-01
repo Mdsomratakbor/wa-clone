@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { PersistencePort } from './persistence/persistence.port';
 import {
   CallEntry,
   CallKind,
@@ -21,22 +22,6 @@ interface CallStoreSnapshot {
 }
 
 const STORE_VERSION = 1;
-
-function readStorage(key: string): string | null {
-  try {
-    return window.localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-function writeStorage(key: string, value: string): void {
-  try {
-    window.localStorage.setItem(key, value);
-  } catch {
-    // Storage unavailable/blocked: persist is best-effort.
-  }
-}
 
 // F-045: `outcome` was added after v1 shipped, and hydrate() had no normalizer, so
 // a snapshot written before this feature loads with `outcome: undefined` and the
@@ -66,7 +51,7 @@ export class CallStore {
 
   private nextCallSeq = 0;
 
-  constructor() {
+  constructor(private readonly storage: PersistencePort) {
     this.hydrate();
   }
 
@@ -78,6 +63,10 @@ export class CallStore {
     this.persist();
   }
 
+  // F-013 preserved deliberately (research §3): unlike ChatStore.reset(), this
+  // *writes an empty snapshot* rather than removing the key. Normalizing it to
+  // remove the key would be a behaviour change nobody asked for, and would make
+  // "cleared" and "never had calls" indistinguishable on disk.
   clearCalls(): void {
     this.calls.set([]);
     this.persist();
@@ -177,11 +166,11 @@ export class CallStore {
       calls: this.calls(),
       nextCallSeq: this.nextCallSeq,
     };
-    writeStorage(CALL_PERSISTENCE_KEY, JSON.stringify(snapshot));
+    this.storage.write(CALL_PERSISTENCE_KEY, JSON.stringify(snapshot));
   }
 
   private hydrate(): void {
-    const raw = readStorage(CALL_PERSISTENCE_KEY);
+    const raw = this.storage.read(CALL_PERSISTENCE_KEY);
     if (raw === null) {
       return;
     }
