@@ -192,6 +192,13 @@ rewritten to a stronger form; each is called out rather than quietly replaced.
 | FR-004 | Composer: `Camera` wired, other 3 disabled | `composer.spec.ts` "F-046 FR-004: Camera navigates and the other three controls are honestly disabled" |
 | FR-005 | 11 Account/Data-storage rows recorded as deferred | `account-page.spec.ts` "Account rows are still inert: deferred to the Account & privacy feature (F-046 G4)"; `data-storage-page.spec.ts` "Data & storage rows are still inert: deferred to the storage feature (F-046 G4)"; plus `disposition.md` |
 | FR-006 | `showPreviews` wired; 5 consumer-less prefs disabled + keys removed | `chat-list-item.spec.ts` "F-046 FR-006: showPreviews gates the preview text" (4 tests); `notifications-page.spec.ts` "F-046 FR-006: four rows have no consumer and are disabled"; `chats-settings-page.spec.ts` media-visibility test; `prefs.store.spec.ts` v4-snapshot normalization + surviving-key tests |
+
+> **F-047 verification note (2026-10-01).** `plan.md`'s Drift Policy predicted "names are stable, so no
+> edit expected — verified at closure rather than assumed" for this row. Verified: the test names cited
+> above still exist and still pass in full. F-047 moved `PrefsStore` onto a `PersistencePort` (its
+> `v4`-snapshot normalization and removed-key tests were not touched), and those tests pass unchanged
+> against the port — which is stronger evidence than a name match, since they exercise the real
+> `LocalStorageAdapter` through the seam. No edit to the names themselves.
 | FR-007 | 2 dead `ChatStore` methods removed, `createBroadcast` kept | `chat.store.spec.ts` "groupParticipants resolves current names and drops deleted contacts (F-046 FR-007)" + "groupParticipants is empty for an unknown chat (F-046 FR-007)"; `chats-page.spec.ts` "renders an empty placeholder when the store has no conversations" (now via `deleteConversation`) |
 | FR-008 | Calls `All`/`Missed` filter actually filters | `calls-page.spec.ts` "F-046 FR-008: the All/Missed filter" (8 tests, incl. the unanswered-call regression); `call-list-item.spec.ts` "F-046 FR-008: missed styling follows outcome, not direction" (3 tests) |
 | FR-009 | Disposition table complete, every deferral names a destination | `disposition.md` (G3 artifact; no unit test — it is a record, not behaviour) |

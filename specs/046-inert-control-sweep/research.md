@@ -86,6 +86,14 @@ Grepped across `src/`, excluding specs:
 | `ChatStore.broadcastRecipients` | `chat.store.ts:276` | specs only |
 | `ChatStore.setConversations` | `chat.store.ts:370` | specs only |
 
+> **F-047 drift note (2026-10-01) — line numbers are stale.** `chat.store.ts:370` now points at a
+> different method: F-047 deleted three private storage helpers and injected a `PersistencePort`, so
+> every line after that point shifted. `createBroadcast` and `broadcastRecipients` were both removed by
+> F-046; `setConversations` survived F-046 but its line number is no longer 370. Likewise
+> `prefs.store.ts:14-22` / `:128` and `call.store.ts:53` / `:130-137` below have moved, and
+> `prefs.store.ts`'s three storage helpers no longer exist at all. No finding here is invalidated — only
+> the coordinates are. Re-run the grep rather than trusting any line number in this file.
+
 `createBroadcast` is the F-042 create-form gap showing up as code: the store can create a broadcast
 and nothing in the app ever asks it to, so `/broadcasts` shows its empty state permanently. The gap
 audit already records this ("createBroadcast() ships without a UI caller").

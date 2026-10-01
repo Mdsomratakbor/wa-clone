@@ -149,21 +149,61 @@ unit tests, build green.
 
 ## Phase 4: Closure
 
-- [ ] **T007** FR-003, FR-008, FR-013 — gate evidence
-  - **Spec**: FR-003, FR-008, FR-013, G2, G3, G4
-  - **Files**: `tasks.md`, `spec.md`, `plan.md`, drift notes
-  - **Do**:
+- [x] **T007** FR-003, FR-008, FR-013 — gate evidence
+  - **Commit**: (this commit). **Verified**: build green; **full suite green twice** —
+    **620/620** both runs (randomized order; T001's `localStorage` stubs are the order-independence
+    risk, and two clean runs say they are contained). Baseline was 588/588 at `6796e42`; +32 tests.
+  - **Do** (as originally planned):
     1. `grep -rE '^function (read|write|clear)Storage' src/app/core` returns **nothing** (FR-003).
     2. `git diff --stat` over `src/app/features` and `src/app/shared` contains **no non-`.spec.ts`
-     file**, and every `*.spec.ts` entry is a ratified test-harness fix listed by file and line
-     (FR-008 **as amended by Clarification Q4**; the original "must be empty" wording would not be
-     satisfiable — see the spec's superseded-wording block).
+       file**, and every `*.spec.ts` entry is a ratified test-harness fix listed by file and line
+       (FR-008 **as amended by Clarification Q4**; the original "must be empty" wording would not be
+       satisfiable — see the spec's superseded-wording block).
     3. One `window.localStorage` reference remains in `core`, inside the adapter (FR-002).
     4. Drift notes in all four artifacts in `plan.md` "Drift Policy".
     5. FR → test traceability table and gate evidence.
   - **Verify**: build; **full** suite green, exact count. Run the suite **twice** — T001 added tests
     that stub `localStorage`, and order-independence is the risk they introduce.
   - **Commit**: `docs(spec)`.
+
+  - **Gate evidence**
+
+| Gate | Requirement | Evidence | Result |
+| ---- | ----------- | -------- | ------ |
+| G2 / FR-003 | no duplicate helper survives | `Select-String '^function (read\|write\|clear)Storage' src/app/core/*.ts` → **0 matches** (was 8) | pass |
+| FR-003 | stores reach storage only via the port | `Select-String 'window.localStorage' src/app/core/*.store.ts` → **0 matches**; the only production reference in `core` is `persistence/local-storage.adapter.ts` (FR-002) | pass |
+| FR-008 (as amended, Q4) | no component/template/style change | `git diff --stat 6796e42 HEAD -- src/app/features src/app/shared` → exactly one file, `calls/calls-page.spec.ts` (+6/-1): one import + one call site, ratified by Clarification Q4. **No non-spec file changed.** | pass with the ratified exemption |
+| FR-001 / FR-009 | the port resolves as the root default | `local-storage.adapter.spec.ts` "resolves PersistencePort with no provider declared anywhere in the test" — empty `TestBed`, no `appConfig` | pass |
+| FR-010 | the seam exists and is substitutable | `chat.store.spec.ts` "F-047 FR-010" — 5 tests: writes through the port, fresh instance hydrates, id counter survives, port/adapter byte agreement, `reset()` removes. Plus `local-storage.adapter.spec.ts` "FR-010: the root default does not obstruct substitution" | pass |
+| FR-012 | sync-port HTTP caveat is documented | `persistence.port.ts` doc comment ("Read this before writing an HTTP adapter"), and the FR-008/import-cycle rationale below it | pass |
+| FR-013 | reset semantics unchanged, per store | `chat.store.spec.ts` "reset removes the key rather than writing an empty snapshot"; `call.store.ts` `clearCalls()` comment; existing F-045/F-046 key assertions still pass | pass |
+| G4 / FR-006 | no behaviour change | Every pre-existing expectation passed **unchanged** through T004–T006; T001's failure-path tests were committed against the *pre-port* code and still pass through the seam | pass |
+| G3 | every store depends on the injected port | `ChatStore`, `CallStore`, `PrefsStore` each take `PersistencePort` in the constructor; no optional/default parameter anywhere | pass |
+| G1 | Figma | N/A — no chrome touched | n/a |
+
+  - **FR → test traceability**
+
+| FR | Test |
+| -- | ---- |
+| FR-001 | `local-storage.adapter.spec.ts` (whole suite) |
+| FR-002 | `local-storage.adapter.spec.ts` "unavailable storage" (3 tests) — the only `window.localStorage` in `core` |
+| FR-003 | T004/T005/T006 diffs + the 0-match greps above |
+| FR-004 | `chat.store.spec.ts`, `call.store.spec.ts`, `prefs.store.spec.ts` construct stores with an explicit port |
+| FR-005 | F-045's pre-v1 `outcome` snapshot test; F-046's removed-key and v4-normalization tests — all unchanged and passing |
+| FR-006 | `local-storage.adapter.spec.ts` "FR-006" key/bytes guard; `chat.store.spec.ts` "port and LocalStorageAdapter agree on key and bytes" |
+| FR-007a | `chat.store.spec.ts` / `call.store.spec.ts` / `prefs.store.spec.ts` storage-unavailable tests + `prefs.store.spec.ts` corrupt-JSON test (10 tests, T001) |
+| FR-008 | the `git diff --stat` row above |
+| FR-009 | `local-storage.adapter.spec.ts` "resolves PersistencePort with no provider declared anywhere in the test" |
+| FR-010 | the 5 `chat.store.spec.ts` FR-010 tests + the 2 adapter-substitution tests + `in-memory.port.spec.ts` (6 double-contract tests) |
+| FR-011 | no HTTP adapter exists; capability finding recorded in `research.md` §5 and FR-011 |
+| FR-012 | `persistence.port.ts` doc comment |
+| FR-013 | `chat.store.spec.ts` FR-010 reset test; `call.store.ts`/`prefs.store.ts` reset comments; existing key assertions |
+
+  - **Not shipped because no spec authorized it:** an HTTP adapter (FR-011), any snapshot/version
+    change (out of scope), normalizing `CallStore.clearCalls()` (FR-013 keeps the divergence), any
+    component/template/style change (FR-008).
+  - **E2E:** no e2e spec changed and none run — this feature moves no user-visible behaviour, and
+    Playwright is paused by directive 2026-09-26.
 
 ## Explicitly not in these tasks
 

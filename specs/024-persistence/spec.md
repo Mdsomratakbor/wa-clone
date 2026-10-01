@@ -64,3 +64,22 @@ version-mismatched.
 
 Storage writes are synchronous snapshot-replace; no write batching — acceptable for prototype
 data size.
+
+## F-047 drift note (2026-10-01)
+
+F-047 replaced the duplicated storage helpers this spec's implementation grew, without changing what
+this spec requires. What moved, not what is required:
+
+- Each store here hand-rolled its own `readStorage`/`writeStorage`/`clearStorage` over
+  `window.localStorage` — three near-identical copies of the same try/catch. They now live in one
+  place: `PersistencePort` (the abstraction) and `LocalStorageAdapter` (the only production code in
+  `src/app/core` that touches `window.localStorage`). The duplication this spec implicitly
+  documented is what F-047's `research.md` §2 inventoried.
+- The try/catch bodies were moved **verbatim**, so "no quota handling beyond try/catch" above is
+  still exactly true. No requirement changed.
+- Snapshot shape, versioning, and normalization stayed in each store. A version mismatch still
+  re-seeds rather than migrates (deviation 2 above), unchanged.
+- The one thing this spec could not have anticipated: a synchronous port is **not** directly
+  implementable over HTTP — see `specs/047-persistence-port/spec.md` Clarification 1. Not a change
+  to this spec; recorded here so a future reader who looks for a network adapter knows the seam is
+  synchronous by decision, not by oversight.

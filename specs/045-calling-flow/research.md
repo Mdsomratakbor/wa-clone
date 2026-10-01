@@ -134,6 +134,19 @@ There is no HTTP layer, no `HttpClient`, no repository, and `package.json` has n
 dependency. So "backend later" currently has no seam to land in — the backend would be hand-wired
 into three stores.
 
+> **F-047 correction (2026-10-01).** The conclusion above — "no HTTP client dependency, so no seam" —
+> was **half wrong**, and the wrong half mattered. The absence of an npm HTTP dependency was read as
+> the absence of a capability, and on that basis three stores were allowed to grow private storage
+> helpers with no seam at all. In fact `HttpClient` ships inside `@angular/common`, which was already
+> a dependency; no `npm install` was ever needed. What was genuinely missing was **the abstraction**,
+> not the capability, and treating a missing abstraction as a missing capability is what deferred the
+> work by a full feature. F-047 landed one shared `PersistencePort` + `LocalStorageAdapter` for all
+> three stores; an HTTP adapter remains unwritten (no backend exists — see F-047 FR-011).
+>
+> Also corrected: the line-number references immediately above (`chat.store.ts:60,68,76`,
+> `call.store.ts:16,24`, `prefs.store.ts:59,67,75`) are stale. Those helpers were deleted in F-047;
+> `localStorage` is now reached only through the port.
+
 The owner chose to land that as **F-047, after this feature** — it was originally numbered F-046,
 but that number was reassigned on 2026-09-29 to the inert-control sweep, with the owner confirming
 the swap. Therefore this feature must:
