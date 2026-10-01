@@ -50,9 +50,11 @@
       box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
     }
 
-    // F-049: the design shows no disabled variant, so this opacity is a
-    // provisional value - but a control that is disabled and looks enabled is its
-    // own small lie, and F-046 exists to stop those.
+    // F-049 FR-008: a disabled control must not still read as live. F-046's
+    // convention is `color: var(--wa-text-tertiary)`, which is the right call on the
+    // composer's light bar but reads as a colour change rather than a disabled state
+    // on this surface's saturated pink fill. Dimming is the standard affordance there,
+    // so this deviates from the convention and is PROVISIONAL until G1 clears.
     &:disabled {
       opacity: 0.4;
       cursor: default;
@@ -76,8 +78,11 @@
   }
 
   // F-049: carries the former placeholder's typography unchanged, so no new value
-  // enters the stylesheet. The real caret replaces the decorative .compose__caret.
+  // enters the stylesheet and the 38px stays unscaled - the placeholder was raw
+  // too, and scaling it could overflow the design-verified 232px field. The real
+  // caret replaces the decorative .compose__caret.
   &__input {
+    appearance: none;
     width: 100%;
     margin: 0;
     padding: 0;
