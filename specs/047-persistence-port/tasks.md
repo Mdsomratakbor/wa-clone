@@ -132,7 +132,13 @@ unit tests, build green.
   - **Verify**: build; suite green. F-045's session-must-not-persist test must still pass (FR-005).
   - **Commit**: `feat`.
 
-- [ ] **T006** FR-003, FR-004, FR-005, FR-013 — `PrefsStore` onto the port
+- [x] **T006** FR-003, FR-004, FR-005, FR-013 — `PrefsStore` onto the port
+  - **Commit**: (this commit). **Verified**: build green, **620/620**. No helper functions remain
+    in `src/app/core` (grep returned 0). `reset()` still removes the key; the v1–v4 normalization and
+    `PREFS_VERSION = 4` are unchanged.
+  - **No spec-file changes under `features/` were needed** for PrefsStore, which matches the amended
+    FR-008. The only `features/` edit in the feature remains the single call site in
+    `calls/calls-page.spec.ts`, ratified by Clarification Q4.
   - **Spec**: FR-003, FR-004, FR-005, FR-013
   - **Files**: `src/app/core/prefs.store.ts`, `prefs.store.spec.ts`
   - **Do**: inject the port; delete `readStorage`/`writeStorage`/`clearStorage` (`:56,64,72`). Keep

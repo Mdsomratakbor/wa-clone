@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { PersistencePort } from './persistence/persistence.port';
 
 export type PrefsKey =
   | 'enterKeySends'
@@ -53,30 +54,6 @@ function isFontScale(value: unknown): value is FontScale {
   return FONT_SCALES.includes(value as FontScale);
 }
 
-function readStorage(key: string): string | null {
-  try {
-    return window.localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-function writeStorage(key: string, value: string): void {
-  try {
-    window.localStorage.setItem(key, value);
-  } catch {
-    // Storage unavailable/blocked: persist is best-effort.
-  }
-}
-
-function clearStorage(key: string): void {
-  try {
-    window.localStorage.removeItem(key);
-  } catch {
-    // Ignore: storage unavailable.
-  }
-}
-
 // F-046 FR-006: a blind { ...DEFAULT_PREFS, ...envelope.prefs } spread would carry
 // removed keys into the live snapshot, leaving the runtime state wider than the
 // PrefsSnapshot type. Keys not in DEFAULT_PREFS are dropped and missing ones take
@@ -102,7 +79,7 @@ export class PrefsStore {
   readonly fontScale = signal<FontScale>(DEFAULT_FONT_SCALE);
   readonly profile = signal<ProfileSnapshot>({ ...DEFAULT_PROFILE });
 
-  constructor() {
+  constructor(private readonly storage: PersistencePort) {
     this.hydrate();
   }
 
@@ -132,7 +109,9 @@ export class PrefsStore {
   }
 
   reset(): void {
-    clearStorage(PREFS_KEY);
+    // FR-013: remove, not an empty envelope. Contrast CallStore.clearCalls(), which
+    // writes an empty snapshot - the divergence is preserved deliberately.
+    this.storage.remove(PREFS_KEY);
     this.prefs.set({ ...DEFAULT_PREFS });
     this.chatSort.set(DEFAULT_CHAT_SORT);
     this.fontScale.set(DEFAULT_FONT_SCALE);
@@ -147,11 +126,11 @@ export class PrefsStore {
       fontScale: this.fontScale(),
       profile: this.profile(),
     };
-    writeStorage(PREFS_KEY, JSON.stringify(envelope));
+    this.storage.write(PREFS_KEY, JSON.stringify(envelope));
   }
 
   private hydrate(): void {
-    const raw = readStorage(PREFS_KEY);
+    const raw = this.storage.read(PREFS_KEY);
     if (raw === null) {
       return;
     }
