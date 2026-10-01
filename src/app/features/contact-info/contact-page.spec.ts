@@ -111,19 +111,17 @@ describe('ContactPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/contact', 'chat-001', 'media']);
   });
 
-  // F-046: this row is a *recorded* deferral, not a fix. It still swallows
-  // activation and still looks live, which `disposition.md` names as the
-  // Groups membership feature (B8). The old name - "stays a no-op" - described
-  // the defect as if it were the intent; it is re-titled to say the gap is
-  // known and tracked, so a future reader does not mistake it for a decision.
-  it('the Groups row is still inert: B8 is deferred, not built (F-046 G4)', async () => {
+  // F-048 discharges the F-046 G4 deferral. The test was deliberately re-titled
+  // back then so the gap could not be mistaken for a decision; it is now a real
+  // destination, and this is its routing assertion.
+  it('the Groups row routes to /contact/:id/groups (F-048 FR-001)', async () => {
     const { el, router } = await render('chat-001');
     spyOn(router, 'navigate').and.resolveTo(true);
     const rows = [...el.querySelectorAll<HTMLButtonElement>('[data-testid="contact-row"]')];
     const groups = rows.find((r) => r.getAttribute('aria-label') === 'Groups');
     expect(groups).toBeDefined();
     groups?.click();
-    expect(router.navigate).not.toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/contact', 'chat-001', 'groups']);
   });
 
   describe('group awareness (F-040 clarified)', () => {
