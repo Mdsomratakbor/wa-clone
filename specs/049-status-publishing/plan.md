@@ -25,12 +25,16 @@ in the text-entry work cannot be mistaken for a data problem.
 | `src/app/features/status/status-page.ts` | inject `StatusStore`, expose `myStatus` and the subtitle |
 | `src/app/features/status/status-page.html` | tip becomes conditional; status text region; subtitle binding |
 | `src/app/features/status/status-page.spec.ts` | tip becomes conditional; add post-publish tests |
-| `tests/e2e/status-compose.spec.ts` | new spec (authored, **not run**) |
+| `tests/e2e/status-compose.spec.ts` | **rewritten, not created** — the file already existed from F-007, and its no-op and focus-ring assertions became false by design (authored, **not run**) |
 | `figma/design-map.md` | rows 6 and 7: `Send` live as of F-049 |
 | `specs/design-gap-audit.md` | row-7 publishing closed |
 
-Not touched: every store except the new one, every shared component, both `.scss` files beyond the
-input's own rules, and all of `chat-window`.
+Not touched: every store except the new one, every shared component, `_tokens.scss`, and all of
+`chat-window`. **Corrected at closure (2026-10-01):** this paragraph originally excluded both `.scss`
+files "beyond the input's own rules", which understated the work. `compose-page.scss` also gained a
+`&:disabled` treatment and a `&__sr-only` utility (no prior sr-only utility existed), and
+`status-page.scss` added `&__mine` / `&__mine-text` as selector-list additions to the existing `&__tip`
+rules. The same correction is recorded in `spec.md`; no token value was added.
 
 ### Model
 

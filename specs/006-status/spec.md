@@ -87,3 +87,11 @@ bottom action bar. The navigation bar shows a leading **Privacy** action and a c
 - **F-035 (2026-09-27)**: the `Privacy` nav action and the `My Status` row are no longer no-ops —
   they navigate to `/settings` and `/status/compose`. The `tip`, header, tab bar and seeded feed are
   unchanged, so `0-8498-status.png` is unaffected. See `specs/035-status-wiring/`.
+- **F-049 (2026-10-01)**: the "No recent updates to show right now." tip is no longer unconditional.
+  The feed now reads the new `StatusStore`, so the tip renders **only** when the app's user has
+  published nothing, and the published text takes its place in a `role="status"` region. The
+  `My Status` row subtitle likewise changes from a hardcoded `Add to my status` to the published text
+  when one exists. The header, the row's badge and circles, and the tab bar are untouched, so the
+  **empty** feed still matches `0-8498-status.png`. The post-publish presentation is **PROVISIONAL**:
+  the design contains only the empty state and no Figma node is cited for it. See
+  `specs/049-status-publishing/`.

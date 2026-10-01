@@ -4,7 +4,9 @@
 
 **Created**: 2026-10-01
 
-**Status**: **Specified** (clarifications resolved; G1 capture still BLOCKED — see Review Gates)
+**Status**: ✅ **Implemented** (T001–T010 done, build green, unit 658/658, 2026-10-01) — G1 capture
+still **BLOCKED**, so T011–T013 and the post-publish presentation remain open. See
+[Closure](./tasks.md#closure-g3).
 
 **Input**: design row 6 (`0:8498`, Status feed) + design row 7 (`0:9634`, Status compose)
 
@@ -124,6 +126,15 @@ counter persisted in the snapshot, and a `hydrate()` that refuses a corrupt or f
 - Whether the keyboard graphic should stay visible once the OS keyboard is up. **Hypothesis** - it
   stays, so the screen keeps the design's look; the two overlapping is a capture-gated cosmetic
   issue, recorded rather than designed around.
+- How a disabled `Send` / `Send-alt` glyph should look. **Hypothesis** - dimmed with `opacity`. F-046
+  set the codebase convention to `color: var(--wa-text-tertiary)`, which reads as *inactive* on the
+  composer's light bar but as a plain colour change on the compose surface's saturated pink fill, so
+  this feature deviates and the deviation is deliberate. Dimming is also what the design never
+  contradicts, since the file shows no disabled variant at all. **PROVISIONAL**, capture-gated.
+- Whether the 38px status input should respond to `--wa-font-scale` (F-041). **Not done** - the
+  placeholder was a raw `38px` and scaling it could overflow the design-verified 232px field, so the
+  input preserves the captured value. This is a pre-existing limitation of the compose screen, not
+  something F-049 introduced, and it is recorded rather than silently changed.
 
 ## Assumptions
 
@@ -136,8 +147,18 @@ counter persisted in the snapshot, and a `hydrate()` that refuses a corrupt or f
 
 ## Out of Scope Changes
 
-- No edits to `status-page.scss`, `compose-page.scss`, `navigation-bar`, `tab-bar` or
-  `user-avatar`. The existing `.compose__placeholder` token styling is reused on the input.
+- `navigation-bar`, `tab-bar` and `user-avatar` are untouched.
+- **Correction, recorded at closure (2026-10-01).** This section originally claimed *no* edits to
+  `compose-page.scss` or `status-page.scss`, on the basis that the input would reuse
+  `.compose__placeholder` verbatim. Implementation showed that is not possible: the placeholder
+  class styles a `<p>`, and reusing it on an `<input>` would leave the browser's default border,
+  background and padding visible, which the design does not have. The stylesheets are therefore in
+  scope, and the deviation is logged here rather than absorbed silently:
+  - `compose-page.scss` gained `&__input` (the placeholder's typography carried over unchanged, plus
+    `appearance: none` and a focus outline), `&__sr-only` (no prior utility existed in the codebase),
+    and a `&:disabled` rule.
+  - `status-page.scss` gained `&__mine` / `&__mine-text` **as selector-list additions to the
+    existing `&__tip` rules**, not as new declarations, so no value is restated.
 - `status-page.html` changes only inside the feed body: the tip becomes conditional and the status
   text is added beside it. The `My Status` row, its badge, its circles and the tab bar are untouched.
 - `compose-page.html` changes only inside `.compose__type` (the decorative `<p>` and fake caret
@@ -145,6 +166,8 @@ counter persisted in the snapshot, and a `hydrate()` that refuses a corrupt or f
 - `PersistencePort`, `LocalStorageAdapter` and `InMemoryPersistencePort` are unchanged — the port
   seam from F-047 already covers this store.
 - No change to `chat.store.ts`, `call.store.ts` or `prefs.store.ts`.
+- No change to `_tokens.scss`: every colour, size and font in the new rules was already present in
+  the file being edited, so no new value entered the token map.
 
 ## Validation Targets
 
@@ -170,17 +193,17 @@ counter persisted in the snapshot, and a `hydrate()` that refuses a corrupt or f
 
 ## Definition of Done
 
-- [ ] Every FR is covered by at least one named unit test
-- [ ] `Send` publishes trimmed, real text and nothing else is persisted (FR-003, FR-004, FR-013)
-- [ ] Blank input yields a genuinely disabled button, not a click-through (FR-002)
-- [ ] `Send-alt` is disabled with an accessible reason and tested (FR-008)
-- [ ] Hydration refuses a corrupt, foreign-version or malformed snapshot without throwing (FR-006)
-- [ ] Ids are monotonic and reload-safe (FR-007)
-- [ ] The feed renders the status as text via interpolation only (FR-011)
-- [ ] No wall-clock read outside `Clock` (FR-012)
-- [ ] The blocked G1 gate is recorded, not skipped, and the two verified screens are distinguished
+- [x] Every FR is covered by at least one named unit test
+- [x] `Send` publishes trimmed, real text and nothing else is persisted (FR-003, FR-004, FR-013)
+- [x] Blank input yields a genuinely disabled button, not a click-through (FR-002)
+- [x] `Send-alt` is disabled with an accessible reason and tested (FR-008)
+- [x] Hydration refuses a corrupt, foreign-version or malformed snapshot without throwing (FR-006)
+- [x] Ids are monotonic and reload-safe (FR-007)
+- [x] The feed renders the status as text via interpolation only (FR-011)
+- [x] No wall-clock read outside `Clock` (FR-012)
+- [x] The blocked G1 gate is recorded, not skipped, and the two verified screens are distinguished
       from the provisional post-publish presentation
-- [ ] Drift notes are added to specs 006, 007, 035, the gap audit, and `figma/design-map.md` rows 6
+- [x] Drift notes are added to specs 006, 007, 035, the gap audit, and `figma/design-map.md` rows 6
       and 7
-- [ ] `npm run build` green; full unit suite green with the exact count reported
-- [ ] Playwright spec authored; execution deferred per the owner directive (2026-09-26)
+- [x] `npm run build` green; full unit suite green with the exact count reported
+- [x] Playwright spec authored; execution deferred per the owner directive (2026-09-26)

@@ -92,3 +92,31 @@ a status is a later feature); the keyboard graphic has no key interactions.
 3. `tests/e2e/status.spec.ts`: remap the camera/note "no-op" case to navigation (US2 swap).
 4. Responsive: `/status/compose` no-overflow appended to `tests/e2e/responsive.spec.ts`.
 5. `figma/design-map.md` row 7 spec column set to `007`; spec status Implemented after closure.
+
+## Drift note (F-049, 2026-10-01)
+
+This spec is superseded on the text-entry and send behaviour it explicitly deferred. F-049 made the
+composer real, so the following are no longer true of the shipped screen:
+
+- **FR-004** ("the two right-side send glyphs no-op") and **Clarification 2** ("render as no-op send
+  affordances") are **live and split apart**. The paper-plane `Send` now publishes the typed text and
+  navigates to `/status`. The text-bar glyph is now **genuinely `disabled`**, out of the tab order,
+  with a screen-reader-only `aria-describedby` explanation — because its real behaviour is a contact
+  picker, which is messaging backend work. It was a no-op here; it is now an accessible no.
+- **FR-005** and **Clarification 4** ("static copy of the frame, not wired to real typing") are
+  **superseded**. The decorative `<p>` and the hardcoded caret `<span>` are replaced by a real
+  single-line `<input>` carrying the same `Type a status` placeholder, so the OS keyboard appears
+  and the caret is the input's own. `aria-hidden="true"`, correct for a decorative paragraph, was
+  removed from the wrapper. Typography is carried over unchanged, so `0-9634` is unaffected in the
+  empty state; the disabled treatment and the overlap between the static keyboard graphic and the OS
+  keyboard are **PROVISIONAL** (the design shows no disabled variant and cannot show a real one).
+- **FR-006 / Clarification 3** (the keyboard graphic is non-interactive) is **unchanged and
+  deliberately so** — see `specs/049-status-publishing/` for why the PNG still does not type.
+- **Non-Goals** — "Entering status text / publishing" is now **shipped** for the text composer.
+  Publishing is not delivery: the status is stored locally and shown to the app's own user only.
+
+The top-row layout, the `#FF8A8C` surface, the glyph positions, the keyboard graphic and FR-001 /
+FR-002 / FR-003 / FR-007 / FR-008 / FR-009 all stand. Note that `tests/e2e/status-compose.spec.ts`
+was rewritten, not merely extended: its "send glyphs, placeholder and keyboard are no-ops" test and
+its focus-ring assertion for the text-bar glyph became false *for a good reason* (a disabled control
+leaves the tab order), and they were re-pointed at the new contract instead of deleted.

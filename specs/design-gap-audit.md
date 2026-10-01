@@ -47,8 +47,17 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 
 ## Tier C — capture-gated (cannot be built faithfully yet)
 
-- **Publish a status** (row 7): Send / Send-alt need the captured keyboard chrome and the design's
-  publish affordance; the compose screen is otherwise complete.
+- **Publish a status** (row 7): **CLOSED by F-049 (2026-10-01)** — and this entry was **wrong about
+  the blocker**. It claimed Send needed the captured keyboard chrome, but nothing about publishing is
+  capture-gated: both screens this touches are design-verified (`0:8498`, `0:9634`). What was actually
+  missing was a real text field. The compose screen had a decorative `<p>` and a hardcoded caret, so
+  there was nothing to type into, and both send glyphs were no-ops. F-049 added a real single-line
+  input, made `Send` publish through a new `StatusStore`, and made the feed render the result; the
+  text-bar glyph is now genuinely `disabled` with an accessible reason, because its contact picker is
+  messaging backend work. The keyboard graphic still does not type and never will from a static PNG —
+  its key layout and glyph geometry exist in no captured artifact, so the OS keyboard does the typing.
+  The *post-publish* presentation remains PROVISIONAL (the design shows only the empty feed) and the
+  goldens stay deferred under the Playwright pause, but the gap itself is closed.
 - **Camera capture pipeline** (row 12): the shutter needs `getUserMedia` plus the captured preview
   treatment. **`Flip` moved here from tier A** (2026-09-27): without a live preview a front/back
   state has no observable effect, so shipping a state-only flip would be dead behaviour — it belongs
@@ -163,3 +172,19 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   finding worth carrying forward: `contactConversations()` sorts alphabetically by contact name, so
   it does not begin at `chat-001` - seeding participants from it silently produced a route param
   and a participant id that disagreed. G1 remains BLOCKED, so the sub-screen chrome is provisional.
+- **2026-10-01** - F-049 Status Publishing landed (**658 unit**, +23) and **"Publish a status" is
+  closed**. A second audit conclusion turned out to be wrong, in the same way B8's was: the entry
+  claimed the captured keyboard chrome was the blocker, but both status screens are already
+  design-verified and nothing about publishing needed a capture. The real gap was structural - a
+  decorative `<p>` where an input belonged, and two no-op glyphs. Fixed with a real input, a
+  `StatusStore` on the F-047 `PersistencePort` (first new store since the seam landed), and a
+  `role="status"` region on the feed. Publishing is **not delivery** and no social graph was
+  invented: only the app's own user's status exists, so the "No recent updates" tip still covers
+  everyone else. `Send-alt` was made honestly `disabled` rather than left silently dead, with the
+  reason exposed to assistive tech. Two process notes carried forward: (1) T003 in the F-049 tasks
+  asserted that a store must survive a `write()` that *throws*, which contradicts F-047 - the
+  adapter owns storage-error handling, so the task was corrected rather than the architecture; and
+  (2) `spec.md` had claimed no stylesheet edits were in scope, which implementation disproved,
+  because the placeholder class styles a `<p>` and reusing it on an input leaves default browser
+  chrome. Both were recorded in the spec at closure instead of absorbed quietly. G1 remains BLOCKED,
+  so the disabled treatment, the post-publish presentation and the goldens are provisional.

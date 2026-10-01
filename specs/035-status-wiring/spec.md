@@ -49,6 +49,13 @@ capture dependency.
 ## Explicit deviations (documented drift)
 
 1. Spec 006's "Privacy and row stay no-ops" is superseded (drift note in `specs/006`).
+2. **F-049 (2026-10-01)**: the `My Status` row this feature made navigable now also carries live
+   state. F-049 added `StatusStore`, so the row's subtitle stops being the hardcoded
+   `Add to my status` once the user has published, and the feed's tip is superseded by the published
+   text. The row's *navigation* — click and `Enter` both open `/status/compose` — is unchanged and
+   still the tested behaviour, so this feature's own contract is not disturbed; only the label
+   beneath the name is now data-driven. `tests/e2e/status-wiring.spec.ts` and the F-035 row tests
+   still pass unchanged, because they run against the empty store. Drift note in `specs/006`.
 
 ## Caveat (deliberately incomplete until G1)
 
