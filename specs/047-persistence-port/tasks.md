@@ -50,12 +50,11 @@ unit tests, build green.
   - **Follow-up, same task (FR-009 was not actually met by `5281b97`)**: the FR-009 binding test was
     written **first** and failed with `ɵNotFound: NG0201: No provider found for PersistencePort`. The
     cause: Angular's injector has no notion of inheritance, so `extends PersistencePort` registers no
-    binding for the abstract token and `providedIn: 'root'` binds only the concrete class. Every store
-    would have injected `null` and thrown at runtime, while the build stayed green. Fixed with
-    `{ provide: PersistencePort, useClass: LocalStorageAdapter }` in `app.config.ts` — which is what
-    FR-009 actually asks for and is not an FR-008 violation (`app.config.ts` is not under `features/`
-    or `shared/`). `plan.md`'s "Why no `app.config.ts` change" section was **factually wrong** and has
-    been corrected in place with the failing-test evidence, rather than quietly left to mislead.
+    binding for the abstract token and `providedIn: 'root'` binds only the concrete class. The first fix
+    (`app.config.ts`) was then found **also insufficient** during T004 — see the T004 note. The final
+    resolution is the binding on the token itself, which needs `extends` → `implements` with an
+    `import type` to avoid a runtime cycle. `plan.md` has been corrected with the full evidence trail
+    rather than quietly left to mislead.
 
 ## Phase 3: Point the stores at the port
 
@@ -75,7 +74,28 @@ unit tests, build green.
     about the code. The proof moved to T004 rather than being written against something that does not
     exist yet. No requirement was dropped — FR-010 still gets its assertion, from `chat.store.spec.ts`.
 
-- [ ] **T004** FR-003, FR-004, FR-005, FR-010, FR-013 — `ChatStore` onto the port
+- [x] **T004** FR-003, FR-004, FR-005, FR-010, FR-013 — `ChatStore` onto the port
+  - **Commit**: (this commit). **Verified**: build green, **620/620**. `chat.store.ts` no longer
+    references `localStorage`; its three helpers are gone. All pre-existing expectations unchanged.
+  - **The T002 `app.config.ts` fix was wrong, and this task is what proved it.** Putting a store on the
+    port turned **210 tests red** across 12 page specs under `src/app/features/**`. They inject the
+    stores through the component tree with a bare `TestBed`, and `TestBed` never reads `app.config` —
+    so a binding that is entirely correct for the shipped app is invisible to them. The options were to
+    edit 12 spec files (violating FR-008, whose diff over `features/` must be **empty**) or make the
+    port optional (which deletes the seam: a store would silently fall back to real storage). Resolved
+    by moving the default onto the token itself — `@Injectable({ providedIn: 'root', useClass:
+    LocalStorageAdapter })` on `PersistencePort` — which satisfies FR-009 and FR-008 together. This
+    required `LocalStorageAdapter extends PersistencePort` → `implements PersistencePort` via an
+    `import type`, because the port now needs the adapter's *value* for `useClass` while the adapter
+    needs the port only as a *type*; with `extends` the cycle is real and dies with a `ReferenceError`
+    at module evaluation. `app.config.ts` was reverted: one mechanism, not two.
+  - **Two of my own new assertions were wrong and were corrected, not bent to fit.** An identity claim
+    (`TestBed.inject(PersistencePort)` === `TestBed.inject(LocalStorageAdapter)`) failed — `useClass`
+    builds a separate instance, and both are stateless so it does not matter; the test now asserts the
+    thing that *is* true and matters, that the override both resolves and takes effect. A counter test
+    asserting one distinct `chat-new-*` id failed because hydration correctly carries the first
+    session's id; the real property is that ids do not *collide*, now asserted as
+    `['chat-new-1', 'chat-new-2']`.
   - **Spec**: FR-003, FR-004, FR-005, FR-010, FR-013
   - **Files**: `src/app/core/chat.store.ts`, `chat.store.spec.ts`
   - **Do**: inject `PersistencePort`; delete `readStorage`/`writeStorage`/`clearStorage` (`:58,66,74`);

@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { PersistencePort } from './persistence/persistence.port';
 import { ChatKind, ChatPreview } from '../features/chat-list/chat.model';
 import { CHAT_SEED } from '../features/chat-list/chat-list.seed';
 import { CHAT_SEED as THREAD_SEED } from '../features/chat-window/chat-window.seed';
@@ -55,29 +56,7 @@ function hydrateDefaults(chat: ChatPreview): Pick<ChatPreview, 'kind' | 'partici
   };
 }
 
-function readStorage(key: string): string | null {
-  try {
-    return window.localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-function writeStorage(key: string, value: string): void {
-  try {
-    window.localStorage.setItem(key, value);
-  } catch {
-    // Storage unavailable/blocked: persist is best-effort.
-  }
-}
-
-function clearStorage(key: string): void {
-  try {
-    window.localStorage.removeItem(key);
-  } catch {
-    // Ignore: storage unavailable.
-  }
-}
+// helpers removed in F-047 - storage via PersistencePort
 
 @Injectable({ providedIn: 'root' })
 export class ChatStore {
@@ -92,7 +71,7 @@ export class ChatStore {
 
   readonly starred = signal<string[]>([]);
 
-  constructor() {
+  constructor(private readonly storage: PersistencePort) {
     this.hydrate();
   }
 
@@ -415,7 +394,7 @@ export class ChatStore {
   }
 
   reset(): void {
-    clearStorage(PERSISTENCE_KEY);
+    this.storage.remove(PERSISTENCE_KEY);
     this.messageSequence = 1000;
     this.newChatCounter = 0;
     this.starred.set([]);
@@ -437,11 +416,11 @@ export class ChatStore {
       messageSequence: this.messageSequence,
       newChatCounter: this.newChatCounter,
     };
-    writeStorage(PERSISTENCE_KEY, JSON.stringify(snapshot));
+    this.storage.write(PERSISTENCE_KEY, JSON.stringify(snapshot));
   }
 
   private hydrate(): void {
-    const raw = readStorage(PERSISTENCE_KEY);
+    const raw = this.storage.read(PERSISTENCE_KEY);
     if (raw === null) {
       return;
     }

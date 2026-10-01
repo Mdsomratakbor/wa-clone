@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ChatStore, THREADED_CONTACT_ID, CONTACT_SUBTITLE, PERSISTENCE_KEY } from './chat.store';
+import { LocalStorageAdapter } from './persistence/local-storage.adapter';
+import { InMemoryPersistencePort } from './persistence/in-memory.port';
 import { ChatPreview } from '../features/chat-list/chat.model';
 import { CHAT_SEED } from '../features/chat-list/chat-list.seed';
 import { CHAT_SEED as THREAD_SEED } from '../features/chat-window/chat-window.seed';
@@ -284,7 +286,7 @@ describe('ChatStore', () => {
 
   it('persists muted state across a reload and clears it on reset', () => {
     store.toggleMuted(THREADED_CONTACT_ID);
-    const reloaded = new ChatStore();
+    const reloaded = new ChatStore(new LocalStorageAdapter());
     expect(reloaded.isMuted(THREADED_CONTACT_ID)).toBe(true);
     reloaded.reset();
     expect(reloaded.isMuted(THREADED_CONTACT_ID)).toBe(false);
@@ -303,7 +305,7 @@ describe('ChatStore', () => {
 
   it('clearMessages persists across a reload', () => {
     store.clearMessages(THREADED_CONTACT_ID);
-    const reloaded = new ChatStore();
+    const reloaded = new ChatStore(new LocalStorageAdapter());
     expect(reloaded.conversationMessages(THREADED_CONTACT_ID)).toEqual([]);
     reloaded.reset();
     expect(reloaded.conversationMessages(THREADED_CONTACT_ID).length).toBe(THREAD_SEED.length);
@@ -327,7 +329,7 @@ describe('ChatStore', () => {
   it('deleteConversation leaves other conversations untouched and persists', () => {
     const otherId = CHAT_SEED[0].id;
     store.deleteConversation(THREADED_CONTACT_ID);
-    const reloaded = new ChatStore();
+    const reloaded = new ChatStore(new LocalStorageAdapter());
     expect(reloaded.conversations().some((c) => c.id === otherId)).toBe(true);
     expect(reloaded.conversations().some((c) => c.id === THREADED_CONTACT_ID)).toBe(false);
   });
@@ -357,7 +359,7 @@ describe('ChatStore', () => {
   it('archiveConversations persists across a reload and reset restores it', () => {
     const [first] = CHAT_SEED;
     store.archiveConversations([first.id]);
-    const reloaded = new ChatStore();
+    const reloaded = new ChatStore(new LocalStorageAdapter());
     expect(reloaded.archivedIds()).toEqual([first.id]);
     reloaded.reset();
     expect(reloaded.archivedIds()).toEqual([]);
@@ -381,7 +383,7 @@ describe('ChatStore', () => {
   it('deleteConversations persists across a reload', () => {
     const [first] = CHAT_SEED;
     store.deleteConversations([first.id]);
-    const reloaded = new ChatStore();
+    const reloaded = new ChatStore(new LocalStorageAdapter());
     expect(reloaded.conversations().some((c) => c.id === first.id)).toBe(false);
   });
 
@@ -404,7 +406,7 @@ describe('ChatStore', () => {
     const [first] = CHAT_SEED;
     store.archiveConversations([first.id]);
     store.unarchiveConversations([first.id]);
-    const reloaded = new ChatStore();
+    const reloaded = new ChatStore(new LocalStorageAdapter());
     expect(reloaded.archivedIds()).toEqual([]);
     const before = reloaded.conversations();
     reloaded.unarchiveConversations([]);
@@ -485,7 +487,7 @@ describe('ChatStore', () => {
   it('a created group persists across a reload (F-040)', () => {
     const contact = store.contactConversations()[0];
     const id = store.createGroup('Persisted group', [contact.id]);
-    const reloaded = new ChatStore();
+    const reloaded = new ChatStore(new LocalStorageAdapter());
     const group = reloaded.conversations().find((chat) => chat.id === id);
     expect(group?.kind).toBe('group');
     expect(group?.participantIds).toEqual([contact.id]);
@@ -611,7 +613,7 @@ describe('ChatStore', () => {
   it('a created broadcast persists across a reload (F-042 FR-002)', () => {
     const contact = store.contactConversations()[0];
     const id = store.createBroadcast('Persisted list', [contact.id]);
-    const reloaded = new ChatStore();
+    const reloaded = new ChatStore(new LocalStorageAdapter());
     const broadcast = reloaded.conversations().find((chat) => chat.id === id);
 
     expect(broadcast?.kind).toBe('broadcast');
@@ -643,7 +645,7 @@ describe('ChatStore', () => {
         newChatCounter: 7,
       }),
     );
-    const reloaded = new ChatStore();
+    const reloaded = new ChatStore(new LocalStorageAdapter());
     const legacy = reloaded.conversations().find((chat) => chat.id === 'chat-x');
 
     expect(legacy?.kind).toBe('direct');
@@ -679,7 +681,7 @@ describe('ChatStore', () => {
       unavailableStorage();
       let recovered: ChatStore | undefined;
       expect(() => {
-        recovered = new ChatStore();
+        recovered = new ChatStore(new LocalStorageAdapter());
       }).not.toThrow();
       expect(recovered?.conversations().length).toBe(CHAT_SEED.length);
     });
@@ -697,6 +699,82 @@ describe('ChatStore', () => {
     it('reset does not throw when removeItem is unavailable', () => {
       unavailableStorage();
       expect(() => store.reset()).not.toThrow();
+    });
+  });
+
+  describe('F-047 FR-010: the seam actually exists', () => {
+    // Acceptance criterion for the port being more than a refactor. A spy cannot carry
+    // this: it proves `write` was called, not that the bytes come back out of a
+    // *different* store instance. The failure this guards against is a store that
+    // persists under one key and hydrates from another, or serializes something
+    // `JSON.parse` rejects — every spy assertion would stay green while real users
+    // lost their chats on reload.
+
+    it('writes the snapshot through the port, not to localStorage', () => {
+      const port = new InMemoryPersistencePort();
+      const wired = new ChatStore(port);
+
+      wired.createConversation('Through the port');
+
+      const raw = port.read(PERSISTENCE_KEY);
+      expect(raw).not.toBeNull();
+      expect(JSON.parse(raw as string).conversations.some((c: ChatPreview) => c.contactName === 'Through the port')).toBe(true);
+      // The point of using a double at all: localStorage is untouched, so the write
+      // demonstrably went through the port rather than around it.
+      expect(localStorage.getItem(PERSISTENCE_KEY)).toBeNull();
+    });
+
+    it('hydrates a fresh store instance from a previous instance payload', () => {
+      const port = new InMemoryPersistencePort();
+      const first = new ChatStore(port);
+      first.createConversation('Survives the session');
+
+      const second = new ChatStore(port);
+
+      expect(second.conversations().some((c) => c.contactName === 'Survives the session')).toBe(true);
+    });
+
+    it('carries the id counter across instances, so generated ids do not collide', () => {
+      // The counter lives in the snapshot, not only in memory. If persist() omitted
+      // it, the second instance would restart at 0 and mint `chat-new-1` a second
+      // time — a duplicate id for a returning user, the exact class of bug F-042 and
+      // F-045 fixed with normalizers. So the property is that the ids are distinct
+      // *across* sessions, not that there is only one of them.
+      const port = new InMemoryPersistencePort();
+      new ChatStore(port).createConversation('first');
+
+      const second = new ChatStore(port);
+      second.createConversation('second');
+
+      const ids = second.conversations().filter((c) => c.id.startsWith('chat-new-')).map((c) => c.id);
+      expect(ids).toEqual(['chat-new-1', 'chat-new-2']);
+    });
+
+    it('agrees with LocalStorageAdapter on the key and the serialized bytes', () => {
+      // FR-006 restated at store level: the port and the real adapter must agree, or
+      // a user who has data written by the pre-port code would hydrate nothing after
+      // the upgrade - with every in-memory test above still passing.
+      const port = new InMemoryPersistencePort();
+      const adapter = new LocalStorageAdapter();
+      const snapshot = { version: 1, conversations: [], threads: {}, starred: [], messageSequence: 1, newChatCounter: 0 };
+
+      port.write(PERSISTENCE_KEY, JSON.stringify(snapshot));
+      adapter.write(PERSISTENCE_KEY, JSON.stringify(snapshot));
+
+      expect(port.read(PERSISTENCE_KEY)).toBe(adapter.read(PERSISTENCE_KEY));
+    });
+
+    it('reset removes the key rather than writing an empty snapshot', () => {
+      const port = new InMemoryPersistencePort();
+      const wired = new ChatStore(port);
+      wired.createConversation('gone after reset');
+
+      wired.reset();
+
+      // FR-013: ChatStore.remove()s the key. The moment a store starts writing
+      // `{"conversations":[]}` instead, a "no data" and a "reset" state become
+      // indistinguishable on disk.
+      expect(port.read(PERSISTENCE_KEY)).toBeNull();
     });
   });
 });

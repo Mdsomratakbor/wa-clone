@@ -1,5 +1,8 @@
+import { Injectable } from '@angular/core';
+import { LocalStorageAdapter } from './local-storage.adapter';
+
 /**
- * F-047 FR-001, FR-012. The seam a backend adapter will implement.
+ * F-047 FR-001, FR-009, FR-012. The seam a backend adapter will implement.
  *
  * An abstract class rather than an `InjectionToken` on purpose: a store with an
  * unsatisfied port dependency then fails to **compile** rather than silently
@@ -30,7 +33,40 @@
  * `@angular/common`, already a dependency. The missing piece was always this
  * abstraction, not the capability. See `specs/047-persistence-port/research.md`
  * §5.
+ *
+ * ## Why the default binding lives here
+ *
+ * `@Injectable({ providedIn: 'root', useClass: LocalStorageAdapter })` on the *abstract token* is not
+ * an arbitrary style choice — it is what makes FR-008 satisfiable at all, and getting it wrong is the
+ * single largest cost of this feature.
+ *
+ * FR-008 requires `git diff --stat` over `src/app/features` and `src/app/shared` to be **empty**, and
+ * ~210 page specs under `src/app/features/**` inject these stores through the component tree. Every
+ * one of them configures a `TestBed` with no persistence providers. A binding declared in
+ * `app.config.ts` is invisible to all of them: `TestBed` does not read the application config. So with
+ * an `app.config.ts`-only binding, the choice was between violating FR-008 across 12 spec files, or
+ * shipping an `optional` port parameter with a `new LocalStorageAdapter()` default — which would delete
+ * the seam, because a store would silently fall back to real storage instead of failing.
+ *
+ * Declaring the default on the token itself resolves it in both places at once, and it keeps the
+ * failure mode honest: an unsatisfied port is still a compile error, because the binding ships with
+ * the port rather than being assembled by each caller.
+ *
+ * The cost is that the abstraction names one of its implementations. That is a real trade and it is
+ * paid knowingly: FR-009 ("provided at the app root with `LocalStorageAdapter` as the default") and
+ * FR-008 (no changes under `features/`) are jointly unsatisfiable without it. The alternative —
+ * `app.config.ts` plus 12 edited spec files — was rejected as the larger violation.
+ *
+ * ## The import cycle this has to avoid
+ *
+ * `LocalStorageAdapter implements PersistencePort`, and this file imports `LocalStorageAdapter` at
+ * runtime for `useClass`. A runtime cycle would be a `ReferenceError` at module evaluation, because
+ * the subclass would be evaluated against a `PersistencePort` still in its temporal dead zone. So the
+ * adapter's reference to the port is `import type`, which TypeScript erases completely — the port
+ * file imports the adapter's value, the adapter imports only the port's type, and there is no cycle.
+ * `implements` preserves the compile-time conformance check that `extends` would have given.
  */
+@Injectable({ providedIn: 'root', useClass: LocalStorageAdapter })
 export abstract class PersistencePort {
   /** Returns the stored payload, or `null` when absent or unreadable. Never throws. */
   abstract read(key: string): string | null;

@@ -38,46 +38,65 @@ export abstract class PersistencePort {
 changing, not of where bytes are stored. Moving it behind the port would also make the port
 model-aware, and a port that understands envelopes is not a transport.
 
-### Why `app.config.ts` **does** need a provider entry
+### Why the root binding lives on the token, not in `app.config.ts`
 
-> **Corrected during implementation (F-047 T002).** This section originally read "Why no
+> **Corrected twice during implementation (F-047 T002 → T004).** This section originally read "Why no
 > `app.config.ts` change" and claimed that `providedIn: 'root'` alone lets the root injector satisfy the
 > abstract-class dependency. **That was wrong**, and the claim was only ever plausible-looking: Angular's
 > injector has no notion of inheritance, and `class LocalStorageAdapter extends PersistencePort` is a
 > compile-time relationship the runtime never sees. `providedIn: 'root'` registers exactly one token —
-> `LocalStorageAdapter`. The `PersistencePort` token got no binding, and every store constructor would
-> have injected `null` and thrown `NG0201` on its first `read`, in the browser, at runtime.
+> `LocalStorageAdapter`. The `PersistencePort` token got no binding. Found by writing the test first:
+> `ɵNotFound: NG0201: No provider found for PersistencePort`.
 >
-> The failure was found by writing the test first
-> (`local-storage.adapter.spec.ts` → "the port itself resolves at the root", asserting against the real
-> `appConfig.providers`): `ɵNotFound: NG0201: No provider found for PersistencePort`. The fix is the
-> explicit binding `{ provide: PersistencePort, useClass: LocalStorageAdapter }`.
+> The first correction put `{ provide: PersistencePort, useClass: LocalStorageAdapter }` in
+> `app.config.ts`. That satisfies FR-009 for the running app and is the obvious fix — and it is wrong
+> for this feature. T004 put `ChatStore` on the port and **210 tests failed**: the page specs under
+> `src/app/features/**` inject the stores through the component tree and configure a `TestBed` with no
+> persistence providers, and **`TestBed` never reads `app.config`**. The two options were to edit 12
+> spec files under `features/` (violating FR-008) or to make the port optional with a
+> `new LocalStorageAdapter()` default — which deletes the seam, because a store would silently fall
+> back to real storage instead of failing.
 >
-> **FR-009 is unchanged and still met** — the port is provided at the app root with `LocalStorageAdapter`
-> as the default, no store lists a provider, and no component changes (FR-008 holds; `app.config.ts` is
-> not under `features/` or `shared/`). Only the *mechanism* the plan mispredicted changed. Left in place
-> uncorrected, the false claim would have read as a decision rather than an error.
+> The resolution is to declare the default on the token itself:
+>
+> ```ts
+> // persistence.port.ts
+> @Injectable({ providedIn: 'root', useClass: LocalStorageAdapter })
+> export abstract class PersistencePort { /* ... */ }
+> ```
+>
+> This resolves in the app **and** in every `TestBed`, so FR-009's "no test needs one for a happy path"
+> and FR-008's empty diff over `features/` hold together. The cost is that the abstraction names one of
+> its implementations — paid knowingly, because FR-008 + FR-009 are jointly unsatisfiable without it.
+> `app.config.ts` was reverted: one mechanism, not two.
+>
+> `LocalStorageAdapter` keeps its own `providedIn: 'root'` as well, and the two are not redundant:
+> the token's binding is what lets a **store** ask for the seam, while the class's is what lets a test
+> ask for the concrete adapter by name (the FR-006 byte-compatibility test needs that).
+>
+> **This required `extends` → `implements` with an `import type`.** With `extends`, `persistence.port.ts`
+> needs the adapter's *value* for `useClass` and the adapter needs the port's *value* to extend —
+> a runtime cycle, and a `ReferenceError` at module evaluation because the subclass would be evaluated
+> against a `PersistencePort` still in its temporal dead zone. `import type` is erased entirely, so the
+> cycle never exists and `implements` keeps the compile-time conformance check.
 
-`LocalStorageAdapter` keeps `providedIn: 'root'` **as well as** the `app.config.ts` binding. The two are
-not redundant and the difference is load-bearing: `providedIn: 'root'` is what lets any test ask for the
-concrete adapter directly, while the `PersistencePort` binding is what lets a store ask for the seam. A
-test that swaps the port does so by overriding *one* token, and `LocalStorageAdapter` remains resolvable
-for the FR-006 byte-compatibility test without a second provider.
+**No requirement changed.** FR-009 always asked for the port to be provided at the app root with
+`LocalStorageAdapter` as the default; the plan simply mispredicted the mechanism twice. Only the means
+were wrong. Left uncorrected, the original claim would have read as a decision rather than an error.
 
 ## File plan
 
 | File | Change |
 | ---- | ------ |
-| `src/app/core/persistence/persistence.port.ts` | **new** — `PersistencePort` abstract class, with the HTTP caveat in its doc comment (FR-012) |
-| `src/app/core/persistence/local-storage.adapter.ts` | **new** — `LocalStorageAdapter`, `@Injectable({ providedIn: 'root' })`; the only `window.localStorage` reference in `core` (FR-002) |
-| `src/app/core/persistence/local-storage.adapter.spec.ts` | **new** — adapter behaviour incl. the throwing-`localStorage` cases, plus the FR-009 root-binding test |
-| `src/app/app.config.ts` | **edit** — bind `PersistencePort` → `LocalStorageAdapter` (FR-009; the "why no change" claim above was corrected after NG0201) |
+| `src/app/core/persistence/persistence.port.ts` | **new** — `PersistencePort` abstract class **carrying its own root default** (`providedIn: 'root', useClass: LocalStorageAdapter`), plus the HTTP caveat (FR-012) and the FR-008 rationale |
+| `src/app/core/persistence/local-storage.adapter.ts` | **new** — `LocalStorageAdapter implements PersistencePort` (via `import type`, to avoid a runtime cycle), `@Injectable({ providedIn: 'root' })`; the only `window.localStorage` reference in `core` (FR-002) |
+| `src/app/core/persistence/local-storage.adapter.spec.ts` | **new** — adapter behaviour incl. the throwing-`localStorage` cases, plus FR-009 root resolution (empty `TestBed`) and FR-010 substitution |
 | `src/app/core/persistence/in-memory.port.ts` | **new** — test double implementing the port, for proving the seam (FR-010) |
 | `src/app/core/chat.store.ts` | inject the port; delete `readStorage`/`writeStorage`/`clearStorage` (`:58,66,74`) (FR-003, FR-004) |
 | `src/app/core/call.store.ts` | inject the port; delete `readStorage`/`writeStorage` (`:25,33`) (FR-003, FR-004) |
 | `src/app/core/prefs.store.ts` | inject the port; delete `readStorage`/`writeStorage`/`clearStorage` (`:56,64,72`) (FR-003, FR-004) |
 | `src/app/core/*.spec.ts` | supply a port at every `new XStore()` site; add the FR-007a gap tests |
-| `src/app/features/**`, `src/app/shared/**` | **untouched** (FR-008) |
+| `src/app/features/**`, `src/app/shared/**` | **untouched** (FR-008) — and this is load-bearing: the root binding lives on the token precisely so these 12 spec files need no provider |
 
 `in-memory.port.ts` lives in `src/app/core/persistence/` rather than under a test folder because
 Angular's build does not special-case test helpers, and a fake that has to be excluded from the
@@ -107,6 +126,11 @@ production bundle by path convention is a fake that eventually ships.
    invisible to the compiler: `providedIn: 'root'` compiles, the build is green, and the defect only
    surfaces as `NG0201` in a running app. The general lesson — an abstract class chosen *precisely
    because* it fails loudly when unsatisfied provides no such guarantee for the token that extends it.
+7. **An `app.config.ts` binding looks like it satisfies FR-009 and does not** (realised during T004 —
+   210 failures). `TestBed` does not read the application config, so a binding that is correct for the
+   shipped app is invisible to all 12 page specs under `features/`, which FR-008 forbids editing. Any
+   seam a component-level test reaches must be self-provisioning; "it works in the app" is not evidence
+   that a test can reach it.
 
 ## Drift Policy
 

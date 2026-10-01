@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PersistencePort } from './persistence.port';
+import type { PersistencePort } from './persistence.port';
 
 /**
  * F-047 FR-002. The only `window.localStorage` reference in `src/app/core`.
@@ -15,13 +15,14 @@ import { PersistencePort } from './persistence.port';
  * - all three can throw merely for *touching* `window.localStorage` at all, which
  *   is why nothing here runs at injection time — see plan.md risk 4.
  *
- * `providedIn: 'root'` is what satisfies the port for all three stores without a
- * provider list in `app.config.ts` and without touching a single component (F-047
- * FR-009, FR-008).
+ * `providedIn: 'root'` here is what lets a test ask for the concrete adapter by name. The *port*
+ * binding — what lets a store ask for the seam — lives on `PersistencePort` itself; see the note in
+ * `persistence.port.ts` for why it cannot live here, and why an `extends` clause would deadlock module
+ * evaluation.
  */
 @Injectable({ providedIn: 'root' })
-export class LocalStorageAdapter extends PersistencePort {
-  override read(key: string): string | null {
+export class LocalStorageAdapter implements PersistencePort {
+  read(key: string): string | null {
     try {
       return window.localStorage.getItem(key);
     } catch {
@@ -29,7 +30,7 @@ export class LocalStorageAdapter extends PersistencePort {
     }
   }
 
-  override write(key: string, value: string): void {
+  write(key: string, value: string): void {
     try {
       window.localStorage.setItem(key, value);
     } catch {
@@ -37,7 +38,7 @@ export class LocalStorageAdapter extends PersistencePort {
     }
   }
 
-  override remove(key: string): void {
+  remove(key: string): void {
     try {
       window.localStorage.removeItem(key);
     } catch {
