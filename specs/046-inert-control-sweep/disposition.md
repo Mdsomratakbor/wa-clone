@@ -64,7 +64,7 @@ gap, not a claim of coverage. G4 does not extend to them.
 | `ds-storage-usage`, `ds-auto-download`, `ds-images`, `ds-audio`, `ds-videos`, `ds-documents`, `ds-network-usage` | Data & storage (7) | Storage usage + media auto-download |
 | `chats-wallpaper` | Chats settings | Wallpaper picker (capture-blocked) |
 | `chats-keyboard` | Chats settings | Chat-wallpaper/keyboard shortcut sheet |
-| `contact-groups` | Contact info | Groups membership (gap-audit B8) |
+| ~~`contact-groups`~~ | Contact info | **RESOLVED by F-048 (2026-10-01)** — now live, opens `/contact/:id/groups` |
 | Status `Send` | Status | Status publishing |
 | Camera `Shutter`, `Flip` | Camera | Capture pipeline — **blocked**, `getUserMedia` unavailable |
 

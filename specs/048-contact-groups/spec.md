@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-01
 
-**Status**: **Specified** (clarifications resolved; G1 capture still BLOCKED — see Review Gates)
+**Status**: **Implemented** (build green, unit 635/635; G1 capture still BLOCKED — see Review Gates)
 
 **Input**: design row 15 (`0:9486`, Contact Info) + gap audit tier B8
 
@@ -57,7 +57,10 @@ the empty-state copy are PROVISIONAL under a blocked capture gate.
 - **FR-004** The accessor is a pure read-time derivation: no new model field, no seed change, no
   snapshot shape change, and nothing persisted. Nothing here belongs in the versioned snapshot.
 - **FR-005** The screen renders each shared group through the existing shared `chat-list-item`
-  component, **unchanged**. No shared component is edited for this feature.
+  component, **unchanged**. No shared component is edited for this feature. Hosting it implies
+  honouring the font scale — `chat-list-item` does not read it itself, so the page applies
+  `data-font-scale` as `chats-page` and `broadcasts-page` do (added at the analyze pass, see
+  `tasks.md`).
 - **FR-006** A contact in no group shows an empty state in a `role="status"` live region, not an
   empty list. This is the **default shipped state for all nine seeded contacts** (see Clarifications).
 - **FR-007** Activating a row navigates to `/chat/<groupId>` — the real group conversation, which
@@ -150,13 +153,16 @@ the empty-state copy are PROVISIONAL under a blocked capture gate.
 
 ## Definition of Done
 
-- [ ] Every FR is covered by at least one named unit test
-- [ ] Broadcasts are explicitly excluded and tested (FR-003)
-- [ ] The accessor is read-only: no field, no seed, no persistence change (FR-004)
-- [ ] The empty-for-everyone default is specified as intentional, not as a defect (FR-006)
-- [ ] Row activation navigates to a real group chat, not a dead control (FR-007)
-- [ ] No shared component is modified (FR-005)
-- [ ] The blocked G1 gate is recorded, not skipped, and the verified entry row is distinguished from
+- [x] Every FR is covered by at least one named unit test (FR → test map in `tasks.md`)
+- [x] Broadcasts are explicitly excluded and tested (FR-003)
+- [x] The accessor is read-only: no field, no seed, no persistence change (FR-004)
+- [x] The empty-for-everyone default is specified as intentional, not as a defect (FR-006)
+- [x] Row activation navigates to a real group chat, not a dead control (FR-007)
+- [x] No shared component is modified (FR-005)
+- [x] The blocked G1 gate is recorded, not skipped, and the verified entry row is distinguished from
       the provisional sub-screen
-- [ ] Drift notes are added to specs 015, 044, 046, the gap audit, and `figma/design-map.md` row 15
-- [ ] Playwright spec authored; execution deferred per the owner directive (2026-09-26)
+- [x] Drift notes are added to specs 015, 044, 046, the gap audit, and `figma/design-map.md` row 15
+- [x] Playwright spec authored; execution deferred per the owner directive (2026-09-26)
+- [x] `npm run build` green; full unit suite green at **635/635**
+- [x] `/speckit.analyze` clean — the one divergence (font scale) is recorded in `tasks.md` and
+      annotated in FR-005 rather than applied silently

@@ -6,7 +6,7 @@
 
 ## Implementation
 
-- [ ] **T001** - `ChatStore.contactGroups(chatId)`: filter conversations to
+- [x] **T001** - `ChatStore.contactGroups(chatId)`: filter conversations to
       `kind === 'group' && participantIds.includes(chatId)`, returning `readonly ChatPreview[]`.
       **Tests first** in `chat.store.spec.ts`:
   - returns a group that contains the contact
@@ -18,14 +18,14 @@
   - does not mutate `conversations()` and does not persist
   - returns the store's conversation order
 
-- [ ] **T002** - Route `contact/:id/groups` → `GroupsPage`, placed after `contact/:id/media` and
+- [x] **T002** - Route `contact/:id/groups` → `GroupsPage`, placed after `contact/:id/media` and
       before `contact/:id/edit`.
 
-- [ ] **T003** - `groups-page.ts` / `.html` / `.scss`: read the `id` param, expose `groups` from
+- [x] **T003** - `groups-page.ts` / `.html` / `.scss`: read the `id` param, expose `groups` from
       `contactGroups()`, single `back` leading action rendering `/contact/:id`, empty state in a
       `role="status"` region, rows fed to the unmodified `chat-list-item`, OnPush, tokens only.
 
-- [ ] **T004** - `groups-page.spec.ts`: **tests first**, asserting
+- [x] **T004** - `groups-page.spec.ts`: **tests first**, asserting
   - one row per shared group, named by the group name
   - the empty state for a contact in no group, inside a `role="status"` region
   - the nav title is `Groups`
@@ -35,21 +35,21 @@
   - no horizontal overflow at 320px
   - the preview text is gated by `showPreviews` (inherited from `chat-list-item` / F-046 FR-006)
 
-- [ ] **T005** - Wire `ContactPage.onRowActivate`: `contact-groups` → `/contact/:id/groups`, and
+- [x] **T005** - Wire `ContactPage.onRowActivate`: `contact-groups` → `/contact/:id/groups`, and
       **delete the now-false comment** asserting the row stays inert. `contact-page.spec.ts`: the
       `Groups` row routes to `/contact/:id/groups`, replacing F-044's "stays a no-op" assertion.
 
-- [ ] **T006** - `tests/e2e/contact-groups.spec.ts` — contact → `Groups` → empty state; then, after
+- [x] **T006** - `tests/e2e/contact-groups.spec.ts` — contact → `Groups` → empty state; then, after
       creating a group including that contact via New Group, the group appears and opens its chat;
       `Back` returns to the contact. **Authored, not run** (Playwright paused, owner directive
       2026-09-26).
 
-- [ ] **T007** - G2: `npm run build` green, then the **full** unit suite green with the exact count
+- [x] **T007** - G2: `npm run build` green, then the **full** unit suite green with the exact count
       reported.
 
-- [ ] **T008** - `/speckit.analyze` pass; resolve any contradiction rather than editing silently.
+- [x] **T008** - `/speckit.analyze` pass; resolve any contradiction rather than editing silently.
 
-- [ ] **T009** - `/speckit.checklist` per FR with named test evidence; `/speckit.converge`.
+- [x] **T009** - `/speckit.checklist` per FR with named test evidence; `/speckit.converge`.
 
 ## Capture - BLOCKED (Figma 429, reset 2026-10-02 18:38 UTC)
 
@@ -84,27 +84,63 @@ npx ng test --watch=false --reporters=progress   # playwright runs paused per ow
 
 ## FR → test traceability
 
-Filled in at closure with the exact suite count and named tests.
+Unit suite: **635/635** (620 baseline + 4 `chat.store.spec.ts` + 11 `groups-page.spec.ts`; the
+`contact-page.spec.ts` deferral test was re-titled in place, not added). Build green. All names in
+`GroupsPage` unless stated.
 
 | FR | Test |
 |----|------|
-| FR-001 | T005 |
-| FR-002 | T001 |
-| FR-003 | T001 |
-| FR-004 | T001 |
-| FR-005 | T004 |
-| FR-006 | T004 |
-| FR-007 | T004 |
-| FR-008 | T004 |
-| FR-009 | T004 |
-| FR-010 | T001, T004 |
-| FR-011 | T004 |
-| FR-012 | T004 |
+| FR-001 | `contact-page.spec.ts` → 'the Groups row routes to /contact/:id/groups (F-048 FR-001)' |
+| FR-002 | store: 'contactGroups lists only the groups a contact belongs to (F-048 FR-002)' |
+| FR-003 | store: 'contactGroups excludes a broadcast containing the contact (F-048 FR-003)' |
+| FR-004 | store: 'contactGroups is read-only and returns the store conversation order (F-048 FR-004)' |
+| FR-005 | 'lists one row per shared group, named by the group (FR-005)', 'the row preview is gated by showPreviews, inherited from chat-list-item (FR-005)' |
+| FR-006 | 'shows the empty state in a live region for a contact in no group (FR-006)' |
+| FR-007 | 'activating a row opens the group chat (FR-007)', 'a row can be opened by keyboard, not only by mouse (FR-007, FR-009)' |
+| FR-008 | 'Back returns to the contact (FR-008)' |
+| FR-009 | 'the nav title is Groups (FR-009)', 'a row is keyboard reachable and labelled with the group name (FR-009)' |
+| FR-010 | 'shows the empty state for an unknown contact id rather than throwing (FR-010)' |
+| FR-011 | 'does not overflow horizontally (FR-011)' |
+| FR-012 | 'shows the empty state in a live region for a contact in no group (FR-006)' — no create/add/leave control is asserted to exist |
 
-## Analysis pass (the `/speckit.analyze` gate)
+Two extras beyond the FRs, both recorded deliberately: the `showPreviews` gating test, because
+`GroupsPage` hosts a component that reads `PrefsStore` but does not own it; and the
+`data-font-scale` test, for the same reason.
 
-Run at closure; results appended here.
+## Analysis pass (the `/speckit.analyze` gate, run at closure)
+
+One divergence between spec and shipped code, recorded rather than fixed silently:
+
+- **The font scale was missing from the spec.** Implementation revealed that `chat-list-item` does
+  not read the font scale itself — every screen that hosts it applies `data-font-scale`
+  (`chats-page`, `broadcasts-page`, per F-041). Without it, the font size setting would be silently
+  inert on the Groups screen, which is a new instance of exactly the defect class F-046 exists to
+  kill. `GroupsPage` therefore applies it, with a test. This is recorded as an addition, not a
+  silent one: `spec.md` FR-005 and `plan.md` are annotated below rather than rewritten.
+
+Two spec claims were confirmed against the code rather than assumed:
+
+- FR-012's "no create control" needed no negative code, because no template element for one exists;
+  the assertion is the empty-state test plus the absence of any such control.
+- The `role="status"` requirement in FR-006 matches the `broadcasts-page` precedent, so the empty
+  state is consistent with the other two list screens.
+
+No unresolved contradictions remain across spec, plan, tasks and code.
+
+### Amendments applied
+
+- `plan.md` §Files and §Page: noted that the page injects `PrefsStore` for `data-font-scale`.
+- `spec.md` FR-005: annotated that hosting `chat-list-item` implies honouring the font scale.
 
 ## Closure (G3)
 
-Appended at closure.
+- `spec.md` status → Implemented; 635/635 unit, build green.
+- Drift notes appended to `specs/015-contact-info/spec.md` and `specs/044-media-screen/spec.md`.
+- `specs/design-gap-audit.md` B8 closed + a 2026-10-01 changelog entry; `figma/design-map.md` row 15
+  updated; `specs/046-inert-control-sweep/disposition.md` `contact-groups` marked resolved.
+- `tests/e2e/contact-groups.spec.ts` authored (6 specs), **not run** per the Playwright pause.
+  `tests/e2e/media.spec.ts` lost its now-false "Groups row is still inert" test.
+- Commits: `684b891` docs(spec) · `e3fc341` feat (store) · `aaa66cf` feat (page + route + wiring) ·
+  `ebd22b3` test · `ba033a4` test (e2e) · closure docs.
+- **Still blocked, not skipped**: G1. The sub-screen chrome is PROVISIONAL; no node ID is cited or
+  invented for it. T010–T012 stay open until the Figma quota resets (**2026-10-02 18:38 UTC**).

@@ -39,7 +39,7 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 | B5 | 16 Chats settings | `Font size` | size control (persisted, applied app-wide) — **done (F-041)** |
 | B6 | 4/5 Calls | `New call`, row tap, call info | call screen / call-info sheet — **DONE (F-045)**: row tap (F-038), the call-info sheet (F-043), and now the calling flow — picker at `/calls/new`, in-call screen at `/calls/active`, and all three previously inert controls wired. The new chrome is PROVISIONAL by construction (no Figma node exists). F-046 additionally wired the `All`/`Missed` filter and fixed `isMissedCall`, which had been reporting unanswered calls as answered since F-045 |
 | B7 | 15 Contact info | `Media, photos and links` | media grid — **done (F-044)**, derived from the chat's own `Message.file` entries; only chat-006 is populated, so the empty state is the default, and the grid chrome is PROVISIONAL |
-| B8 | 15 Contact info | `Groups` | shared-groups list — **open, and now a named deferral**: needs shared-group membership data the store does not hold. F-046 left the row untouched and recorded it; the row is still live-looking and still inert, which is a tracked gap rather than a fix |
+| B8 | 15 Contact info | `Groups` | shared-groups list — **closed by F-048 (2026-10-01)**, 635 unit green. F-044's premise was half right: the seed holds no group, but `ChatPreview.participantIds` *is* the membership record and is populated by the live F-040 New Group flow, so the list is a filter rather than an invented social graph. `/contact/:id/groups` lists groups where `kind === 'group'` and the contact id is a participant. **Owner decision: derive only, seed nothing** — so all nine seeded contacts show the empty state on first run, which is the honest state of a fresh install. Sub-screen chrome is **provisional** (no Figma node exists for it) |
 | B9 | 14 Account | `Security`, `Two-step verification`, `Change number`, `Delete my account` | 4 sub-screens — **still open, now a named deferral.** F-046 left all 4 rows untouched and recorded them |
 | B10 | 17 Notifications | `Sound`, `Vibrate`, `Popup notification` | **not a gap — the "3 sub-screens" wording was wrong.** All five notification rows ship as flat toggles in F-017, which the owner confirmed on 2026-09-29 is the intended shape. **F-046 completed this**: `onRowActivate` and its dead `<button>` branch are removed, and `sound`/`vibrate`/`popup`/`light`/`mediaVisibility` — five live switches that persisted values nothing read — are now honestly disabled with their storage keys deleted |
 | B11 | 18 Data and storage | `Storage usage`, `Media auto-download`, `Images`, `Audio`, `Videos`, `Documents`, `Network usage` | storage management — **still open, now a named deferral.** F-046 left all 7 rows untouched and recorded them |
@@ -77,8 +77,8 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   media grid derived from that chat's own file messages, so the screen cannot contradict the chat
   window. Only `chat-006` (Martha Craig) has a thread, and it holds all four file messages, so eight
   of nine contacts get the empty state; that is the honest result of not inventing per-contact
-  media. The `Groups` row (B8) stays inert: it needs shared-group membership the store does not
-  have, and inventing it would mean inventing the social graph.
+  media. The `Groups` row (B8) was inert here for the same reason and was **closed by F-048**: the
+  social graph is not invented, it is read from `participantIds`. See the B8 row above.
 
 ## Suggested order
 
@@ -125,7 +125,8 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 - **2026-09-29** — F-044 Media screen (469 unit) landed; build green. B7 done for the populated
   case: a per-contact grid derived from that chat's own `Message.file` entries, so the screen cannot
   contradict the chat window. Empty state is the honest default — only `chat-006` has a thread.
-  B8 (`Groups`) stays inert and needs shared-group membership the store does not hold.
+  B8 (`Groups`) was left inert on the same reasoning and was **wrong**: membership is readable from
+  `participantIds`, not absent. Closed by F-048 on 2026-10-01.
 - **2026-09-29** — F-045 Calling flow (**549 unit**, +55) landed; build green, `tsc` clean. **B6
   done, audit A6 closed**: all five inert controls are now live. The calling flow is a real state
   machine (`dialing → ringing → connected → ended`) over local state on an injected clock, with
@@ -151,3 +152,14 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   `enterKeySends` is the only read in the app). F-046's scope was narrowed by the owner to the
   **honesty fixes**; the large destinations each become their own spec. This sweep also caused the
   backend seam to be **renumbered F-046 → F-047** (owner-confirmed 2026-09-29).
+
+- **2026-10-01** - F-048 Shared Groups landed (**635 unit**, +15) and **B8 is closed**. The row now
+  opens /contact/:id/groups. This also **corrects an F-044 conclusion**: shared-group membership
+  was never missing data, it is `ChatPreview.participantIds`, which F-040's live New Group screen
+  already populates. The list is a filter, so no social graph is invented. Owner decision on
+  2026-10-01 was to derive only and seed nothing, which leaves all nine seeded contacts showing the
+  empty state on first run - honest, and one New Group away from populated. `ChatStore` gained one
+  pure accessor; no model field, no seed, no snapshot change and no shared component edit. One
+  finding worth carrying forward: `contactConversations()` sorts alphabetically by contact name, so
+  it does not begin at `chat-001` - seeding participants from it silently produced a route param
+  and a participant id that disagreed. G1 remains BLOCKED, so the sub-screen chrome is provisional.

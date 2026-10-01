@@ -100,3 +100,12 @@ action targets are later features (messaging, calling, media/groups screens not 
 
 Until T001 lands, `contact-page` renders the structural hero + hypothesis rows (stable testids/
 aria-labels) — replaced at G1 with the captured design.
+
+## Drift note (F-048, 2026-10-01)
+
+- The `Groups` row on this screen was seeded by F-015 and left inert. It is **live as of F-048**:
+  it opens `/contact/:id/groups`, which lists the groups whose `participantIds` contain this
+  contact. See `specs/048-contact-groups`.
+- This also corrects the rationale recorded by F-026/F-044, which described the row as needing
+  membership data the store does not hold. `ChatPreview.participantIds` **is** that membership
+  record, and the live F-040 New Group screen populates it. No social graph was invented.

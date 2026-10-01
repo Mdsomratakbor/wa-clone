@@ -155,3 +155,13 @@ and the empty-state copy are PROVISIONAL under a blocked capture gate.
 - [x] The blocked G1 gate is recorded, not skipped, and the verified entry row is distinguished from
       the provisional sub-screen
 - [x] Drift notes are planned for specs 015 and the gap audit
+
+## Drift note (F-048, 2026-10-01)
+
+- The **Non-Goal** above -- "The `Groups` row (gap audit B8) - needs shared-group membership data
+  the store lacks" -- is **discharged** by F-048. The non-goal stands as a scope decision for *this*
+  feature; the row is built in its own spec.
+- The premise behind it was **half wrong**, and the correction matters: the seed contains no group at
+  all, but `ChatPreview.participantIds` is the membership record, so the shared-groups list is a
+  filter rather than an invented social graph. F-048 derives it and seeds nothing, by owner
+  decision on 2026-10-01.
