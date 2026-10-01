@@ -511,6 +511,47 @@ describe('ChatStore', () => {
     expect(store.contact('chat-006')?.subtitle).toBe(CONTACT_SUBTITLE);
   });
 
+  it('contactGroups lists only the groups a contact belongs to (F-048 FR-002)', () => {
+    const mine = store.contactConversations()[0];
+    const other = store.contactConversations()[1];
+    const shared = store.createGroup('Weekend plans', [mine.id, other.id]);
+    const notMine = store.createGroup('Others only', [other.id]);
+
+    const sharedIds = store.contactGroups(mine.id).map((chat) => chat.id);
+    expect(sharedIds).toEqual([shared]);
+    expect(sharedIds).not.toContain(notMine);
+  });
+
+  it('contactGroups excludes a broadcast containing the contact (F-048 FR-003)', () => {
+    const mine = store.contactConversations()[0];
+    const broadcast = store.createBroadcast('All hands', [mine.id]);
+
+    expect(
+      store.conversations().find((chat) => chat.id === broadcast)?.participantIds,
+    ).toContain(mine.id);
+    expect(store.contactGroups(mine.id)).toEqual([]);
+  });
+
+  it('contactGroups excludes direct conversations and returns [] for an unknown id (F-048 FR-002)', () => {
+    const mine = store.contactConversations()[0];
+    const other = store.contactConversations()[1];
+
+    expect(store.contactGroups(mine.id)).toEqual([]);
+    expect(store.contactGroups('no-such-contact')).toEqual([]);
+    expect(store.contactGroups('')).toEqual([]);
+    expect(store.conversations().some((chat) => chat.id === other.id)).toBe(true);
+  });
+
+  it('contactGroups is read-only and returns the store conversation order (F-048 FR-004)', () => {
+    const mine = store.contactConversations()[0];
+    const first = store.createGroup('First', [mine.id]);
+    const second = store.createGroup('Second', [mine.id]);
+    const before = store.conversations().map((chat) => chat.id);
+
+    expect(store.contactGroups(mine.id).map((chat) => chat.id)).toEqual([first, second]);
+    expect(store.conversations().map((chat) => chat.id)).toEqual(before);
+  });
+
   it('createBroadcast makes a broadcast with recipients and an empty thread (F-042 FR-002)', () => {
     const id = store.createBroadcast('All hands', ['chat-001', 'chat-002']);
     const broadcast = store.conversations().find((chat) => chat.id === id);

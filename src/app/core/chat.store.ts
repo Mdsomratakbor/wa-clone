@@ -202,6 +202,16 @@ export class ChatStore {
     return kind === 'group' || kind === 'broadcast';
   }
 
+  contactGroups(chatId: string): readonly ChatPreview[] {
+    // F-048 FR-003: the kind test is load-bearing, not decorative. createBroadcast()
+    // fills participantIds with recipient ids too, so a membership-only filter
+    // would report broadcasts as groups.
+    return this.conversations().filter(
+      (chat) =>
+        (chat.kind ?? 'direct') === 'group' && (chat.participantIds ?? []).includes(chatId),
+    );
+  }
+
   private resolveContactNames(chatId: string): readonly string[] {
     const chat = this.conversations().find((c) => c.id === chatId);
     if (!chat) {
