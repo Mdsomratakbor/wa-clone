@@ -1,22 +1,45 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
+import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 import { ComposePage } from './compose-page';
 import { StatusStore } from '../../core/status.store';
 import { Clock } from '../../core/clock';
 
 describe('ComposePage', () => {
   let fixture: ComponentFixture<ComposePage>;
+  let routeKind: string | null = null;
 
   beforeEach(async () => {
     localStorage.clear();
+    routeKind = null;
     await TestBed.configureTestingModule({
       imports: [ComposePage],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        // F-050: the page reads `?kind=photo` off the route snapshot, following the
+        // `in-call-page.ts` precedent. A getter keeps the stub mutable so one TestBed
+        // can render both modes, instead of reconfiguring mid-test.
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              get queryParamMap(): URLSearchParams {
+                return new URLSearchParams(routeKind === null ? '' : `kind=${routeKind}`);
+              },
+            },
+          },
+        },
+      ],
     }).compileComponents();
   });
 
   function render(): HTMLElement {
+    return renderIn(null);
+  }
+
+  function renderIn(kind: string | null): HTMLElement {
+    routeKind = kind;
     fixture = TestBed.createComponent(ComposePage);
+    fixture.autoDetectChanges();
     fixture.detectChanges();
     return fixture.nativeElement as HTMLElement;
   }
@@ -166,5 +189,206 @@ describe('ComposePage', () => {
     (el.querySelector('[data-testid="compose-keyboard"]') as HTMLElement).click();
     fixture.detectChanges();
     expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  // ---------------------------------------------------------------- F-050 ------
+
+  describe('photo mode', () => {
+    /** F-050: a real PNG from a canvas, so the downscale path is genuinely exercised. */
+    function imageFile(width = 40, height = 30, name = 'photo.png'): File {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext('2d')!;
+      context.fillStyle = '#ff8a8c';
+      context.fillRect(0, 0, width, height);
+      const binary = atob(canvas.toDataURL('image/png').split(',')[1]);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return new File([bytes], name, { type: 'image/png' });
+    }
+
+    function chooseFile(el: HTMLElement, file: File): void {
+      const input = el.querySelector<HTMLInputElement>('[data-testid="compose-file"]')!;
+      input.files = (() => {
+        const transfer = new DataTransfer();
+        transfer.items.add(file);
+        return transfer.files;
+      })();
+      input.dispatchEvent(new Event('change'));
+    }
+
+    function decodeDimensions(dataUrl: string): Promise<{ width: number; height: number }> {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+        image.onerror = () => reject(new Error('preview data URL did not decode'));
+        image.src = dataUrl;
+      });
+    }
+
+    /**
+     * F-050: an `Image` load is not a task zone.js tracks, so `whenStable()` returns
+     * before the decode lands, and clock-based polling is slow and flaky. Instead the
+     * fixture runs with `autoDetectChanges`, so the DOM mutates on the zone turn the
+     * decode finishes in, and this waits on DOM mutations alone — settling the moment
+     * the `decoding` indicator is rendered away. The timeout guard exists only to
+     * fail loudly if the pipeline ever breaks.
+     */
+    async function chooseAndSettle(el: HTMLElement, file: File): Promise<void> {
+      chooseFile(el, file);
+      await waitForDecodingToClear(el);
+    }
+
+    function waitForDecodingToClear(el: HTMLElement, timeoutMs = 5000): Promise<void> {
+      return new Promise((resolve, reject) => {
+        const container = el.querySelector('[data-testid="compose-photo"]') ?? el;
+        const timer = window.setTimeout(() => {
+          observer.disconnect();
+          reject(new Error('the photo never finished decoding'));
+        }, timeoutMs);
+        const settled = (): boolean =>
+          el.querySelector('[data-testid="compose-photo-decoding"]') === null;
+        if (settled()) {
+          window.clearTimeout(timer);
+          resolve();
+          return;
+        }
+        const observer = new MutationObserver(() => {
+          if (settled()) {
+            observer.disconnect();
+            window.clearTimeout(timer);
+            resolve();
+          }
+        });
+        observer.observe(container, { childList: true, subtree: true, attributes: true });
+      });
+    }
+
+    it('opens in photo mode from ?kind=photo (FR-001)', () => {
+      const el = renderIn('photo');
+
+      expect(el.querySelector('[data-testid="compose-file"]')).not.toBeNull();
+      expect(el.querySelector('[data-testid="compose-input"]')).toBeNull();
+    });
+
+    it('treats any other kind as text mode, so an unknown param is not an empty screen (FR-001)', () => {
+      expect(renderIn('nonsense').querySelector('[data-testid="compose-input"]')).not.toBeNull();
+      expect(renderIn(null).querySelector('[data-testid="compose-input"]')).not.toBeNull();
+    });
+
+    it('renders a labelled file input accepting images (FR-002)', () => {
+      const el = renderIn('photo');
+      const input = el.querySelector<HTMLInputElement>('[data-testid="compose-file"]')!;
+
+      expect(input.getAttribute('type')).toBe('file');
+      expect(input.getAttribute('accept')).toBe('image/*');
+      const label = el.querySelector<HTMLLabelElement>('label[for="compose-file"]');
+      expect(label?.textContent?.trim().length).toBeGreaterThan(0);
+      expect(input.getAttribute('aria-label') ?? label?.textContent?.trim()).toBeTruthy();
+    });
+
+    it('omits the keyboard graphic in photo mode, and keeps it in text mode (FR-003)', () => {
+      expect(renderIn('photo').querySelector('[data-testid="compose-keyboard"]')).toBeNull();
+      expect(renderIn(null).querySelector('[data-testid="compose-keyboard"]')).not.toBeNull();
+    });
+
+    it('Send is disabled until an image is chosen, and enabled once decoded (FR-002)', async () => {
+      const el = renderIn('photo');
+      const send = () => el.querySelector<HTMLButtonElement>('[data-testid="compose-send"]')!;
+
+      expect(send().disabled).toBe(true);
+
+      await chooseAndSettle(el, imageFile());
+
+      expect(send().disabled).toBe(false);
+    });
+
+    it('shows a preview of the chosen photo and publishes it (FR-002, FR-004, FR-005)', async () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate').and.resolveTo(true);
+      const el = renderIn('photo');
+
+      await chooseAndSettle(el, imageFile());
+
+      const preview = el.querySelector<HTMLImageElement>('[data-testid="compose-photo-preview"]')!;
+      expect(preview.getAttribute('src')).toMatch(/^data:image\/jpeg;base64,/);
+
+      (el.querySelector('[data-testid="compose-send"]') as HTMLButtonElement).click();
+      fixture.detectChanges();
+
+      const status = TestBed.inject(StatusStore).myStatus();
+      expect(status?.photo?.dataUrl).toMatch(/^data:image\/jpeg;base64,/);
+      expect(status?.text).toBe('');
+      expect(router.navigate).toHaveBeenCalledWith(['/status']);
+    });
+
+    it('a file that is not an image leaves Send disabled and publishes nothing (FR-004)', async () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate').and.resolveTo(true);
+      const el = renderIn('photo');
+
+      await chooseAndSettle(el, new File([new Uint8Array([1, 2, 3])], 'notes.txt', { type: 'text/plain' }));
+
+      expect(el.querySelector('[data-testid="compose-photo-preview"]')).toBeNull();
+      expect(el.querySelector<HTMLButtonElement>('[data-testid="compose-send"]')?.disabled).toBe(true);
+      expect(TestBed.inject(StatusStore).myStatus()).toBeNull();
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('picks a second file in place of the first rather than stacking (FR-005)', async () => {
+      const el = renderIn('photo');
+
+      await chooseAndSettle(el, imageFile(40, 30, 'first.png'));
+      const first = el
+        .querySelector<HTMLImageElement>('[data-testid="compose-photo-preview"]')!
+        .getAttribute('src');
+
+      await chooseAndSettle(el, imageFile(64, 48, 'second.png'));
+      const second = el
+        .querySelector<HTMLImageElement>('[data-testid="compose-photo-preview"]')!
+        .getAttribute('src');
+
+      // FR-005 is replacement, so the second photo must read as a different image: the
+      // decoded source of `second` is the 64x48 PNG, and only one preview exists.
+      const secondDimensions = await decodeDimensions(second!);
+      expect(secondDimensions).toEqual({ width: 64, height: 48 });
+      expect(second).not.toBe(first);
+      expect(el.querySelectorAll('[data-testid="compose-photo-preview"]').length).toBe(1);
+    });
+
+    it('uses the injected Clock for the photo (FR-010)', async () => {
+      const el = renderIn('photo');
+      spyOn(TestBed.inject(Clock), 'now').and.returnValue(1_700_000_000_000);
+
+      await chooseAndSettle(el, imageFile());
+      (el.querySelector('[data-testid="compose-send"]') as HTMLButtonElement).click();
+      fixture.detectChanges();
+
+      expect(TestBed.inject(StatusStore).myStatus()?.createdAtMs).toBe(1_700_000_000_000);
+    });
+
+    it('Close returns to /status without publishing (FR-011)', async () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate').and.resolveTo(true);
+      const el = renderIn('photo');
+
+      await chooseAndSettle(el, imageFile());
+      (el.querySelector('[data-testid="compose-close"]') as HTMLButtonElement).click();
+      fixture.detectChanges();
+
+      expect(router.navigate).toHaveBeenCalledWith(['/status']);
+      expect(TestBed.inject(StatusStore).myStatus()).toBeNull();
+    });
+
+    it('keeps the same surface and Close/Send glyphs as text mode (FR-001, FR-011)', () => {
+      const photo = renderIn('photo');
+      const surface = photo.querySelector<HTMLElement>('[data-testid="compose-page"]')!;
+      expect(getComputedStyle(surface).backgroundColor).toBe('rgb(255, 138, 140)');
+      expect(photo.querySelector('[data-testid="compose-close"]')).not.toBeNull();
+      expect(photo.querySelector('[data-testid="compose-send"]')).not.toBeNull();
+    });
   });
 });
