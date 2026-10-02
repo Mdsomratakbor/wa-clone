@@ -57,22 +57,51 @@
     </p>
   </div>
 
-  <div class="compose__type" data-testid="compose-type">
-    <input
-      class="compose__input"
-      data-testid="compose-input"
-      type="text"
-      placeholder="Type a status"
-      aria-label="Type a status"
-      [value]="value()"
-      (input)="onValue($event)"
-    />
-  </div>
+  @if (photoMode) {
+    <div class="compose__photo" data-testid="compose-photo">
+      @if (decoding()) {
+        <p class="compose__photo-empty" data-testid="compose-photo-decoding">Preparing photo…</p>
+      } @else if (photo(); as dataUrl) {
+        <img
+          class="compose__preview"
+          data-testid="compose-photo-preview"
+          [src]="dataUrl"
+          alt="Selected status photo"
+        />
+      } @else {
+        <p class="compose__photo-empty" data-testid="compose-photo-empty">
+          Choose a photo to add to your status.
+        </p>
+      }
 
-  <img
-    class="compose__keyboard"
-    data-testid="compose-keyboard"
-    src="/status-compose-keyboard.png"
-    alt=""
-  />
+      <label class="compose__file-label" for="compose-file">Choose photo</label>
+      <input
+        class="compose__file"
+        id="compose-file"
+        data-testid="compose-file"
+        type="file"
+        accept="image/*"
+        (change)="onFileChosen($event)"
+      />
+    </div>
+  } @else {
+    <div class="compose__type" data-testid="compose-type">
+      <input
+        class="compose__input"
+        data-testid="compose-input"
+        type="text"
+        placeholder="Type a status"
+        aria-label="Type a status"
+        [value]="value()"
+        (input)="onValue($event)"
+      />
+    </div>
+
+    <img
+      class="compose__keyboard"
+      data-testid="compose-keyboard"
+      src="/status-compose-keyboard.png"
+      alt=""
+    />
+  }
 </div>

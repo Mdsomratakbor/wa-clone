@@ -121,6 +121,86 @@
     border: 0;
   }
 
+  // F-050 FR-002/FR-004. The photo region replaces the text field and the keyboard
+  // graphic, both of which are meaningless when the interaction is choosing a file.
+  // PROVISIONAL: the design contains no photo variant, so this is a centred preview
+  // in the space the text field occupied, not a captured layout.
+  &__photo {
+    position: absolute;
+    top: 140px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 232px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__preview {
+    display: block;
+    width: 232px;
+    height: 232px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.24);
+  }
+
+  &__photo-empty {
+    margin: 0;
+    width: 232px;
+    height: 232px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 20px;
+    color: #fff;
+  }
+
+  // The real input stays in the accessibility tree and keeps its focus ring, so the
+  // control is operable by keyboard and announced with its label. It is visually the
+  // label, which is why the label text is not repeated inside the field.
+  &__file {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  &__file-label {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 999px;
+    background: #fff;
+    color: #ff8a8c;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 20px;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+  }
+
+  // F-050: the file field is visually the label above, so it must not be reachable
+  // by pointer as an invisible sliver.
+  &__file:focus-visible + &__file-label {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
   &__keyboard {
     position: absolute;
     top: 477px;
