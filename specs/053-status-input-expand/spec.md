@@ -4,10 +4,10 @@
 
 **Created**: 2026-10-02
 
-**Status**: In progress — behaviour extension of the design-verified `0:9634` compose field,
-owner-approved (2026-10-02). G2 gate: build + full unit suite green. The 3-line cap and internal
-scroll are PROVISIONAL (no Figma node shows a grown field); the field's rest-state chrome stays the
-verified single-line design.
+**Status**: Shipped and closed (2026-10-02) — behaviour extension of the design-verified `0:9634`
+compose field, owner-approved (2026-10-02). G2 gate passed: build green + full unit suite **709/709**.
+The 3-line cap and internal scroll are PROVISIONAL (no Figma node shows a grown field); the field's
+rest-state chrome stays the verified single-line design.
 
 **Input**: design row 7 (`0:9634`, Status compose chrome) — the field, its typography and its
 placement. No node shows the field grown past one line.
@@ -124,12 +124,12 @@ outer whitespace and preserves internal `\n`, and JSON persistence keeps them.
 
 ## Definition of Done
 
-- [ ] Every FR is covered by at least one named unit test
-- [ ] Text mode renders a growing single-row textarea capped at 3 lines with internal scroll (FR-001)
-- [ ] Newlines accepted and preserved through publish and the feed (FR-002, FR-004)
-- [ ] Growth follows the single value source from both entry paths; clear restores one line (FR-003)
-- [ ] Photo mode, store, model, tokens and routes untouched (FR-005)
-- [ ] PROVISIONAL cap/scroll and alignment recorded for the post-capture pass (G1)
-- [ ] Drift note added to the F-049/F-051 field footprint, design-map row 7, gap audit
-- [ ] `npm run build` green; full unit suite green with the exact count reported
-- [ ] Playwright specs authored; execution deferred per the owner directive (2026-09-26)
+- [x] Every FR is covered by at least one named unit test
+- [x] Text mode renders a growing single-row textarea capped at 3 lines with internal scroll (FR-001)
+- [x] Newlines accepted and preserved through publish and the feed (FR-002, FR-004)
+- [x] Growth follows the single value source from both entry paths; clear restores one line (FR-003)
+- [x] Photo mode, store, model, tokens and routes untouched (FR-005)
+- [x] PROVISIONAL cap/scroll and alignment recorded for the post-capture pass (G1)
+- [x] Drift note added to the F-049/F-051 field footprint, design-map row 7, gap audit
+- [x] `npm run build` green; full unit suite green — **709/709**
+- [x] Playwright specs authored; execution deferred per the owner directive (2026-09-26)

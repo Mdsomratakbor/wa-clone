@@ -223,3 +223,14 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   post-reset reconcile (T010–T012 and the 051/052 reconcile tasks). E2E authored-only per the
   2026-09-26 Playwright pause; the compose golden (`0-9634-status-compose.png`) now shows the
   provisional keyboard and must be re-captured when the pause lifts and the capture gate clears.
+- **2026-10-02** — F-053 Expanding status input landed (**709/709**, build green) and closed. The
+  owner asked that the status text input "should be expand"; the clarify pass settled auto-grow,
+  a 3-line cap with internal scrolling, and preserved line breaks. `compose-page.html` replaces the
+  `<input>` with a `rows="1"` `textarea`; a `viewChild` effect driven by the page's `value` signal
+  (shared by the OS keyboard and F-051's keys) re-measures at `height: 0` and sizes to
+  `min(scrollHeight, 136.8px)`, toggling `overflowY` only past the rounded cap. The feed's shared
+  `__tip-text, __mine-text` rule gains `white-space: pre-wrap`, so a multi-line status renders as
+  composed. Chrome rounds `scrollHeight` up, which the commit series records. The 3-line cap and
+  scroll treatment are PROVISIONAL — no Figma node shows a grown field — and the centred-alignment
+  hypothesis stays recorded for the post-reset reconcile alongside the 051/052 tasks. E2E authored
+  only. The compose golden's keyboard is re-captured with F-051's when the pause lifts.
