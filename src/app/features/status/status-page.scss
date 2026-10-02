@@ -139,6 +139,9 @@
     // F-049: a status is free text, so it wraps rather than being clipped by a
     // fixed-height band the design never specified for it.
     overflow-wrap: anywhere;
+    // F-053 FR-004: a status published with line breaks renders as composed. The
+    // tip shares the rule; its single sentence is unaffected.
+    white-space: pre-wrap;
   }
 
   // F-052 FR-001, PROVISIONAL: no Figma node shows a published photo, so the

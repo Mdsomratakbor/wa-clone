@@ -1,9 +1,24 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  viewChild,
+  type ElementRef,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StatusStore } from '../../core/status.store';
 import { Clock } from '../../core/clock';
 import { downscaleToJpegDataUrl } from '../../core/status-photo';
 import { StatusKeyboard } from './status-keyboard';
+
+/**
+ * F-053 FR-001: one line of the 38px/1.2 field (45.6px) times the 3-line cap. The
+ * values are repeated in `compose-page.scss` and recorded in the 053 spec.
+ */
+const FIELD_MAX_HEIGHT_PX = 136.8;
 
 @Component({
   selector: 'app-compose-page',
@@ -17,6 +32,35 @@ export class ComposePage {
   private readonly store = inject(StatusStore);
   private readonly clock = inject(Clock);
   private readonly route = inject(ActivatedRoute);
+
+  /**
+   * F-053 FR-003. The field element, rendered in text mode only; absent in photo
+   * mode, so the growth effect below must tolerate `undefined`.
+   */
+  private readonly statusInput = viewChild<ElementRef<HTMLTextAreaElement>>('statusInput');
+
+  /**
+   * F-053 FR-001/FR-003. Grows the field with the value from either entry path
+   * (OS keyboard or the F-051 on-screen keys) by re-measuring after the text has
+   * rendered. Capped at FIELD_MAX_HEIGHT_PX; past the cap the field scrolls
+   * internally instead of growing further.
+   */
+  constructor() {
+    effect(() => {
+      this.value();
+      const el = this.statusInput()?.nativeElement;
+      if (!el) {
+        return;
+      }
+      el.style.height = '0px';
+      const content = el.scrollHeight;
+      el.style.height = `${Math.min(content, FIELD_MAX_HEIGHT_PX)}px`;
+      // Chrome rounds scrollHeight (a 136.8px cap measures 137px), so the
+      // comparison must use the rounded cap: 3 lines fit -> hidden; a 4th line
+      // exceeds it -> internal scrolling.
+      el.style.overflowY = content > Math.ceil(FIELD_MAX_HEIGHT_PX) ? 'auto' : 'hidden';
+    });
+  }
 
   /**
    * F-050 FR-001. A mode of this screen rather than a new one, so the design-verified
@@ -44,7 +88,7 @@ export class ComposePage {
   );
 
   protected onValue(event: Event): void {
-    this.value.set((event.target as HTMLInputElement).value);
+    this.value.set((event.target as HTMLTextAreaElement).value);
   }
 
   /**

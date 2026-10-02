@@ -71,7 +71,9 @@
     left: 50%;
     transform: translateX(-50%);
     width: 232px;
-    height: 52px;
+    // F-053 FR-001: the field grows with its content, so the well is a min-height,
+    // not a fixed 52px box.
+    min-height: 52px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -81,13 +83,21 @@
   // enters the stylesheet and the 38px stays unscaled - the placeholder was raw
   // too, and scaling it could overflow the design-verified 232px field. The real
   // caret replaces the decorative .compose__caret.
+  // F-053 FR-001 (PROVISIONAL): the field is a single-row textarea that grows to
+  // at most 3 lines (45.6px each) and scrolls inside past the cap; the cap and the
+  // scroll treatment are recorded in the 053 spec - no Figma node shows a grown
+  // field. Values mirror FIELD_MAX_HEIGHT_PX in compose-page.ts.
   &__input {
     appearance: none;
     width: 100%;
+    min-height: 45.6px;
+    max-height: 136.8px;
     margin: 0;
     padding: 0;
     border: 0;
     background: transparent;
+    resize: none;
+    overflow-wrap: anywhere;
     text-align: center;
     font-family: 'Helvetica Neue', Arial, sans-serif;
     font-size: 38px;

@@ -86,15 +86,16 @@
     </div>
   } @else {
     <div class="compose__type" data-testid="compose-type">
-      <input
+      <textarea
+        #statusInput
         class="compose__input"
         data-testid="compose-input"
-        type="text"
+        rows="1"
         placeholder="Type a status"
         aria-label="Type a status"
         [value]="value()"
         (input)="onValue($event)"
-      />
+      ></textarea>
     </div>
 
     <app-status-keyboard
