@@ -251,7 +251,7 @@ describe('ComposePage', () => {
 
   // ---------------------------------------------------------------- F-053 ------
 
-  // F-053 FR-003: the field is sized to `min(contentHeight, 136.8px)`. Chrome
+  // F-053 FR-003: the field is sized to `min(contentHeight, 228px)`. Chrome
   // rounds scrollHeight up (46px vs the 45.6px token), so heights are compared
   // against the measured one-line value, never exact fractional strings.
   it('starts at one line and grows with the typed content (FR-001, FR-003)', () => {
@@ -268,21 +268,21 @@ describe('ComposePage', () => {
     expect(parseFloat(field.style.height)).toBeGreaterThan(oneLine);
   });
 
-  it('caps the field at three lines, then scrolls inside it (FR-001)', () => {
+  it('caps the field at five lines, then scrolls inside it (FR-001)', () => {
     const el = render();
     const field = el.querySelector<HTMLTextAreaElement>('[data-testid="compose-input"]')!;
 
-    type(el, ['one', 'two', 'three'].join('\n'));
+    type(el, ['one', 'two', 'three', 'four', 'five'].join('\n'));
     fixture.detectChanges();
-    expect(field.style.height).toBe('136.8px');
+    expect(field.style.height).toBe('228px');
     expect(field.style.overflowY).toBe('hidden');
 
-    type(el, ['one', 'two', 'three', 'four'].join('\n'));
+    type(el, ['one', 'two', 'three', 'four', 'five', 'six'].join('\n'));
     fixture.detectChanges();
-    expect(field.style.height).toBe('136.8px');
+    expect(field.style.height).toBe('228px');
     expect(field.style.overflowY).toBe('auto');
 
-    type(el, ['one', 'two', 'three', 'four', 'five', 'six'].join('\n'));
+    type(el, ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'].join('\n'));
     fixture.detectChanges();
     expect(field.scrollHeight).toBeGreaterThan(field.clientHeight);
     expect(getComputedStyle(field).scrollbarWidth).toBe('none');
