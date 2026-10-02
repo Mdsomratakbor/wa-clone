@@ -141,19 +141,21 @@
     overflow-wrap: anywhere;
   }
 
-  // F-050 FR-008, PROVISIONAL: no Figma node shows a published photo, so the photo
-  // fills the existing band (cover-fit within the feed) rather than a size taken
-  // from a design that never captured one. Aligned to the row's padding, not the
-  // text indent, because a photo is not text.
-  &__mine--photo {
-    padding-left: 13px;
+  // F-052 FR-001, PROVISIONAL: no Figma node shows a published photo, so the
+  // block geometry (radius 8px, gutters 16px, max-height 280px) is recorded in
+  // the 052 spec for the G1 reconcile rather than taken from a design that
+  // never captured one. The block replaces the 43px strip so the photo reads
+  // as a photo, not a smear.
+  &__photo {
+    margin: 35px 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
   }
 
-  &__mine-photo {
+  &__photo-img {
     display: block;
-    flex: 1;
-    min-width: 0;
-    height: 43px;
+    width: 100%;
+    max-height: 280px;
     object-fit: cover;
   }
 

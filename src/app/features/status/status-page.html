@@ -76,9 +76,9 @@
 
       @if (myStatus(); as status) {
         @if (status.photo; as photo) {
-          <div class="status-page__mine status-page__mine--photo" data-testid="status-mine" role="status">
+          <div class="status-page__photo" data-testid="status-mine" role="status">
             <img
-              class="status-page__mine-photo"
+              class="status-page__photo-img"
               data-testid="status-mine-photo"
               [src]="photo.dataUrl"
               alt="Status photo"
