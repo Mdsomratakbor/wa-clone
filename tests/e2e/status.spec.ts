@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 test.describe('Status feed (US1)', () => {
   test.beforeEach(async ({ page }) => {
@@ -128,6 +130,38 @@ test.describe('Status routing (US2)', () => {
     await page.getByTestId('status-my').waitFor();
     await page.getByTestId('status-my').press('Enter');
     await expect(page).toHaveURL(/\/status\/compose$/);
+  });
+});
+
+// AUTHORED but never executed: Playwright is paused by owner directive
+// 2026-09-26. This case is updated in lockstep with the unit tests and will
+// run when the pause is lifted.
+test.describe('Status photo preview (F-052)', () => {
+  test('a published photo renders as a rounded preview block, not the text band (FR-001, FR-002, FR-005)', async ({
+    page,
+  }) => {
+    await page.goto('/status/compose?kind=photo');
+    await page.getByTestId('compose-page').waitFor();
+
+    await page.getByTestId('compose-file').setInputFiles({
+      name: 'status.png',
+      mimeType: 'image/png',
+      buffer: readFileSync(join(__dirname, 'golden', 'status-my-avatar.png')),
+    });
+    await page.getByRole('button', { name: 'Send status' }).click();
+    await expect(page).toHaveURL(/\/status$/);
+
+    const mine = page.getByTestId('status-mine');
+    await expect(mine).toHaveAttribute('role', 'status');
+    await expect(mine).toHaveCSS('border-radius', '8px');
+    await expect(mine).toHaveCSS('margin-left', '16px');
+    await expect(page.getByTestId('status-mine-photo')).toHaveAttribute(
+      'src',
+      /^data:image\/jpeg;base64,/,
+    );
+    await expect(page.getByTestId('status-mine-photo')).toHaveAttribute('alt', 'Status photo');
+    await expect(page.locator('.status-page__mine--photo')).toHaveCount(0);
+    await expect(page.getByTestId('status-tip')).toHaveCount(0);
   });
 });
 

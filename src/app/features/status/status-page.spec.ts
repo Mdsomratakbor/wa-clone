@@ -101,6 +101,30 @@ describe('StatusPage', () => {
     expect(el.querySelector('[data-testid="status-tip"]')).toBeNull();
   });
 
+  // F-052 FR-001/FR-005 (PROVISIONAL): the photo renders as a rounded preview block -
+  // full feed width, capped height, cover-fit - not the 43px band, and the band
+  // modifier's CSS is gone from the DOM.
+  it('renders a published photo as a rounded preview block, not the band (FR-001, FR-005)', () => {
+    const store = TestBed.inject(StatusStore);
+    store.publishPhoto('data:image/jpeg;base64,/9j/4AAQ==', 1);
+    const el = render();
+
+    const block = el.querySelector<HTMLElement>('[data-testid="status-mine"]')!;
+    const img = el.querySelector<HTMLImageElement>('[data-testid="status-mine-photo"]')!;
+    const blockStyle = getComputedStyle(block);
+    const imgStyle = getComputedStyle(img);
+
+    expect(blockStyle.borderRadius).toBe('8px');
+    expect(blockStyle.marginTop).toBe('35px');
+    expect(blockStyle.marginLeft).toBe('16px');
+    expect(blockStyle.marginRight).toBe('16px');
+    expect(imgStyle.maxHeight).toBe('280px');
+    expect(imgStyle.objectFit).toBe('cover');
+    expect(img.clientWidth).toBe(block.clientWidth);
+    expect(el.querySelector('.status-page__mine--photo')).toBeNull();
+    expect(el.querySelector('.status-page__mine-photo')).toBeNull();
+  });
+
   it('the My Status subtitle shows the provisional photo label for a photo status (FR-009)', () => {
     const store = TestBed.inject(StatusStore);
     store.publishPhoto('data:image/jpeg;base64,/9j/4AAQ==', 1);

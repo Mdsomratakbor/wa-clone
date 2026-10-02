@@ -17,11 +17,40 @@ test.describe('Status compose (US1)', () => {
 
   // F-049: the decorative <p> and its fake caret became a real input, so the
   // placeholder is an attribute and the caret is the input's own.
-  test('renders a real input and the keyboard graphic (F-049 FR-001)', async ({ page }) => {
+  // F-051: the band is a real keyboard component now, not the inert PNG graphic.
+  test('renders a real input and the on-screen keyboard (F-049 FR-001, F-051 FR-001)', async ({
+    page,
+  }) => {
     await expect(page.getByTestId('compose-input')).toHaveAttribute('placeholder', 'Type a status');
     await expect(page.getByTestId('compose-input')).toHaveValue('');
     await expect(page.locator('.compose__caret')).toHaveCount(0);
     await expect(page.getByTestId('compose-keyboard')).toBeVisible();
+  });
+
+  // F-051: tapping a key edits the same value signal the input uses (FR-007); shift
+  // is covered by the unit suite - here the one-shot uppercase is sampled once.
+  test('a tapped key types into the field and backspace removes it (F-051 FR-002, FR-004, FR-007)', async ({
+    page,
+  }) => {
+    await page.getByTestId('compose-key-shift').click();
+    await page.getByTestId('compose-key-h').click();
+    await expect(page.getByTestId('compose-input')).toHaveValue('H');
+    await page.getByTestId('compose-key-i').click();
+    await expect(page.getByTestId('compose-input')).toHaveValue('Hi');
+    await page.getByTestId('compose-key-backspace').click();
+    await expect(page.getByTestId('compose-input')).toHaveValue('H');
+  });
+
+  test('keyboard Send publishes the status and navigates to the feed (F-051 FR-006, FR-007)', async ({
+    page,
+  }) => {
+    await page.getByTestId('compose-key-h').click();
+    await page.getByTestId('compose-key-i').click();
+    await page.getByTestId('compose-key-e').click();
+    await page.getByTestId('compose-key-send').click();
+
+    await expect(page).toHaveURL(/\/status$/);
+    await expect(page.getByTestId('status-mine')).toContainText('hie');
   });
 
   test('Send is disabled until text is typed (F-049 FR-002)', async ({ page }) => {
@@ -105,6 +134,11 @@ test.describe('Status compose photo mode (F-050)', () => {
     await expect(page.getByTestId('status-mine-text')).toHaveCount(0);
     await expect(page.getByTestId('status-tip')).toHaveCount(0);
 
+    // F-052: the photo renders as a rounded preview block, not the 43px band.
+    await expect(page.getByTestId('status-mine')).toHaveCSS('border-radius', '8px');
+    await expect(page.getByTestId('status-mine')).toHaveCSS('margin-left', '16px');
+    await expect(page.locator('.status-page__mine--photo')).toHaveCount(0);
+
     await page.reload();
     await expect(page.getByTestId('status-mine-photo')).toBeVisible();
   });
@@ -129,15 +163,17 @@ test.describe('Status compose routing (US2)', () => {
     await page.getByTestId('status-my').waitFor();
   });
 
-  test('the keyboard graphic is inert (F-049 FR-001)', async ({ page }) => {
+  test('the keyboard holds 26 live letter keys and no decorative sub-keys (F-051 FR-001, FR-008)', async ({
+    page,
+  }) => {
     await page.goto('/status/compose');
     await page.getByTestId('compose-page').waitFor();
-    const url = page.url();
 
-    await page.getByTestId('compose-keyboard').click();
-
-    await expect(page).toHaveURL(url);
-    await expect(page.getByTestId('compose-page')).toBeVisible();
+    await expect(page.getByTestId('compose-key-h')).toBeVisible();
+    await expect(page.getByTestId('compose-key-z')).toBeVisible();
+    await expect(page.getByTestId('compose-key-123')).toHaveCount(0);
+    await expect(page.getByTestId('compose-key-globe')).toHaveCount(0);
+    await expect(page.getByTestId('compose-key-emoji')).toHaveCount(0);
   });
 });
 
