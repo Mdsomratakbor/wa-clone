@@ -285,6 +285,22 @@ describe('ComposePage', () => {
     type(el, ['one', 'two', 'three', 'four', 'five', 'six'].join('\n'));
     fixture.detectChanges();
     expect(field.scrollHeight).toBeGreaterThan(field.clientHeight);
+    expect(getComputedStyle(field).scrollbarWidth).toBe('none');
+  });
+
+  it('shows an in-field bottom underline on focus, not a boxed border (FR-001)', () => {
+    const el = render();
+    const field = el.querySelector<HTMLTextAreaElement>('[data-testid="compose-input"]')!;
+    fixture.detectChanges();
+
+    expect(getComputedStyle(field).boxShadow).toBe('none');
+
+    field.focus();
+    fixture.detectChanges();
+
+    const focused = getComputedStyle(field);
+    expect(focused.outlineStyle).toBe('none');
+    expect(focused.boxShadow).toContain('inset');
   });
 
   it('clearing the field returns it to one line (FR-001)', () => {
