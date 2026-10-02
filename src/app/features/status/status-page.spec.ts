@@ -86,6 +86,16 @@ describe('StatusPage', () => {
     expect(el.querySelector('[data-testid="status-mine"] img')).toBeNull();
   });
 
+  it('renders a status with line breaks as composed (F-053 FR-004)', () => {
+    const store = TestBed.inject(StatusStore);
+    store.publish('line one\nline two', 1);
+    const el = render();
+
+    const mineText = el.querySelector<HTMLElement>('.status-page__mine-text')!;
+    expect(mineText.textContent).toContain('line one\nline two');
+    expect(getComputedStyle(mineText).whiteSpace).toBe('pre-wrap');
+  });
+
   it('renders a published photo and not the text region (FR-008)', () => {
     const store = TestBed.inject(StatusStore);
     store.publishPhoto('data:image/jpeg;base64,/9j/4AAQ==', 1);

@@ -53,6 +53,25 @@ test.describe('Status compose (US1)', () => {
     await expect(page.getByTestId('status-mine')).toContainText('hie');
   });
 
+  // F-053 FR-001/FR-004. AUTHORED, never executed (Playwright pause 2026-09-26).
+  test('a multi-line status grows the field and the feed shows the composed lines', async ({
+    page,
+  }) => {
+    const field = page.getByTestId('compose-input');
+    const before = await field.evaluate((el) => getComputedStyle(el).height);
+
+    await field.fill('first line\nsecond line\nthird line\nfourth line');
+    const after = await field.evaluate((el) => getComputedStyle(el).height);
+
+    expect(Number.parseFloat(after)).toBeGreaterThan(Number.parseFloat(before));
+    await expect(page.getByRole('button', { name: 'Send status' })).toBeEnabled();
+
+    await page.getByRole('button', { name: 'Send status' }).click();
+    await expect(page).toHaveURL(/\/status$/);
+    await expect(page.getByTestId('status-mine')).toContainText('first line');
+    await expect(page.getByTestId('status-mine')).toContainText('fourth line');
+  });
+
   test('Send is disabled until text is typed (F-049 FR-002)', async ({ page }) => {
     await expect(page.getByRole('button', { name: 'Send status' })).toBeDisabled();
 

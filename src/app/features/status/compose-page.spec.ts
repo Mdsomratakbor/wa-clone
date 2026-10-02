@@ -64,11 +64,13 @@ describe('ComposePage', () => {
   // F-049: the decorative <p> and its fake caret are replaced by a real input,
   // so the placeholder is now an attribute and the caret is the input's own.
   // F-051: the keyboard band is a component now, not the inert PNG graphic.
-  it('renders a real input, not a decorative placeholder, plus the on-screen keyboard (FR-001)', () => {
+  // F-053: the field is a growing single-row textarea, not a fixed-height input.
+  it('renders a real expanding textarea, not a decorative placeholder, plus the on-screen keyboard (FR-001)', () => {
     const el = render();
-    const input = el.querySelector<HTMLInputElement>('[data-testid="compose-input"]');
+    const input = el.querySelector<HTMLTextAreaElement>('[data-testid="compose-input"]');
 
-    expect(input).not.toBeNull();
+    expect(input?.tagName).toBe('TEXTAREA');
+    expect(input?.getAttribute('rows')).toBe('1');
     expect(input?.getAttribute('placeholder')).toBe('Type a status');
     expect(input?.getAttribute('aria-label')).toBe('Type a status');
     expect(el.querySelector('.compose__placeholder')).toBeNull();
@@ -245,6 +247,98 @@ describe('ComposePage', () => {
     fixture.detectChanges();
     expect(TestBed.inject(StatusStore).myStatus()).toBeNull();
     expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  // ---------------------------------------------------------------- F-053 ------
+
+  // F-053 FR-003: the field is sized to `min(contentHeight, 136.8px)`. Chrome
+  // rounds scrollHeight up (46px vs the 45.6px token), so heights are compared
+  // against the measured one-line value, never exact fractional strings.
+  it('starts at one line and grows with the typed content (FR-001, FR-003)', () => {
+    const el = render();
+    const field = el.querySelector<HTMLTextAreaElement>('[data-testid="compose-input"]')!;
+
+    fixture.detectChanges();
+    const oneLine = parseFloat(field.style.height);
+    expect(oneLine).toBeGreaterThan(0);
+    expect(field.style.overflowY).toBe('hidden');
+
+    type(el, 'one\ntwo');
+    fixture.detectChanges();
+    expect(parseFloat(field.style.height)).toBeGreaterThan(oneLine);
+  });
+
+  it('caps the field at three lines, then scrolls inside it (FR-001)', () => {
+    const el = render();
+    const field = el.querySelector<HTMLTextAreaElement>('[data-testid="compose-input"]')!;
+
+    type(el, ['one', 'two', 'three'].join('\n'));
+    fixture.detectChanges();
+    expect(field.style.height).toBe('136.8px');
+    expect(field.style.overflowY).toBe('hidden');
+
+    type(el, ['one', 'two', 'three', 'four'].join('\n'));
+    fixture.detectChanges();
+    expect(field.style.height).toBe('136.8px');
+    expect(field.style.overflowY).toBe('auto');
+
+    type(el, ['one', 'two', 'three', 'four', 'five', 'six'].join('\n'));
+    fixture.detectChanges();
+    expect(field.scrollHeight).toBeGreaterThan(field.clientHeight);
+  });
+
+  it('clearing the field returns it to one line (FR-001)', () => {
+    const el = render();
+    const field = el.querySelector<HTMLTextAreaElement>('[data-testid="compose-input"]')!;
+
+    fixture.detectChanges();
+    const oneLine = parseFloat(field.style.height);
+
+    type(el, 'a\nb\nc');
+    fixture.detectChanges();
+    expect(parseFloat(field.style.height)).toBeGreaterThan(oneLine);
+
+    type(el, '');
+    fixture.detectChanges();
+    expect(parseFloat(field.style.height)).toBe(oneLine);
+  });
+
+  it('the on-screen keys grow the field too, since they share the value (FR-003)', () => {
+    const el = render();
+    const field = el.querySelector<HTMLTextAreaElement>('[data-testid="compose-input"]')!;
+
+    for (let i = 0; i < 30; i++) {
+      press(el, 'compose-key-a');
+    }
+    fixture.detectChanges();
+
+    expect(parseFloat(field.style.height)).toBeGreaterThan(45.6);
+  });
+
+  it('newlines typed in the field are preserved through publish (FR-002, FR-004)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+
+    type(el, 'first line\nsecond line');
+    fixture.detectChanges();
+    press(el, 'compose-key-send');
+    fixture.detectChanges();
+
+    expect(TestBed.inject(StatusStore).myStatus()?.text).toBe('first line\nsecond line');
+    expect(router.navigate).toHaveBeenCalledWith(['/status']);
+  });
+
+  it('the on-screen backspace removes a trailing line break (FR-003)', () => {
+    const el = render();
+    const field = el.querySelector<HTMLTextAreaElement>('[data-testid="compose-input"]')!;
+
+    type(el, 'ab\n');
+    fixture.detectChanges();
+    press(el, 'compose-key-backspace');
+    fixture.detectChanges();
+
+    expect(field.value).toBe('ab');
   });
 
   // ---------------------------------------------------------------- F-050 ------
