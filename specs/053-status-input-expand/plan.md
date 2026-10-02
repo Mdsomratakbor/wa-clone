@@ -6,7 +6,7 @@
 
 The page already owns the single `value` signal (F-051 FR-007), so growth needs no new component,
 store, or clock. Change the field to a `textarea`, then re-measure it whenever the `value` signal
-changes and set its height to `min(contentHeight, 3 lines)`, flipping `overflow-y` to `auto` past the
+changes and set its height to `min(contentHeight, 5 lines)`, flipping `overflow-y` to `auto` past the
 cap. Both entry paths — the OS keyboard and the F-051 on-screen keys — change the same signal, so a
 single effect covers them by construction. Line-break preservation is a one-line feed CSS change
 (`white-space: pre-wrap`); the store already trims outer whitespace and persists internal `\n`.
@@ -15,13 +15,13 @@ single effect covers them by construction. Line-break preservation is a one-line
 
 - `compose-page.ts` adds `viewChild('statusInput')` and a constructor `effect` that reads
   `value()` then the field element and sets:
-  - `height` to `Math.min(el.scrollHeight, 136.8)` (measuring with `height: 0` first),
-  - `overflowY` to `auto` when `scrollHeight > 136.8`, else `hidden`.
+  - `height` to `Math.min(el.scrollHeight, 228)` (measuring with `height: 0` first),
+  - `overflowY` to `auto` when `scrollHeight > 228`, else `hidden`.
 - `compose-page.html` swaps `<input type="text">` → `<textarea rows="1" #statusInput …>`, keeping
   `[value]`, `(input)`, `data-testid="compose-input"`, `aria-label`, `placeholder`, and the visible
   focus rule.
 - `compose-page.scss`: `.compose__type` keeps `top: 211px` but `height` → `min-height: 52px`;
-  field gains `min-height: 45.6px`, `max-height: 136.8px`, `resize: none`, `overflow-wrap: anywhere`.
+  field gains `min-height: 45.6px`, `max-height: 228px`, `resize: none`, `overflow-wrap: anywhere`.
 
 ### Why this shape
 
@@ -35,7 +35,8 @@ single effect covers them by construction. Line-break preservation is a one-line
 ## Review Gates
 
 - **G1 — capture**: blocked/incomplete for the *grown* presentation: no Figma node shows a field past
-  one line. Rest-state chrome is design-verified; the 3-line cap, scroll and centered multi-line
+  one line. Rest-state chrome is design-verified; the 5-line cap (raised 3 → 5 lines by owner decision
+  2026-10-02), scroll and centered multi-line
   alignment are recorded owner-approved hypotheses (spec FR-001, G1). The 051/052 PROVISIONAL values
   are untouched.
 - **G2 — build + unit**: `npm run build` green; full `ng test` suite green with the exact count

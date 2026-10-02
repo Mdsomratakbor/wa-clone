@@ -5,9 +5,10 @@
 **Created**: 2026-10-02
 
 **Status**: Shipped and closed (2026-10-02) — behaviour extension of the design-verified `0:9634`
-compose field, owner-approved (2026-10-02). G2 gate passed: build green + full unit suite **709/709**.
-The 3-line cap and internal scroll are PROVISIONAL (no Figma node shows a grown field); the field's
-rest-state chrome stays the verified single-line design.
+compose field, owner-approved (2026-10-02). G2 gate passed: build green + full unit suite **710/710**.
+The 5-line cap (228px) and internal scroll are PROVISIONAL (no Figma node shows a grown field); the
+field's rest-state chrome stays the verified single-line design. The cap moved 3 → 5 lines by owner
+decision in clarify session v3 (2026-10-02).
 
 **Input**: design row 7 (`0:9634`, Status compose chrome) — the field, its typography and its
 placement. No node shows the field grown past one line.
@@ -43,12 +44,22 @@ The owner ran the shipped feature and flagged two artefacts of the approved trea
   (`box-shadow: inset 0 -2px 0`) replaces the offset outline, so focus stays discoverable
   (the accessibility golden rule) without the rectangle border.
 
+### Session 2026-10-02 (v3 — height increase)
+
+The owner asked to "increase the height of the status box".
+
+- Q: How tall may the composing field grow? One line measures 45.6px and the bound is currently 3
+  lines, chosen so the field never overlaps the on-screen keyboard.
+  A (**owner**): **5 lines (228px)** — the cap moves 3 → 5 lines and the v2 treatments are
+  unchanged: past the cap the field scrolls internally with the scrollbar hidden, and the
+  "never overlap the on-screen keyboard" bound still applies.
+
 ## Summary
 
 The compose field is a fixed single-line `<input>` on a design-verified screen, so a status longer
 than the 232px field is clipped by the `overflow: hidden` surface and never fully visible while
 composing. F-053 turns the field into a single-row `textarea` that grows with its value (typed via
-the OS keyboard *or* the F-051 on-screen keys — both write the same `value` signal), capped at three
+the OS keyboard *or* the F-051 on-screen keys — both write the same `value` signal), capped at five
 lines with internal scrolling, and makes the feed render internal line breaks so a composed
 multi-line status appears as composed. The store is untouched: `StatusStore.publish` already trims
 outer whitespace and preserves internal `\n`, and JSON persistence keeps them.
@@ -60,14 +71,14 @@ outer whitespace and preserves internal `\n`, and JSON persistence keeps them.
   background, white caret, `placeholder`/`aria-label` "Type a status",
   `data-testid="compose-input"`, and the owner-approved visible focus treatment — an in-field bottom
   underline (v2, 2026-10-02), not F-049's offset outline. The field grows to fit its content (a
-  `\n` or wrapped line adds a line), capped at **3 lines (136.8px)**, above which it **scrolls
+  `\n` or wrapped line adds a line), capped at **5 lines (228px)**, above which it **scrolls
   internally with the scrollbar visually hidden** (wheel/touch still scroll — v2, 2026-10-02).
   Native `resize` is disabled; there is no horizontal scroll.
 - **FR-002** Enter inserts a line break into the status value. The value stays the single source:
   text entered via the OS keyboard or the on-screen keys grows the field identically, and F-051
   backspace removes the last character including a `\n` (unchanged).
 - **FR-003** Growth is driven by the `value` signal, not the key: the field is re-measured after
-  every value change from either entry path and sized to `min(contentHeight, 136.8px)`. Clearing the
+  every value change from either entry path and sized to `min(contentHeight, 228px)`. Clearing the
   value returns the field to one line (45.6px). Growth never reads the wall clock.
 - **FR-004** Publishing preserves internal line breaks: `StatusStore.publish` is unchanged; the feed
   renders the status text with `white-space: pre-wrap` (the shared `__mine-text` rule; the tip's
@@ -87,7 +98,8 @@ outer whitespace and preserves internal `\n`, and JSON persistence keeps them.
 ## Review Gates
 
 - **G1 (avoid claiming design verification)**: the field's rest-state is design-verified (`0:9634`),
-  but **no Figma node shows a grown field**; the 3-line cap, internal-scroll treatment and `pre-wrap`
+  but **no Figma node shows a grown field**; the 5-line cap (228px), internal-scroll treatment and
+  `pre-wrap`
   feed rendering are owner-approved hypotheses recorded in this spec for the post-capture pass. The
   keyboard/photo PROVISIONAL values from 051/052 are untouched.
 - **G2**: `npm run build` green and the full unit suite green with the exact count reported.
@@ -102,8 +114,9 @@ outer whitespace and preserves internal `\n`, and JSON persistence keeps them.
 
 ## UNKNOWN / NEEDS CLARIFICATION
 
-- Line cap. **Hypothesis (owner-approved)** — 3 lines. One line of 38px `Helvetica Neue` at
-  `line-height 1.2` measures 45.6px; the cap is 136.8px. Recorded literally for the reconcile.
+- Line cap. **Hypothesis (owner-approved, v3 2026-10-02)** — 5 lines. One line of 38px `Helvetica
+  Neue` at `line-height 1.2` measures 45.6px; the cap is 228px (raised from 136.8px). Recorded
+  literally for the reconcile.
 - Whether a composed paragraph should centre each line or be left-aligned past the first. **Recorded
   hypothesis (not clarified)** — centred like the single-line field; the design shows no multi-line
   example to source an alignment rule from.
@@ -122,7 +135,7 @@ outer whitespace and preserves internal `\n`, and JSON persistence keeps them.
 - `compose-page.ts` — growth effect driven by the `value` signal and the field element
   (`viewChild`); `onValue` reads a `HTMLTextAreaElement`. No store/clock/router change.
 - `compose-page.scss` — `.compose__type` goes from fixed `height: 52px` to `min-height: 52px`;
-  field `min-height: 45.6px`, `max-height: 136.8px`, `resize: none`, `overflow-wrap: anywhere`;
+  field `min-height: 45.6px`, `max-height: 228px`, `resize: none`, `overflow-wrap: anywhere`;
   typography/placement unchanged. Post-closure v2 (2026-10-02): `resize: none` is joined by the
   hidden-scrollbar rules and `:focus-visible` becomes the in-field bottom underline.
 - `status-page.scss` — `white-space: pre-wrap` added to the shared `__tip-text, __mine-text` rule.
@@ -133,7 +146,7 @@ outer whitespace and preserves internal `\n`, and JSON persistence keeps them.
 ### Unit
 
 - `ComposePage`: the field is a `textarea`; typing wrapping content grows its measured height while
-  remaining capped at 136.8px with internal scroll; clearing returns it to one line; a value holding
+  remaining capped at 228px with internal scroll; clearing returns it to one line; a value holding
   `\n` from the physical keyboard is preserved in the signal and published with its line breaks;
   F-051 keys still type into the field and backspace removes a `\n`; photo mode renders no field.
 - `StatusPage`: a published status containing `\n` renders with `white-space: pre-wrap`, so the feed
@@ -142,7 +155,7 @@ outer whitespace and preserves internal `\n`, and JSON persistence keeps them.
 ## Definition of Done
 
 - [x] Every FR is covered by at least one named unit test
-- [x] Text mode renders a growing single-row textarea capped at 3 lines with internal scroll (FR-001)
+- [x] Text mode renders a growing single-row textarea capped at 5 lines with internal scroll (FR-001)
 - [x] Newlines accepted and preserved through publish and the feed (FR-002, FR-004)
 - [x] Growth follows the single value source from both entry paths; clear restores one line (FR-003)
 - [x] Photo mode, store, model, tokens and routes untouched (FR-005)

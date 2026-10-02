@@ -239,3 +239,7 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   scrollbar is now visually hidden (wheel/touch still scroll) and focus is an in-field bottom
   underline, keeping the visible-focus accessibility rule without the rectangle border. See the
   053 spec's second clarify session; the goldens still re-capture with the pause lift.
+  **Post-closure v3 (same day, third clarify pass)**: the owner asked to "increase the height of
+  the status box" — the 3-line cap became **5 lines (228px)**, leaving the v2 scrollbar/focus
+  treatments and the "never overlap the on-screen keyboard" bound intact, recorded in the 053 spec's
+  third clarify session.
