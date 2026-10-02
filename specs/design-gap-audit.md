@@ -27,6 +27,7 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 | A4 | 21 Auth | keypad digits / backspace / `Continue` | fill phone region, verify, enter the app | **done (F-037)** |
 | A5 | 12 Camera | `Flip` | swap front/back camera state | moved to tier C (see below) |
 | A6 | 2 Chat window | `Video call`, `Call` | start a call | **DONE (F-045)** — both start a real call and open the in-call screen. The buttons are row 2, design-verified; the in-call chrome is PROVISIONAL |
+| A7 | 7 Status | camera circle ("Add a photo to my status") | open a photo flow, not the text composer | **done (F-050)** — the circle opens photo mode at `/status/compose?kind=photo`, a real `<input type="file" accept="image/*">` picker; the photo is downscaled to a JPEG data URL, stored on the single-entry `StatusStore`, and rendered in the feed. Photo presentation/subtitle/alt are PROVISIONAL (capture-gated T010–T012) |
 
 ## Tier B — real design flow, needs one new (hypothesis) screen
 
@@ -188,3 +189,18 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   because the placeholder class styles a `<p>` and reusing it on an input leaves default browser
   chrome. Both were recorded in the spec at closure instead of absorbed quietly. G1 remains BLOCKED,
   so the disabled treatment, the post-publish presentation and the goldens are provisional.
+- **2026-10-01** - F-050 Photo Status landed (**691 unit**, +33) and **A7 is closed**: the camera
+  circle was a control whose label the app contradicted — it said *Add a photo to my status* and
+  opened the text composer. The owner's decision (2026-10-01) was a **real photo picker**, not a
+  `/camera` route (whose shutter cannot work without `getUserMedia`) and not a provisional QWERTY.
+  Photo mode rides the existing `status/compose` route as `?kind=photo`, reusing the verified
+  `0:9634` chrome so nothing new is invented: a labelled file input feeds a pure async
+  downscale-to-JPEG helper (640px cap, then a store-enforced character budget — because the adapter
+  swallows quota errors by design, the store is the only place that can keep the visible and
+  persisted status identical), and the feed renders the photo in its `role="status"` region with a
+  provisional subtitle (`A photo`) instead of the add invitation. A malformed `photo` is dropped at
+  load, an F-049 snapshot loads unchanged, and ids stay monotonic. **The keyboard that types** was
+  explicitly deferred by the owner (rather than invented): it is an open, capture-gated task (T013
+  in `specs/050-photo-status/`) that inherits the recorded "keep both" decision — the real input
+  stays focusable and the OS keyboard keeps working. G1 remains BLOCKED, so the photo preview, feed
+  sizing, subtitle and alt text are PROVISIONAL pending the T010–T012 reconcile at the reset.

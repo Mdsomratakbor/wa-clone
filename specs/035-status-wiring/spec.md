@@ -56,6 +56,12 @@ capture dependency.
    still the tested behaviour, so this feature's own contract is not disturbed; only the label
    beneath the name is now data-driven. `tests/e2e/status-wiring.spec.ts` and the F-035 row tests
    still pass unchanged, because they run against the empty store. Drift note in `specs/006`.
+3. **F-050 (2026-10-01)**: **FR-003** ("the two existing 'add a photo/text' action circles keep
+   navigating to `/status/compose`") is **partial for the camera circle**. The camera circle now
+   navigates to `/status/compose?kind=photo`; the note circle and the row body keep the exact
+   `/status/compose` target FR-002/FR-003 describe, so this feature's row contract stands. The
+   row's subtitle additionally shows the provisional label `A photo` while the current status is a
+   photo. See `specs/050-photo-status/`.
 
 ## Caveat (deliberately incomplete until G1)
 

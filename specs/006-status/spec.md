@@ -95,3 +95,12 @@ bottom action bar. The navigation bar shows a leading **Privacy** action and a c
   **empty** feed still matches `0-8498-status.png`. The post-publish presentation is **PROVISIONAL**:
   the design contains only the empty state and no Figma node is cited for it. See
   `specs/049-status-publishing/`.
+- **F-050 (2026-10-01)**: the **camera** circle (`Add a photo to my status`) is no longer a text
+  compose entry — it navigates to `/status/compose?kind=photo` (photo mode). The pencil/note circle
+  and the row body keep navigating to the text composer, exactly as F-035/F-007 shipped. The feed
+  can also render a **photo** status now: the `role="status"` region shows an `<img>` bound to the
+  persisted data URL (no text region), and the row subtitle shows the provisional label `A photo`
+  instead of inviting a second publish. The `My Status` row's `aria-label` mirrors the subtitle so
+  a photo is not announced as an invitation. The photo presentation and subtitle/alt copy are
+  **PROVISIONAL**, capture-gated at `specs/050-photo-status/` T010–T011; the empty state still
+  matches `0-8498-status.png`.

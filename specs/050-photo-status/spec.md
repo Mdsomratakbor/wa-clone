@@ -4,7 +4,9 @@
 
 **Created**: 2026-10-01
 
-**Status**: **Specified** (clarifications resolved; G1 capture still BLOCKED — see Review Gates)
+**Status**: ✅ **Implemented** (T001–T009 done, build green, unit 691/691, 2026-10-01) — G1 capture
+still **BLOCKED**, so T010–T012 (photo presentation reconcile) and T013 (the on-screen keyboard)
+remain open. See [Closure](./tasks.md#closure-g3).
 
 **Input**: design row 7 (`0:9634`, Status compose chrome) + the open gap "Publish a status" follow-up
 raised after F-049 shipped
@@ -151,6 +153,29 @@ defect class F-049 fixed for the entry itself.
 - `status.model.ts` gains one optional field; no existing field changes type or meaning.
 - `_tokens.scss` is unchanged.
 - `chat-window` and all other features are untouched.
+
+## Implemented (2026-10-01) — recorded, not design-verified
+
+The PROVISIONAL hypotheses from `UNKNOWN / NEEDS CLARIFICATION` shipped as literal choices so that
+T010/T011 have exact values to reconcile against a capture, and no node is cited for any of them:
+
+- **Subtitle copy**: `A photo` (FR-009), replacing both the empty-string trap (`text: ''`) and the
+  `Add to my status` invitation that would invite a second publish.
+- **Alt text**: `Status photo` (FR-008) — short and literal, no invented description of content.
+- **Preview**: 232px wide (the screen's design-verified field width), `object-fit: cover`,
+  `border-radius: 8`, label pill 999 radius, `gap: 16`, using only values already present on the
+  screen. Feed photo: the existing 43px band, `object-fit: cover`, left padding 13 to match the
+  row's design padding.
+- **Decoding state**: the page shows the provisional copy "Preparing photo…" while the file
+  read-decode-encode runs (an inert button through an async step would read as broken), which is
+  also the deterministic wait target the unit tests settle on.
+- **Row `aria-label`**: now mirrors `subtitle()`. The hardcoded `Add to my status` predates
+  F-049's data-driven subtitle and would have announced a photo status as an invitation — FR-009's
+  intent ("no invitation over a photo") is honoured for assistive technology too. Recorded as a
+  deviation rather than a silent spec change.
+- **Failure path**: a non-image resolves to "no photo" and `Send` stays disabled (FR-004). The
+  file input is visually the label, stays in the accessibility tree, keeps a real focus ring, and
+  is unreachable by pointer as a 1px sliver.
 
 ## Validation Targets
 

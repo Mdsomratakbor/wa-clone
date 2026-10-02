@@ -120,3 +120,27 @@ FR-002 / FR-003 / FR-007 / FR-008 / FR-009 all stand. Note that `tests/e2e/statu
 was rewritten, not merely extended: its "send glyphs, placeholder and keyboard are no-ops" test and
 its focus-ring assertion for the text-bar glyph became false *for a good reason* (a disabled control
 leaves the tab order), and they were re-pointed at the new contract instead of deleted.
+
+## Drift note (F-050, 2026-10-01)
+
+This spec's *entry-point* claim is superseded for the **camera circle only**. F-050 gave the circle
+labelled `Add a photo to my status` its real flow: activating it navigates to
+`/status/compose?kind=photo`, a photo **mode** of this same screen that reuses the verified `0:9634`
+chrome rather than inventing a second frame. The note circle, the `My Status` row body, `Close`, all
+of text mode, and FR-001 / FR-002 / FR-003 / FR-007 / FR-008 are unchanged.
+
+- **Clarification 1 / FR-001 "Entry points"** ("both the camera circle and the note circle
+  navigate to `/status/compose` ... there is exactly one compose frame in the design — the text
+  composer; the camera/photo flow is not part of row 7") is **partial**. The sentence stays true
+  for the text affordance; the camera circle is now photo mode of the same frame. The photo
+  *presentation* — preview, feed photo, subtitle copy, alt text — is **PROVISIONAL**, no Figma node
+  exists for it, and it is capture-gated (T010–T012 in `specs/050-photo-status/`).
+- **FR-007** ("activating the camera or note circle navigates to `/status/compose`") is **partial
+  for the camera circle**: it navigates to `/status/compose?kind=photo`. The note circle and row
+  body keep the exact target below.
+- **Non-Goals / FR-003 camera/photo compose** ("a separate design if it exists beyond row 7") is
+  **struck**: the design has no separate photo frame, and this feature deliberately avoided
+  inventing one.
+- The keyboard graphic remains deliberately non-functional; photo mode omits it (a keyboard is
+  meaningless mid-file-pick), and text-mode typing stays the **open, capture-gated T013** in
+  `specs/050-photo-status/`, inheriting the owner's "keep both" decision.

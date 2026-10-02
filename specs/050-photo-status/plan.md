@@ -82,5 +82,6 @@ Not touched: routes (the query param rides the existing route), `navigation-bar`
 
 - **G1 BLOCKED** — quota resets 2026-10-02 18:38 UTC. Reused chrome is verified; photo presentation
   is provisional. Capture tasks stay open in `tasks.md`.
-- **G2** — `npm run build` green, full unit suite green, exact count reported.
-- **G3** — closure commit, drift notes, checklist, converge clean.
+- **G2** — `npm run build` green, full unit suite green, exact count reported. **CLEARED 2026-10-01**:
+  build green, **691 / 691** (baseline 658, +33).
+- **G3** — closure commit, drift notes, checklist, converge clean. See `tasks.md#closure-g3`.
