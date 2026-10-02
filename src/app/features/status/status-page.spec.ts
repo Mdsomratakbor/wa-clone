@@ -86,6 +86,57 @@ describe('StatusPage', () => {
     expect(el.querySelector('[data-testid="status-mine"] img')).toBeNull();
   });
 
+  it('renders a published photo and not the text region (FR-008)', () => {
+    const store = TestBed.inject(StatusStore);
+    store.publishPhoto('data:image/jpeg;base64,/9j/4AAQ==', 1);
+    const el = render();
+
+    const mine = el.querySelector('[data-testid="status-mine"]');
+    const img = el.querySelector<HTMLImageElement>('[data-testid="status-mine-photo"]');
+    expect(mine).not.toBeNull();
+    expect(mine?.getAttribute('role')).toBe('status');
+    expect(img?.getAttribute('src')).toBe('data:image/jpeg;base64,/9j/4AAQ==');
+    expect(img?.getAttribute('alt')).toBe('Status photo');
+    expect(el.querySelector('[data-testid="status-mine-text"]')).toBeNull();
+    expect(el.querySelector('[data-testid="status-tip"]')).toBeNull();
+  });
+
+  it('the My Status subtitle shows the provisional photo label for a photo status (FR-009)', () => {
+    const store = TestBed.inject(StatusStore);
+    store.publishPhoto('data:image/jpeg;base64,/9j/4AAQ==', 1);
+    const el = render();
+    expect(el.querySelector('[data-testid="status-my-subtitle"]')?.textContent?.trim()).toBe(
+      'A photo',
+    );
+  });
+
+  it('a photo data URL containing markup-like text stays an inert img src (FR-008)', () => {
+    const store = TestBed.inject(StatusStore);
+    const crafted = 'data:image/jpeg;base64,<img src=x onerror="alert(1)">';
+    store.publishPhoto(crafted, 1);
+    const el = render();
+
+    const img = el.querySelector<HTMLImageElement>('[data-testid="status-mine-photo"]');
+    expect(img?.getAttribute('src')).toBe(crafted);
+    expect(el.querySelector('[data-testid="status-mine"] img[onerror]')).toBeNull();
+  });
+
+  it('camera opens photo mode, note opens the text composer (FR-001)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+
+    (el.querySelector('[data-testid="status-camera"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/status/compose'], {
+      queryParams: { kind: 'photo' },
+    });
+
+    (el.querySelector('[data-testid="status-note"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(router.navigate).toHaveBeenCalledWith(['/status/compose']);
+  });
+
   it('renders the tab bar with Status active and no FAB', () => {
     const el = render();
     const tabs = [...el.querySelectorAll<HTMLElement>('[role="tab"]')];
@@ -147,20 +198,6 @@ describe('StatusPage', () => {
     expect(router.navigate).not.toHaveBeenCalled();
     expect(el.querySelector('[data-testid="status-feed"]')).not.toBeNull();
     expect(el.querySelector('[data-testid="tab-stub"]')).toBeNull();
-  });
-
-  it('camera and note navigate to compose', () => {
-    const router = TestBed.inject(Router);
-    spyOn(router, 'navigate').and.resolveTo(true);
-    const el = render();
-
-    (el.querySelector('[data-testid="status-camera"]') as HTMLButtonElement).click();
-    fixture.detectChanges();
-    expect(router.navigate).toHaveBeenCalledWith(['/status/compose']);
-
-    (el.querySelector('[data-testid="status-note"]') as HTMLButtonElement).click();
-    fixture.detectChanges();
-    expect(router.navigate).toHaveBeenCalledWith(['/status/compose']);
   });
 
   it('Privacy opens settings (F-035)', () => {
