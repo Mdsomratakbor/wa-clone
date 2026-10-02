@@ -11,7 +11,7 @@
         class="status-page__row"
         role="button"
         tabindex="0"
-        aria-label="My Status, Add to my status"
+        aria-label="My Status, {{ subtitle() }}"
         data-testid="status-my"
         (click)="onRowActivate()"
         (keydown.enter)="onRowActivate()"
@@ -75,9 +75,20 @@
       </div>
 
       @if (myStatus(); as status) {
-        <div class="status-page__mine" data-testid="status-mine" role="status">
-          <p class="status-page__mine-text">{{ status.text }}</p>
-        </div>
+        @if (status.photo; as photo) {
+          <div class="status-page__mine status-page__mine--photo" data-testid="status-mine" role="status">
+            <img
+              class="status-page__mine-photo"
+              data-testid="status-mine-photo"
+              [src]="photo.dataUrl"
+              alt="Status photo"
+            />
+          </div>
+        } @else {
+          <div class="status-page__mine" data-testid="status-mine" role="status">
+            <p class="status-page__mine-text">{{ status.text }}</p>
+          </div>
+        }
       } @else {
         <div class="status-page__tip" data-testid="status-tip" role="status">
           <p class="status-page__tip-text">No recent updates to show right now.</p>

@@ -33,7 +33,18 @@ export class StatusPage {
   // truncated status is one the user cannot read in full.
   protected readonly myStatus = this.status.myStatus;
 
-  protected readonly subtitle = computed(() => this.myStatus()?.text ?? 'Add to my status');
+  // F-050 FR-009: a photo status has `text: ''`, which must not render as an empty
+  // subtitle; the proprietial photo label hides nothing and invites no second publish.
+  protected readonly subtitle = computed(() => {
+    const entry = this.myStatus();
+    if (entry === null) {
+      return 'Add to my status';
+    }
+    if (entry.photo !== undefined) {
+      return 'A photo';
+    }
+    return entry.text;
+  });
 
   protected readonly tabs = computed<TabItem[]>(() =>
     TAB_KEYS.map((key) => ({ key, label: TAB_LABELS[key], active: key === this.activeTab() })),
@@ -75,8 +86,9 @@ export class StatusPage {
   }
 
   protected onCamera(): void {
-    // F-007: camera entry opens the text-status composer (design-map row 7).
-    void this.router.navigate(['/status/compose']);
+    // F-050 FR-001: the camera circle is labelled "Add a photo to my status", so it
+    // no longer opens the text composer the way the note circle and row body do.
+    void this.router.navigate(['/status/compose'], { queryParams: { kind: 'photo' } });
   }
 
   protected onNote(): void {

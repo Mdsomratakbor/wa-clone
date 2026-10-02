@@ -141,6 +141,22 @@
     overflow-wrap: anywhere;
   }
 
+  // F-050 FR-008, PROVISIONAL: no Figma node shows a published photo, so the photo
+  // fills the existing band (cover-fit within the feed) rather than a size taken
+  // from a design that never captured one. Aligned to the row's padding, not the
+  // text indent, because a photo is not text.
+  &__mine--photo {
+    padding-left: 13px;
+  }
+
+  &__mine-photo {
+    display: block;
+    flex: 1;
+    min-width: 0;
+    height: 43px;
+    object-fit: cover;
+  }
+
   &__stub {
     height: 100%;
     display: flex;
