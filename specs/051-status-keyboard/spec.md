@@ -35,6 +35,15 @@ The owner reported the on-screen keyboard "is not working" and approved building
   A (**owner**): **keep both** (confirms the F-050 "keep both" decision). The input stays focusable
   and the on-screen keys insert into it.
 
+## Drift note (F-053, 2026-10-02) — the shared-value field is now a growing textarea
+
+F-051 says "the real input stays focusable and the on-screen keys insert into it". By owner decision
+on **2026-10-02** (`specs/053-status-input-expand/`), the field is a **single-row `textarea` that
+grows with the value** (capped at 3 lines, internal scroll), and newlines are now part of the value:
+Enter inserts `\n`, and backspace removes it. The shared-value contract is unchanged — both entry
+paths write the same `value` signal and the keyboard still inserts letters, with `onKeyBackspace`
+already handling a trailing `\n`.
+
 ## Summary
 
 The text composer's keyboard band is a picture of a keyboard. Tapping it changes nothing, so the

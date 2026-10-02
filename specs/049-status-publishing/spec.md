@@ -10,6 +10,15 @@ still **BLOCKED**, so T011–T013 and the post-publish presentation remain open.
 
 **Input**: design row 6 (`0:8498`, Status feed) + design row 7 (`0:9634`, Status compose)
 
+## Drift note (F-053, 2026-10-02) — the compose field now grows
+
+FR-001 and the Summary call the compose field a "single-line text input". By owner decision on
+**2026-10-02** (`specs/053-status-input-expand/`), the field is a `textarea` that **auto-grows with
+its content**, capped at 3 lines with internal scroll, and published statuses keep their line breaks
+in the feed (`white-space: pre-wrap`). Everything else in F-049 — the shared `value` source, `Send`'s
+trim-dependent disabled state, the disabled `Send-alt` treatment — is unchanged; the F-053 spec
+inherits them.
+
 ## Clarifications
 
 ### Session 2026-10-01
