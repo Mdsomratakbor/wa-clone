@@ -29,6 +29,20 @@ The owner asked that the status text input box "should be expand".
   A (**owner**): **preserve line breaks** — the store keeps the newlines and the feed renders the
   status as composed (`white-space: pre-wrap`).
 
+### Session 2026-10-02 (post-closure refinement)
+
+The owner ran the shipped feature and flagged two artefacts of the approved treatment.
+
+- Q: The scrollbar Chrome paints once the field is capped at three lines — should it show?
+  A (**owner**): **hide it, keep scrolling** — the 3-line cap and internal scrolling stay; the
+  scrollbar is visually hidden (`scrollbar-width: none`, `::-webkit-scrollbar { display: none }`)
+  while wheel/touch scrolling still works.
+- Q: The white box around the field is the focus ring (F-049's 2px white outline with a 2px
+  offset). What should focus look like?
+  A (**owner**): **keep a visible, less boxy focus** — an in-field bottom underline
+  (`box-shadow: inset 0 -2px 0`) replaces the offset outline, so focus stays discoverable
+  (the accessibility golden rule) without the rectangle border.
+
 ## Summary
 
 The compose field is a fixed single-line `<input>` on a design-verified screen, so a status longer
@@ -44,9 +58,11 @@ outer whitespace and preserves internal `\n`, and JSON persistence keeps them.
 - **FR-001** Text compose mode renders a single-row `textarea` in place of the `<input>`, keeping
   the verified rest-state chrome: 232px wide, 38px/500 `Helvetica Neue`, centred, white, transparent
   background, white caret, `placeholder`/`aria-label` "Type a status",
-  `data-testid="compose-input"`, and the visible focus rule. The field grows to fit its content (a
+  `data-testid="compose-input"`, and the owner-approved visible focus treatment — an in-field bottom
+  underline (v2, 2026-10-02), not F-049's offset outline. The field grows to fit its content (a
   `\n` or wrapped line adds a line), capped at **3 lines (136.8px)**, above which it **scrolls
-  internally**. Native `resize` is disabled; there is no horizontal scroll.
+  internally with the scrollbar visually hidden** (wheel/touch still scroll — v2, 2026-10-02).
+  Native `resize` is disabled; there is no horizontal scroll.
 - **FR-002** Enter inserts a line break into the status value. The value stays the single source:
   text entered via the OS keyboard or the on-screen keys grows the field identically, and F-051
   backspace removes the last character including a `\n` (unchanged).
@@ -107,7 +123,8 @@ outer whitespace and preserves internal `\n`, and JSON persistence keeps them.
   (`viewChild`); `onValue` reads a `HTMLTextAreaElement`. No store/clock/router change.
 - `compose-page.scss` — `.compose__type` goes from fixed `height: 52px` to `min-height: 52px`;
   field `min-height: 45.6px`, `max-height: 136.8px`, `resize: none`, `overflow-wrap: anywhere`;
-  typography/placement/focus unchanged.
+  typography/placement unchanged. Post-closure v2 (2026-10-02): `resize: none` is joined by the
+  hidden-scrollbar rules and `:focus-visible` becomes the in-field bottom underline.
 - `status-page.scss` — `white-space: pre-wrap` added to the shared `__tip-text, __mine-text` rule.
 - `status.store.ts`, `status.model.ts`, tokens, routes: untouched.
 

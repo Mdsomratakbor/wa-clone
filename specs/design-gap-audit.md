@@ -234,3 +234,8 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   scroll treatment are PROVISIONAL — no Figma node shows a grown field — and the centred-alignment
   hypothesis stays recorded for the post-reset reconcile alongside the 051/052 tasks. E2E authored
   only. The compose golden's keyboard is re-captured with F-051's when the pause lifts.
+  **Post-closure v2 (same day, second clarify pass)**: running the app, the owner flagged Chrome's
+  scrollbar past the 3-line cap and F-049's 2px offset focus outline as unwanted artefacts — the
+  scrollbar is now visually hidden (wheel/touch still scroll) and focus is an in-field bottom
+  underline, keeping the visible-focus accessibility rule without the rectangle border. See the
+  053 spec's second clarify session; the goldens still re-capture with the pause lift.

@@ -16,8 +16,11 @@ FR-001 and the Summary call the compose field a "single-line text input". By own
 **2026-10-02** (`specs/053-status-input-expand/`), the field is a `textarea` that **auto-grows with
 its content**, capped at 3 lines with internal scroll, and published statuses keep their line breaks
 in the feed (`white-space: pre-wrap`). Everything else in F-049 — the shared `value` source, `Send`'s
-trim-dependent disabled state, the disabled `Send-alt` treatment — is unchanged; the F-053 spec
-inherits them.
+  trim-dependent disabled state, the disabled `Send-alt` treatment — is unchanged; the F-053 spec
+  inherits them. **Post-closure refine (2026-10-02)**: F-049's `&__input` focus outline (2px white,
+  2px offset) was owner-replaced by an in-field bottom underline (F-053 v2 clarify), and F-053's
+  hidden-scrollbar treatment applies past the cap; the visible-focus accessibility requirement still
+  holds either way.
 
 ## Clarifications
 
