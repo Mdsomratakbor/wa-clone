@@ -4,9 +4,9 @@
 
 **Created**: 2026-10-02
 
-**Status**: In progress — provisional presentation approved by the owner (2026-10-02); G1 capture
-still **BLOCKED** until 2026-10-02 18:38 UTC, so the block's size is PROVISIONAL and carries a
-post-capture reconcile task.
+**Status**: ✅ Implemented (2026-10-02) — provisional presentation approved by the owner
+(2026-10-02), G2 green (**702/702**); G1 capture still **BLOCKED** until 2026-10-02 18:38 UTC, so the
+block's size is PROVISIONAL and carries a post-capture reconcile task.
 
 **Input**: design row 6 (`0:8498`, Status feed). No node in the file shows a published photo.
 
@@ -115,12 +115,12 @@ left as dead CSS.
 
 ## Definition of Done
 
-- [ ] Every FR is covered by at least one named unit test
-- [ ] A published photo renders as a real preview block, not the strip (FR-001)
-- [ ] Semantics, testids, src/alt and role are preserved (FR-002)
-- [ ] Text status and tip unchanged; band styles deleted (FR-003)
-- [ ] No store/model/route/token change; no wall-clock read (FR-004)
-- [ ] PROVISIONAL geometry recorded for the reconcile (FR-005)
-- [ ] Drift note added to the F-050 spec and design-map row 6
-- [ ] `npm run build` green; full unit suite green with the exact count reported
-- [ ] Playwright specs authored; execution deferred per the owner directive (2026-09-26)
+- [x] Every FR is covered by at least one named unit test
+- [x] A published photo renders as a real preview block, not the strip (FR-001)
+- [x] Semantics, testids, src/alt and role are preserved (FR-002)
+- [x] Text status and tip unchanged; band styles deleted (FR-003)
+- [x] No store/model/route/token change; no wall-clock read (FR-004)
+- [x] PROVISIONAL geometry recorded for the reconcile (FR-005)
+- [x] Drift note added to the F-050 spec and design-map row 6
+- [x] `npm run build` green; full unit suite green with the exact count reported
+- [x] Playwright specs authored; execution deferred per the owner directive (2026-09-26)

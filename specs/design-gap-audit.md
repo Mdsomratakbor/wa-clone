@@ -58,7 +58,9 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   messaging backend work. The keyboard graphic still does not type and never will from a static PNG —
   its key layout and glyph geometry exist in no captured artifact, so the OS keyboard does the typing.
   The *post-publish* presentation remains PROVISIONAL (the design shows only the empty feed) and the
-  goldens stay deferred under the Playwright pause, but the gap itself is closed.
+  goldens stay deferred under the Playwright pause, but the gap itself is closed. **(2026-10-02) The
+  "OS keyboard does the typing" sentence is superseded by F-051**: the owner reversed the deferral and
+  approved a real, provisional CSS keyboard replacing the PNG (see changelog).
 - **Camera capture pipeline** (row 12): the shutter needs `getUserMedia` plus the captured preview
   treatment. **`Flip` moved here from tier A** (2026-09-27): without a live preview a front/back
   state has no observable effect, so shipping a state-only flip would be dead behaviour — it belongs
@@ -204,3 +206,20 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   in `specs/050-photo-status/`) that inherits the recorded "keep both" decision — the real input
   stays focusable and the OS keyboard keeps working. G1 remains BLOCKED, so the photo preview, feed
   sizing, subtitle and alt text are PROVISIONAL pending the T010–T012 reconcile at the reset.
+- **2026-10-02** - F-051 On-screen status keyboard (**+10 unit**, 692 at F-051 alone) and F-052 Photo
+  status preview landed (**702/702**, build green). **F-051 reverses the F-050 deferral by owner
+  decision**: the owner reported the on-screen keyboard "is not working" and approved a real,
+  provisional segmented keyboard instead of waiting for the capture. The inert `status-compose-
+  keyboard.png` is deleted; a `status-keyboard` component renders the 26 letters + shift/backspace/
+  space/send as live buttons (dark `keyboard-*` tokens, 44px keys, 6px gaps/radius, one-shot shift
+  with `aria-pressed`). It emits only — `ComposePage` owns the value signal — so F-050's "keep both"
+  decision holds: the real input stays focusable and the keys type into the same value, and both
+  Send glyphs and the keyboard's Send publish through the same path. No `123`/globe/emoji keys are
+  rendered (they would be inert). **F-052 fixes the 43px photo smear**: the published photo now
+  renders as a rounded preview block (radius 8px — the composer preview's radius — gutters 16px,
+  max-height 280px, `object-fit: cover`) with `role="status"` and the same testids/`alt`, and the
+  band modifier CSS is deleted. Both ship PROVISIONAL: the keyboard values exist in no captured
+  artifact and no Figma node shows a published photo, both recorded in their specs for the
+  post-reset reconcile (T010–T012 and the 051/052 reconcile tasks). E2E authored-only per the
+  2026-09-26 Playwright pause; the compose golden (`0-9634-status-compose.png`) now shows the
+  provisional keyboard and must be re-captured when the pause lifts and the capture gate clears.

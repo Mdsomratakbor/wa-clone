@@ -21,6 +21,16 @@ tokens, replacing the static band graphic). T013 below is therefore **superseded
 dropped: the F-051 spec inherits and confirms the "keep both" decision (the real input stays
 focusable; on-screen keys insert into it).
 
+## Drift note (F-052, 2026-10-02) — feed photo presentation superseded
+
+FR-008's provisional photo treatment (the photo fills the existing 43px band, cover-fit, left
+padding 13 to match the row) is **superseded** by `specs/052-status-photo-preview/`, approved the
+same day because the smear was not informative: the published photo now renders as a rounded preview
+block (radius 8px, gutters 16px, max-height 280px, `object-fit: cover`), and the band modifier plus
+strip styles are deleted. The subtitle (`A photo`), `role="status"`, testids, `src`/`alt`, and the
+store/model/route contract are unchanged. The photo geometry remains PROVISIONAL against the
+T010–T012 reconcile.
+
 ## Clarifications
 
 ### Session 2026-10-01

@@ -4,9 +4,10 @@
 
 **Created**: 2026-10-02
 
-**Status**: In progress — provisional implementation approved by the owner (2026-10-02); G1 capture
-still **BLOCKED** until 2026-10-02 18:38 UTC, so the keyboard's styling is PROVISIONAL and carries a
-post-capture reconcile task.
+**Status**: ✅ Implemented (2026-10-02) — real provisional keyboard, owner-approved reversal of the
+F-050 deferral; G2 green (**701/701**, 702/702 across both closures). G1 capture still **BLOCKED**
+until 2026-10-02 18:38 UTC, so the keyboard's styling is PROVISIONAL and carries a post-capture
+reconcile task.
 
 **Input**: design row 7 (`0:9634`, Status compose chrome). The compose frame's keyboard band is the
 only captured artifact for a keyboard: `status-compose-keyboard.png` (375x291), a crop of the frame
@@ -171,15 +172,15 @@ targets:
 
 ## Definition of Done
 
-- [ ] Every FR is covered by at least one named unit test
-- [ ] Text mode renders a working segmented keyboard; every rendered key is live (FR-001, FR-008)
-- [ ] Letters, shift (one-shot), backspace, space and send behave per FR-002…FR-006
-- [ ] Field and on-screen keys edit one value: entry via either is reflected in the other's output
+- [x] Every FR is covered by at least one named unit test
+- [x] Text mode renders a working segmented keyboard; every rendered key is live (FR-001, FR-008)
+- [x] Letters, shift (one-shot), backspace, space and send behave per FR-002…FR-006
+- [x] Field and on-screen keys edit one value: entry via either is reflected in the other's output
       (FR-007)
-- [ ] The runtime keyboard PNG is removed; no dead CSS or dead asset remains
-- [ ] No wall-clock read, no persistent-state write, no new dependency (FR-009)
-- [ ] The blocked G1 gate and every provisional value are recorded for the post-capture reconcile
-- [ ] Drift note added to the F-050 spec (non-goal superseded by owner reversal), design-map row 7,
+- [x] The runtime keyboard PNG is removed; no dead CSS or dead asset remains
+- [x] No wall-clock read, no persistent-state write, no new dependency (FR-009)
+- [x] The blocked G1 gate and every provisional value are recorded for the post-capture reconcile
+- [x] Drift note added to the F-050 spec (non-goal superseded by owner reversal), design-map row 7,
       gap audit
-- [ ] `npm run build` green; full unit suite green with the exact count reported
-- [ ] Playwright specs authored; execution deferred per the owner directive (2026-09-26)
+- [x] `npm run build` green; full unit suite green with the exact count reported
+- [x] Playwright specs authored; execution deferred per the owner directive (2026-09-26)
