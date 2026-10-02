@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 test.describe('Status compose (US1)', () => {
   test.beforeEach(async ({ page }) => {
@@ -64,6 +66,57 @@ test.describe('Status compose (US1)', () => {
     await expect(page.getByRole('tab')).toHaveCount(0);
     await expect(page.getByTestId('navigation-bar')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Start new chat' })).toHaveCount(0);
+  });
+});
+
+test.describe('Status compose photo mode (F-050)', () => {
+  // AUTHORED but never executed: Playwright is paused by owner directive
+  // 2026-09-26. It is updated in lockstep with the unit tests and will run when
+  // the pause is lifted.
+  test('choosing a photo shows a preview, Send publishes, and the feed survives a reload (FR-002, FR-004, FR-005, FR-008)', async ({
+    page,
+  }) => {
+    await page.goto('/status/compose?kind=photo');
+    await page.getByTestId('compose-page').waitFor();
+
+    await expect(page.getByTestId('compose-keyboard')).toHaveCount(0);
+    await expect(page.getByTestId('compose-input')).toHaveCount(0);
+    await expect(page.getByTestId('compose-photo-empty')).toContainText(
+      'Choose a photo to add to your status.',
+    );
+    await expect(page.getByRole('button', { name: 'Send status' })).toBeDisabled();
+
+    await page.getByTestId('compose-file').setInputFiles({
+      name: 'status.png',
+      mimeType: 'image/png',
+      buffer: readFileSync(join(__dirname, 'golden', 'status-my-avatar.png')),
+    });
+
+    await expect(page.getByTestId('compose-photo-preview')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Send status' })).toBeEnabled();
+
+    await page.getByRole('button', { name: 'Send status' }).click();
+    await expect(page).toHaveURL(/\/status$/);
+
+    const photo = page.getByTestId('status-mine-photo');
+    await expect(photo).toBeVisible();
+    await expect(photo).toHaveAttribute('src', /^data:image\/jpeg;base64,/);
+    await expect(photo).toHaveAttribute('alt', 'Status photo');
+    await expect(page.getByTestId('status-mine-text')).toHaveCount(0);
+    await expect(page.getByTestId('status-tip')).toHaveCount(0);
+
+    await page.reload();
+    await expect(page.getByTestId('status-mine-photo')).toBeVisible();
+  });
+
+  test('Close in photo mode returns to the feed without publishing (FR-011)', async ({ page }) => {
+    await page.goto('/status/compose?kind=photo');
+    await page.getByTestId('compose-page').waitFor();
+
+    await page.getByRole('button', { name: 'Close' }).click();
+    await expect(page).toHaveURL(/\/status$/);
+    await page.getByTestId('status-my').waitFor();
+    await expect(page.getByTestId('status-mine')).toHaveCount(0);
   });
 });
 

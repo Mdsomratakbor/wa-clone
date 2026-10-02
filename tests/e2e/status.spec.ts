@@ -94,19 +94,19 @@ test.describe('Status routing (US2)', () => {
     await page.getByTestId('status-my').waitFor();
   });
 
-  test('camera and note navigate to compose', async ({ page }) => {
+  test('camera opens photo mode, note opens the text composer (F-050 FR-001)', async ({ page }) => {
     await page.goto('/status');
     await page.getByTestId('status-my').waitFor();
 
     await page.getByTestId('status-camera').click();
-    await expect(page).toHaveURL(/\/status\/compose$/);
-    await page.getByTestId('compose-page').waitFor();
+    await expect(page).toHaveURL(/\/status\/compose\?kind=photo$/);
+    await page.getByTestId('compose-photo').waitFor();
 
     await page.goto('/status');
     await page.getByTestId('status-my').waitFor();
     await page.getByTestId('status-note').click();
     await expect(page).toHaveURL(/\/status\/compose$/);
-    await page.getByTestId('compose-page').waitFor();
+    await page.getByTestId('compose-input').waitFor();
   });
 
   test('Privacy opens settings and the My Status row opens the composer (F-035)', async ({
