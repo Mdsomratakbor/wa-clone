@@ -28,6 +28,14 @@ $wa-colors: (
   // screen (G1 blocked and not clearable), so this is a PROVISIONAL hypothesis
   // and is the one token addition this feature required.
   call-field: #1c1c1e,
+  // F-051: the on-screen status keyboard, replacing the static band graphic. The
+  // band's key geometry exists in no captured artifact (G1 blocked, reset
+  // 2026-10-02), so this dark palette is a PROVISIONAL hypothesis modelled on the
+  // iOS dark keycap family and is recorded in spec 051 for the reconcile pass.
+  keyboard-bg: #17181c,
+  keycap: #3a3a3c,
+  keycap-special: #2c2c2e,
+  key-text: #ffffff,
 );
 
 $wa-font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,

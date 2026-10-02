@@ -3,10 +3,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { StatusStore } from '../../core/status.store';
 import { Clock } from '../../core/clock';
 import { downscaleToJpegDataUrl } from '../../core/status-photo';
+import { StatusKeyboard } from './status-keyboard';
 
 @Component({
   selector: 'app-compose-page',
-  imports: [],
+  imports: [StatusKeyboard],
   templateUrl: './compose-page.html',
   styleUrl: './compose-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,6 +45,20 @@ export class ComposePage {
 
   protected onValue(event: Event): void {
     this.value.set((event.target as HTMLInputElement).value);
+  }
+
+  /**
+   * F-051 FR-007: the on-screen keys and the real input edit the same `value` signal,
+   * so entry through either is reflected in the field, the keys and Send identically.
+   */
+  protected onKeyType(character: string): void {
+    this.value.update((value) => value + character);
+  }
+
+  protected onKeyBackspace(): void {
+    this.value.update((value) =>
+      value.length === 0 ? value : Array.from(value).slice(0, -1).join(''),
+    );
   }
 
   /**

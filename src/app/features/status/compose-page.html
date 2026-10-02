@@ -97,11 +97,11 @@
       />
     </div>
 
-    <img
-      class="compose__keyboard"
-      data-testid="compose-keyboard"
-      src="/status-compose-keyboard.png"
-      alt=""
+    <app-status-keyboard
+      [value]="value()"
+      (type)="onKeyType($event)"
+      (backspace)="onKeyBackspace()"
+      (send)="onSend()"
     />
   }
 </div>

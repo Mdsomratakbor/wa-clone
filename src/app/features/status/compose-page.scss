@@ -201,14 +201,7 @@
     outline-offset: 2px;
   }
 
-  &__keyboard {
-    position: absolute;
-    top: 477px;
-    left: 0;
-    width: 100%;
-    height: auto;
-    display: block;
-    -webkit-user-drag: none;
-    user-select: none;
-  }
+  // F-051: the keyboard is a component now (app-status-keyboard), anchored to the
+  // screen bottom. The static band graphic, its PNG and this position rule are gone;
+  // see specs/051-status-keyboard for the PROVISIONAL geometry.
 }
