@@ -11,6 +11,16 @@ remain open. See [Closure](./tasks.md#closure-g3).
 **Input**: design row 7 (`0:9634`, Status compose chrome) + the open gap "Publish a status" follow-up
 raised after F-049 shipped
 
+## Drift note (F-051, 2026-10-02) — on-screen keyboard decision reversed
+
+On 2026-10-01 the owner decided to **wait for the capture** and declined a provisional QWERTY; the
+on-screen keyboard and its "keep both" decision were recorded here as a capture-gated deferral and
+open task T013. On **2026-10-02** the owner reversed that: the keyboard is now built **immediately**
+and **provisional** by `specs/051-status-keyboard/` (a real segmented keyboard rendered from design
+tokens, replacing the static band graphic). T013 below is therefore **superseded**, not silently
+dropped: the F-051 spec inherits and confirms the "keep both" decision (the real input stays
+focusable; on-screen keys insert into it).
+
 ## Clarifications
 
 ### Session 2026-10-01
