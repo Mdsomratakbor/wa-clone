@@ -15,10 +15,11 @@ import { downscaleToJpegDataUrl } from '../../core/status-photo';
 import { StatusKeyboard } from './status-keyboard';
 
 /**
- * F-053 FR-001: one line of the 38px/1.2 field (45.6px) times the 3-line cap. The
- * values are repeated in `compose-page.scss` and recorded in the 053 spec.
+ * F-053 FR-001: one line of the 38px/1.2 field (45.6px) times the 5-line cap. The
+ * values are repeated in `compose-page.scss` and recorded in the 053 spec. The
+ * cap moved 3 → 5 lines by owner decision (2026-10-02, session v3).
  */
-const FIELD_MAX_HEIGHT_PX = 136.8;
+const FIELD_MAX_HEIGHT_PX = 228;
 
 @Component({
   selector: 'app-compose-page',
@@ -55,8 +56,8 @@ export class ComposePage {
       el.style.height = '0px';
       const content = el.scrollHeight;
       el.style.height = `${Math.min(content, FIELD_MAX_HEIGHT_PX)}px`;
-      // Chrome rounds scrollHeight (a 136.8px cap measures 137px), so the
-      // comparison must use the rounded cap: 3 lines fit -> hidden; a 4th line
+      // Chrome rounds scrollHeight (a 228px cap is already integer), so the
+      // comparison uses the rounded cap: 5 lines fit -> hidden; a 6th line
       // exceeds it -> internal scrolling.
       el.style.overflowY = content > Math.ceil(FIELD_MAX_HEIGHT_PX) ? 'auto' : 'hidden';
     });

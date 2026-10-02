@@ -84,21 +84,22 @@
   // too, and scaling it could overflow the design-verified 232px field. The real
   // caret replaces the decorative .compose__caret.
   // F-053 FR-001 (PROVISIONAL): the field is a single-row textarea that grows to
-  // at most 3 lines (45.6px each) and scrolls inside past the cap; the cap and the
+  // at most 5 lines (45.6px each) and scrolls inside past the cap; the cap and the
   // scroll treatment are recorded in the 053 spec - no Figma node shows a grown
-  // field. Values mirror FIELD_MAX_HEIGHT_PX in compose-page.ts.
+  // field. Values mirror FIELD_MAX_HEIGHT_PX in compose-page.ts (136.8px → 228px,
+  // owner decision 2026-10-02, session v3).
   &__input {
     appearance: none;
     width: 100%;
     min-height: 45.6px;
-    max-height: 136.8px;
+    max-height: 228px;
     margin: 0;
     padding: 0;
     border: 0;
     background: transparent;
     resize: none;
     // F-053 v2 (owner decision 2026-10-02): the scrollbar Chrome paints past the
-    // 3-line cap is hidden while wheel/touch scrolling still works.
+    // 5-line cap is hidden while wheel/touch scrolling still works.
     scrollbar-width: none;
 
     &::-webkit-scrollbar {
