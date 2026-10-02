@@ -63,7 +63,8 @@ describe('ComposePage', () => {
 
   // F-049: the decorative <p> and its fake caret are replaced by a real input,
   // so the placeholder is now an attribute and the caret is the input's own.
-  it('renders a real input, not a decorative placeholder, plus the keyboard graphic (FR-001)', () => {
+  // F-051: the keyboard band is a component now, not the inert PNG graphic.
+  it('renders a real input, not a decorative placeholder, plus the on-screen keyboard (FR-001)', () => {
     const el = render();
     const input = el.querySelector<HTMLInputElement>('[data-testid="compose-input"]');
 
@@ -74,8 +75,8 @@ describe('ComposePage', () => {
     expect(el.querySelector('.compose__caret')).toBeNull();
     expect(el.querySelector('[data-testid="compose-type"]')?.getAttribute('aria-hidden')).toBeNull();
 
-    const kb = el.querySelector<HTMLImageElement>('[data-testid="compose-keyboard"]');
-    expect(kb?.src.endsWith('/status-compose-keyboard.png')).toBe(true);
+    expect(el.querySelector('app-status-keyboard')).not.toBeNull();
+    expect(el.querySelector('img[src="/status-compose-keyboard.png"]')).toBeNull();
   });
 
   it('renders no tab bar, navigation bar, FAB or title', () => {
@@ -182,12 +183,67 @@ describe('ComposePage', () => {
     expect(TestBed.inject(StatusStore).myStatus()).toBeNull();
   });
 
-  it('the keyboard graphic stays inert (FR-001)', () => {
+  // ---------------------------------------------------------------- F-051 ------
+
+  function press(el: HTMLElement, testid: string): void {
+    (el.querySelector(`[data-testid="${testid}"]`) as HTMLButtonElement).click();
+  }
+
+  // F-051 FR-007: one value for both entry points — the real input and the on-screen
+  // keys edit the same signal, so entry through either is seen by the other.
+  it('the on-screen keys and the field share one value (FR-007)', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
-    (el.querySelector('[data-testid="compose-keyboard"]') as HTMLElement).click();
+    const input = el.querySelector<HTMLInputElement>('[data-testid="compose-input"]')!;
+
+    press(el, 'compose-key-h');
+    expect(input.value).toBe('h');
+
+    // the helper writes the whole field value, so appending 'i' means typing 'hi'.
+    type(el, 'hi');
+    expect(input.value).toBe('hi');
+
+    press(el, 'compose-key-e');
+    expect(input.value).toBe('hie');
+
+    press(el, 'compose-key-send');
     fixture.detectChanges();
+    expect(TestBed.inject(StatusStore).myStatus()?.text).toBe('hie');
+    expect(router.navigate).toHaveBeenCalledWith(['/status']);
+  });
+
+  it('the on-screen backspace removes the last typed character (FR-004)', () => {
+    const el = render();
+    const input = el.querySelector<HTMLInputElement>('[data-testid="compose-input"]')!;
+
+    press(el, 'compose-key-a');
+    press(el, 'compose-key-b');
+    press(el, 'compose-key-backspace');
+    fixture.detectChanges();
+
+    expect(input.value).toBe('a');
+    expect(el.querySelector<HTMLButtonElement>('[data-testid="compose-send"]')?.disabled).toBe(
+      false,
+    );
+  });
+
+  it('a blank value leaves the on-screen Send disabled and nothing is published (FR-006)', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    const el = render();
+
+    expect(el.querySelector<HTMLButtonElement>('[data-testid="compose-key-send"]')?.disabled).toBe(
+      true,
+    );
+    press(el, 'compose-key-space');
+    fixture.detectChanges();
+    expect(el.querySelector<HTMLButtonElement>('[data-testid="compose-key-send"]')?.disabled).toBe(
+      true,
+    );
+    press(el, 'compose-key-send');
+    fixture.detectChanges();
+    expect(TestBed.inject(StatusStore).myStatus()).toBeNull();
     expect(router.navigate).not.toHaveBeenCalled();
   });
 
