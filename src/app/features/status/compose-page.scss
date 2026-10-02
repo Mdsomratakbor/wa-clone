@@ -97,6 +97,14 @@
     border: 0;
     background: transparent;
     resize: none;
+    // F-053 v2 (owner decision 2026-10-02): the scrollbar Chrome paints past the
+    // 3-line cap is hidden while wheel/touch scrolling still works.
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
     overflow-wrap: anywhere;
     text-align: center;
     font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -111,9 +119,12 @@
       color: rgba(255, 255, 255, 0.74);
     }
 
+    // F-053 v2 (owner decision 2026-10-02): the 2px offset white outline read as
+    // a boxed border; focus is now an in-field bottom underline, so it stays
+    // visible without surrounding the field.
     &:focus-visible {
-      outline: 2px solid #fff;
-      outline-offset: 2px;
+      outline: none;
+      box-shadow: inset 0 -2px 0 #fff;
     }
   }
 
