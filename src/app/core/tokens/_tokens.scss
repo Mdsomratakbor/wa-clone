@@ -36,6 +36,16 @@ $wa-colors: (
   keycap: #3a3a3c,
   keycap-special: #2c2c2e,
   key-text: #ffffff,
+  // F-056: the Camera screen chrome. The node is uncaptured (expired Figma token),
+  // so this whole block is a PROVISIONAL hypothesis and is recorded in spec 056
+  // for the post-re-auth reconcile, following the call-field/keyboard precedents.
+  camera-bg: #000000,
+  camera-gradient-a: #2c2c2e,
+  camera-gradient-b: #0a0a0c,
+  camera-control-bg: rgba(255, 255, 255, 0.14),
+  camera-control-fg: #ffffff,
+  camera-hint: rgba(255, 255, 255, 0.72),
+  camera-grid: rgba(255, 255, 255, 0.18),
 );
 
 $wa-font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,

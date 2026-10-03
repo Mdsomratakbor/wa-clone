@@ -1,40 +1,136 @@
-<div class="camera-page__viewport" data-testid="camera-page">
-  <div class="camera-page__controls">
-    <button
-      type="button"
-      class="camera-page__control"
-      data-testid="camera-close"
-      aria-label="Close camera"
-      (click)="onClose()"
-    >
-      <svg viewBox="0 0 24 24" class="camera-page__glyph" aria-hidden="true">
-        <path d="M6.4 5 12 10.6 17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12 5 6.4Z" fill="currentColor" />
-      </svg>
-    </button>
+<div class="camera-page" data-testid="camera-page">
+  <div class="camera-page__viewport">
+    @if (captured()) {
+      <img
+        class="camera-page__preview"
+        data-testid="camera-preview"
+        [src]="photo()"
+        [alt]="previewAlt"
+      />
+    } @else {
+      <div class="camera-page__filler" data-testid="camera-filler" aria-hidden="true"></div>
+      <div class="camera-page__grid" data-testid="camera-grid" aria-hidden="true"></div>
+      <span class="camera-page__hint" data-testid="camera-hint">{{ hint }}</span>
+    }
 
     <button
       type="button"
-      class="camera-page__control camera-page__control--shutter"
-      data-testid="camera-shutter"
-      aria-label="Take photo"
-      (click)="onShutter()"
+      class="camera-page__viewfinder"
+      data-testid="camera-viewfinder"
+      aria-label="Choose a photo"
+      (click)="onViewfinder()"
     ></button>
 
-    <button
-      type="button"
-      class="camera-page__control"
-      data-testid="camera-flip"
-      aria-label="Switch camera"
-      (click)="onFlip()"
-    >
-      <svg viewBox="0 0 24 24" class="camera-page__glyph" aria-hidden="true">
-        <path
-          d="M4 7v5h5L6.6 9.6A6.5 6.5 0 0 1 18.7 9l1.4-1.4A8.5 8.5 0 0 0 6.1 8.2L4 6Zm16 10v-5h-5l2.4 2.4a6.5 6.5 0 0 1-12.1.6L4 15a8.5 8.5 0 0 0 13.9 2.8L20 20Z"
-          fill="currentColor"
-        />
-      </svg>
-    </button>
-  </div>
-</div>
+    <div class="camera-page__top">
+      <button
+        type="button"
+        class="camera-page__control"
+        data-testid="camera-flash"
+        aria-label="Flash"
+        [attr.aria-pressed]="flash()"
+        (click)="onFlash()"
+      >
+        <svg viewBox="0 0 24 24" class="camera-page__glyph" aria-hidden="true">
+          <path
+            d="M13 2 4.5 13.5H11L9.5 22 19 9.5h-6.5L13 2Z"
+            fill="currentColor"
+          />
+        </svg>
+      </button>
 
-<app-tab-bar [items]="tabs()" (select)="onTabSelect($event)" />
+      @if (!captured()) {
+        <span class="camera-page__quality" data-testid="camera-quality" aria-hidden="true">HD</span>
+      }
+
+      <button
+        type="button"
+        class="camera-page__control"
+        data-testid="camera-close"
+        aria-label="Close camera"
+        (click)="onClose()"
+      >
+        <svg viewBox="0 0 24 24" class="camera-page__glyph" aria-hidden="true">
+          <path d="M6.4 5 12 10.6 17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12 5 6.4Z" fill="currentColor" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="camera-page__bottom">
+      <button
+        type="button"
+        class="camera-page__control"
+        data-testid="camera-gallery"
+        aria-label="Choose from gallery"
+        (click)="onGallery()"
+      >
+        @if (lastPhoto(); as thumb) {
+          <img class="camera-page__thumb" [src]="thumb" alt="" />
+        } @else {
+          <svg viewBox="0 0 24 24" class="camera-page__glyph" aria-hidden="true">
+            <path
+              d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm1 3v3.2l2.6-2.7 2.7 2.7 4.4-4.4H6V7Zm0 6.2v4.3L9.5 14l1.7 1.8 2.3-2.3L6.1 10l-.1.1v3.1Zm9 1.3-1.5 1.5L17 17.4v-1.4l-1.5-1.5Z"
+              fill="currentColor"
+            />
+          </svg>
+        }
+      </button>
+
+      <button
+        type="button"
+        class="camera-page__control camera-page__control--shutter"
+        data-testid="camera-shutter"
+        [attr.aria-label]="captured() ? 'Retake' : 'Take photo'"
+        (click)="onShutter()"
+      ></button>
+
+      @if (captured()) {
+        <button
+          type="button"
+          class="camera-page__control"
+          data-testid="camera-send"
+          aria-label="Send to status"
+          (click)="onSend()"
+        >
+          <svg viewBox="0 0 24 24" class="camera-page__glyph" aria-hidden="true">
+            <path
+              d="M2.5 11.5 21 4l-7.5 18L9.5 14.5 2.5 11.5Z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="camera-page__control"
+          data-testid="camera-flip"
+          aria-label="Switch camera"
+          [attr.aria-pressed]="flipped()"
+          (click)="onFlip()"
+        >
+          <svg viewBox="0 0 24 24" class="camera-page__glyph" aria-hidden="true">
+            <path
+              d="M4 7v5h5L6.6 9.6A6.5 6.5 0 0 1 18.7 9l1.4-1.4A8.5 8.5 0 0 0 6.1 8.2L4 6Zm16 10v-5h-5l2.4 2.4a6.5 6.5 0 0 1-12.1.6L4 15a8.5 8.5 0 0 0 13.9 2.8L20 20Z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      }
+    </div>
+
+    <p class="camera-page__status" data-testid="camera-status" role="status">
+      {{ statusText() }}
+    </p>
+  </div>
+
+  <input
+    #cameraFile
+    class="camera-page__file"
+    data-testid="camera-file"
+    type="file"
+    accept="image/*"
+    aria-label="Choose a photo"
+    (change)="onFileChosen($event)"
+  />
+
+  <app-tab-bar [items]="tabs()" (select)="onTabSelect($event)" />
+</div>
