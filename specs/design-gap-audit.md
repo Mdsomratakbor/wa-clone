@@ -243,3 +243,16 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   the status box" — the 3-line cap became **5 lines (228px)**, leaving the v2 scrollbar/focus
   treatments and the "never overlap the on-screen keyboard" bound intact, recorded in the 053 spec's
   third clarify session.
+- **2026-10-03** — F-054 Settings row descriptions landed (**715/715**, +5, build green) and closed.
+  The owner asked that the Settings screens be "more informative"; the clarify pass (2026-10-03)
+  settled WhatsApp-style one-line descriptions under every row label on all five settings screens,
+  with the pinned header kept as-is. `SettingsRowSeed.description?` is additive; the seed carries
+  the literal strings, each screen wraps its row label in a text block (label + description) in
+  *every* row kind — chevron, live toggle and the F-046 unavailable switch — and the description
+  uses existing `--wa-fs-control`/`--wa-text-secondary` so no token map changes. `aria-label`
+  stays the row label. Copy and treatment are **PROVISIONAL for a new reason**: the capture gate is
+  no longer blocked by the 429 quota but by an expired OAuth token (`{"status":403,"err":"Token
+  expired"}`, 2026-10-03), so settings rows 13/14/16/17/18 still cannot be fetched until the owner
+  re-authenticates the Figma developer token. After re-auth, reconcile the F-054 strings together
+  with the pending 051/052/053 provisional values. E2E authored only (Playwright pause
+  2026-09-26).

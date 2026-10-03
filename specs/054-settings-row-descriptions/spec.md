@@ -4,12 +4,12 @@
 
 **Created**: 2026-10-03
 
-**Status**: In progress — owner-approved behaviour extension, PROVISIONAL copy (2026-10-03). G2
-gate: build + full unit suite green. The description copy is **owner-approved but design-unverified**:
-the Figma capture gate is currently blocked by an expired OAuth token (`{"status":403,"err":"Token
-expired"}`, 2026-10-03), so row 13 (`0:9198`) and rows 14/16/17/18 cannot be fetched until the owner
-re-authenticates. Every string is recorded literally in this spec for the post-capture reconcile,
-and the header stays pinned (owner decision, below).
+**Status**: ✅ Shipped and closed (2026-10-03) — owner-approved behaviour extension, PROVISIONAL
+copy. G2 gate passed: build green + full unit suite **715/715**. The description copy is
+**owner-approved but design-unverified**: the Figma capture gate is blocked by an expired OAuth
+token (`{"status":403,"err":"Token expired"}`, 2026-10-03), so row 13 (`0:9198`) and rows
+14/16/17/18 cannot be fetched until the owner re-authenticates. Every string is recorded literally
+in this spec for the post-capture reconcile, and the header stays pinned (owner decision, below).
 
 **Input**: design rows 13 (`0:9198` Settings), 14 (`0:9371` Account), 16 (`0:9973` Chats Settings),
 17 (`0:10758` Notifications), 18 (`0:10894` Data & Storage) — the `settings-row` group (`0:9207`,
@@ -76,8 +76,10 @@ description under every row label across the five screens. The header, routes, t
   owner-approved hypotheses; the capture gate is blocked by the expired token, so nothing here is
   design-verified. Reconcile against row `0:9207`/`0:9200` groups after token re-auth.
 - **G2**: `npm run build` green and the full unit suite green with the exact count reported.
+  **CLEARED 2026-10-03**: build green, full suite **715/715** (710 baseline + 5 new tests).
 - **G3**: closure commit with drift notes in specs 013/014/016/017/018, design-map rows
-  13/14/16/17/18, gap-audit changelog, checklist + converge clean.
+  13/14/16/17/18, gap-audit changelog, checklist + converge clean. **CLEARED 2026-10-03** — see
+  `tasks.md` closure and FR → test traceability.
 
 ## UNKNOWN / NEEDS CLARIFICATION
 
