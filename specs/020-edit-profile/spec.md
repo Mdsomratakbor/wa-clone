@@ -13,6 +13,16 @@ at G1; provisional/hypothesis values in place.
 
 **Input**: `figma/design-map.md` row 20 (`0:10659`) + `specs/020-edit-profile/research.md`
 
+## Drift note (F-055, 2026-10-03) — the form fields now carry hint captions
+
+By owner decision on **2026-10-03** (`specs/055-profile-informative/`), each form field renders an
+owner-approved hint line beneath its input — Name → `Your name is visible to everyone`, About →
+`Shown next to your name in chats` — reusing the F-054 description style
+(`--wa-fs-control`/`--wa-text-secondary`). The Settings profile header (this feature's entry point)
+also shows the user's About text beneath "Tap to edit profile" when set (see the F-055 drift note in
+spec 013). PROVISIONAL copy: the capture gate is blocked by an expired OAuth token, so row `0:10659`
+cannot be fetched; reconcile after re-auth.
+
 ---
 
 ## Summary

@@ -24,6 +24,14 @@ capture is blocked by an expired OAuth token, so row `0:9198` cannot be fetched)
 `aria-label`, the pinned header and the tab bar are unchanged; the F-054 spec inherits them and
 records every string literally for the reconcile.
 
+## Drift note (F-055, 2026-10-03) — the profile header also shows the About text
+
+On the same date (`specs/055-profile-informative/`), the profile header row now renders the user's
+About text as a line beneath "Tap to edit profile" when set (owner decision), reusing the F-054
+description style. When `about` is empty the header is unchanged; the date-free placeholder still
+reads "Tap to edit profile". Both treatments stay PROVISIONAL until the capture token is
+re-authenticated.
+
 ---
 
 ## Summary
