@@ -30,6 +30,17 @@ test.describe('Edit profile screen (US2)', () => {
     await expect(page.getByTestId('profile-about')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
   });
+
+  // F-055 FR-002: authored only - Playwright execution is paused by owner
+  // directive (2026-09-26). Both fields carry their hint captions.
+  test('both fields show their hint captions (F-055)', async ({ page }) => {
+    await page.goto('/settings/profile');
+    await page.getByTestId('profile-page').waitFor();
+    await expect(
+      page.getByText('Your name is visible to everyone', { exact: true }),
+    ).toBeVisible();
+    await expect(page.getByText('Shown next to your name in chats', { exact: true })).toBeVisible();
+  });
 });
 
 test.describe('Edit profile chroming + visual (US3)', () => {

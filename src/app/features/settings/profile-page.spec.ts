@@ -35,6 +35,24 @@ describe('ProfilePage', () => {
     expect(el.querySelector('[data-testid="profile-save"]')?.textContent?.trim()).toBe('Save');
   });
 
+  // F-055 FR-002: WhatsApp-style hints under both inputs, reusing the F-054
+  // description style; the inputs keep their accessible names.
+  it('F-055: each field shows its hint caption under the input', () => {
+    const el = render();
+    const hints = el.querySelectorAll<HTMLElement>('.profile__hint');
+    expect(hints.length).toBe(2);
+    expect(hints[0]?.textContent?.trim()).toBe('Your name is visible to everyone');
+    expect(hints[1]?.textContent?.trim()).toBe('Shown next to your name in chats');
+    expect(getComputedStyle(hints[0]).fontSize).toBe('13px');
+    expect(getComputedStyle(hints[0]).color).toBe('rgb(142, 142, 147)');
+    expect(el.querySelector('[data-testid="profile-name"]')?.getAttribute('aria-label')).toBe(
+      'Name',
+    );
+    expect(el.querySelector('[data-testid="profile-about"]')?.getAttribute('aria-label')).toBe(
+      'About',
+    );
+  });
+
   it('does not render the tab bar (pushed surface)', () => {
     const el = render();
     expect(el.querySelector('[role="tab"]')).toBeNull();

@@ -50,6 +50,37 @@ describe('SettingsPage', () => {
     expect(el.querySelector('.settings__subtitle')?.textContent?.trim()).toBe('Tap to edit profile');
   });
 
+  // F-055 FR-001: the header keeps its hint and shows the About text beneath it
+  // only when set; a fresh install (empty about) renders exactly as before.
+  it('F-055: the header keeps the hint and hides the About line when unset', () => {
+    const el = render();
+    expect(el.querySelector('.settings__subtitle')?.textContent?.trim()).toBe(
+      'Tap to edit profile',
+    );
+    expect(el.querySelector('[data-testid="settings-about"]')).toBeNull();
+    expect(el.querySelector('[data-testid="settings-profile"]')?.getAttribute('aria-label')).toBe(
+      'Edit profile',
+    );
+  });
+
+  it('F-055: the header shows the About text beneath the hint when set', () => {
+    TestBed.inject(PrefsStore).updateProfile('Anita', 'Building things');
+    const el = render();
+    expect(el.querySelector('[data-testid="settings-name"]')?.textContent?.trim()).toBe('Anita');
+    expect(el.querySelector('.settings__subtitle')?.textContent?.trim()).toBe(
+      'Tap to edit profile',
+    );
+    const about = el.querySelector<HTMLElement>('[data-testid="settings-about"]');
+    expect(about).not.toBeNull();
+    if (!about) return;
+    expect(about?.textContent?.trim()).toBe('Building things');
+    expect(el.querySelector('[data-testid="settings-profile"]')?.getAttribute('aria-label')).toBe(
+      'Edit profile',
+    );
+    expect(getComputedStyle(about).fontSize).toBe('13px');
+    expect(getComputedStyle(about).color).toBe('rgb(142, 142, 147)');
+  });
+
   it('renders one row per seeded setting', () => {
     const el = render();
     const rows = el.querySelectorAll<HTMLButtonElement>('[data-testid="settings-row"]');

@@ -47,6 +47,23 @@ test.describe('Settings screen (US1)', () => {
     }
   });
 
+  // F-055 FR-001: authored only - once a profile has an About, the header shows
+  // it under the hint; a fresh profile renders no extra line.
+  test('the profile header shows the About text under the hint once set (F-055)', async ({
+    page,
+  }) => {
+    await page.goto('/settings');
+    await page.getByTestId('settings-page').waitFor();
+    await expect(page.getByTestId('settings-about')).toHaveCount(0);
+
+    await page.goto('/settings/profile');
+    await page.getByTestId('profile-page').waitFor();
+    await page.getByTestId('profile-about').fill('Building things');
+    await page.getByRole('button', { name: 'Save' }).click();
+    await page.getByTestId('settings-page').waitFor();
+    await expect(page.getByTestId('settings-about')).toHaveText('Building things');
+  });
+
   test('tab bar has Settings active and routes Chats/Camera/Calls/Status away', async ({ page }) => {
     await page.goto('/settings');
     await page.getByTestId('settings-page').waitFor();
