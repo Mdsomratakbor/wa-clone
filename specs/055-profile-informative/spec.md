@@ -4,9 +4,9 @@
 
 **Created**: 2026-10-03
 
-**Status**: In progress — owner-approved follow-on to F-054 (2026-10-03). G2 gate: build + full unit
-suite green. The header About line and the Edit Profile hints are **owner-approved but
-design-unverified**: the capture gate is blocked by the expired OAuth token
+**Status**: ✅ Shipped and closed (2026-10-03) — owner-approved follow-on to F-054. G2 gate passed:
+build green + full unit suite **718/718**. The header About line and the Edit Profile hints are
+**owner-approved but design-unverified**: the capture gate is blocked by the expired OAuth token
 (`{"status":403,"err":"Token expired"}`, 2026-10-03), so the Settings header (`0:9198`) and Edit
 Profile row (`0:10659`) cannot be fetched until the owner re-authenticates. Copy is recorded
 literally in this spec for the post-capture reconcile alongside the F-054 strings.
@@ -70,8 +70,10 @@ Name and About inputs. No store, model, route or token change.
   hypotheses; the capture gate is blocked by the expired token. Reconcile against rows `0:9198`
   / `0:10659` after token re-auth.
 - **G2**: `npm run build` green and the full unit suite green with the exact count reported.
+  **CLEARED 2026-10-03**: build green, full suite **718/718** (715 baseline + 3 new tests).
 - **G3**: closure commit with drift notes in specs 013 and 020, design-map rows 13 and 20,
-  gap-audit changelog, checklist + converge clean.
+  gap-audit changelog, checklist + converge clean. **CLEARED 2026-10-03** — see `tasks.md` closure
+  and FR → test traceability.
 
 ## UNKNOWN / NEEDS CLARIFICATION
 
@@ -100,11 +102,11 @@ Owner-approved 2026-10-03. Reconcile against the real design after token re-auth
 ## DoD
 
 - [x] `spec.md` + plan/tasks exist and match the shipped behaviour
-- [ ] Clarify answers written back into the spec; no open contradiction
-- [ ] Drift notes in specs 013 and 020
-- [ ] `npm run build` green
-- [ ] Full unit suite green, exact count reported
-- [ ] E2E authored (execution deferred)
-- [ ] Checklist satisfied per requirement with evidence
-- [ ] Commits as docs(spec) / feat / test
-- [ ] Nothing shipped that no spec authorizes
+- [x] Clarify answers written back into the spec; no open contradiction
+- [x] Drift notes in specs 013 and 020
+- [x] `npm run build` green
+- [x] Full unit suite green, exact count reported
+- [x] E2E authored (execution deferred)
+- [x] Checklist satisfied per requirement with evidence
+- [x] Commits as docs(spec) / feat / test
+- [x] Nothing shipped that no spec authorizes

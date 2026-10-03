@@ -256,3 +256,16 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   re-authenticates the Figma developer token. After re-auth, reconcile the F-054 strings together
   with the pending 051/052/053 provisional values. E2E authored only (Playwright pause
   2026-09-26).
+- **2026-10-03** — F-055 Informative Profile landed (**718/718**, +3, build green) and closed. The
+  owner asked to make the profile "more informative" too. The clarify pass (2026-10-03) closed on:
+  Edit Profile fields get WhatsApp-style helper hints under Name and About; the Settings profile
+  header keeps "Tap to edit profile" and adds the user's About text beneath it when set; both reuse
+  the F-054 description treatment (`--wa-fs-control`/`--wa-text-secondary`). `settings-page`'s
+  profile computed exposes `about` and the identity block renders a `settings-about` line only when
+  non-empty (the default `about: ''` leaves a fresh install byte-identical); `profile-page` gains
+  `.profile__hint` captions (`Your name is visible to everyone` / drafted `Shown next to your name
+  in chats`). No store, model, route or token change; `aria-label`s pinned. Drift notes in specs
+  013 and 020, design-map rows 13 and 20. PROVISIONAL for the same reason as F-054: the capture
+  gate is blocked by the expired OAuth token (`403 Token expired`, 2026-10-03), sharing the
+  post-re-auth reconcile with the F-054 strings and the 051/052/053 provisional values. E2E
+  authored only.
