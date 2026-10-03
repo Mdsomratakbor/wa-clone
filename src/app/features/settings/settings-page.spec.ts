@@ -57,6 +57,27 @@ describe('SettingsPage', () => {
     expect(rows[0]?.getAttribute('aria-label')).toBe('Account');
   });
 
+  // F-054 FR-001/FR-003: each Settings row shows an owner-approved one-line
+  // description beneath its label; the aria-label stays the label so the row's
+  // accessible name is the control it activates, never the description copy.
+  it('F-054: every Settings row shows its description under the label', () => {
+    const el = render();
+    const rows = el.querySelectorAll<HTMLButtonElement>('[data-testid="settings-row"]');
+    rows.forEach((row, i) => {
+      const seed = SETTINGS_ROWS[i];
+      expect(row.querySelector('.settings__row-label')?.textContent?.trim()).toBe(seed.label);
+      expect(row.querySelector('.settings__row-description')?.textContent?.trim()).toBe(
+        seed.description,
+      );
+      expect(row.getAttribute('aria-label')).toBe(seed.label);
+      const desc = row.querySelector<HTMLElement>('.settings__row-description');
+      expect(desc).not.toBeNull();
+      if (!desc) return;
+      expect(getComputedStyle(desc).fontSize).toBe('13px');
+      expect(getComputedStyle(desc).color).toBe('rgb(142, 142, 147)');
+    });
+  });
+
   it('renders the tab bar with Settings active', () => {
     const el = render();
     const tabs = el.querySelectorAll('[role="tab"]');

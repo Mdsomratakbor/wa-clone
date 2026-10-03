@@ -36,6 +36,27 @@ describe('DataStoragePage', () => {
     expect(rows[0]?.getAttribute('aria-label')).toBe('Storage usage');
   });
 
+  // F-054 FR-001/FR-003: every Data & Storage row shows its description under the label.
+  it('F-054: every Data & Storage row shows its description under the label', () => {
+    const el = render();
+    const rows = el.querySelectorAll<HTMLButtonElement>('[data-testid="data-storage-row"]');
+    rows.forEach((row, i) => {
+      const seed = DATA_STORAGE_ROWS[i];
+      expect(row.querySelector('.data-storage__row-label')?.textContent?.trim()).toBe(
+        seed.label,
+      );
+      expect(row.querySelector('.data-storage__row-description')?.textContent?.trim()).toBe(
+        seed.description,
+      );
+      expect(row.getAttribute('aria-label')).toBe(seed.label);
+      const desc = row.querySelector<HTMLElement>('.data-storage__row-description');
+      expect(desc).not.toBeNull();
+      if (!desc) return;
+      expect(getComputedStyle(desc).fontSize).toBe('13px');
+      expect(getComputedStyle(desc).color).toBe('rgb(142, 142, 147)');
+    });
+  });
+
   it('does not render the tab bar (pushed surface)', () => {
     const el = render();
     expect(el.querySelector('[role="tab"]')).toBeNull();

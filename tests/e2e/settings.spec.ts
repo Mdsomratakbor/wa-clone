@@ -30,6 +30,23 @@ test.describe('Settings screen (US1)', () => {
     }
   });
 
+  // F-054 FR-002: authored only - Playwright execution is paused by owner
+  // directive (2026-09-26). Every row shows its owner-approved one-line
+  // description beneath the label while its aria-label stays the label.
+  test('every row shows its description under the label (F-054)', async ({ page }) => {
+    await page.goto('/settings');
+    await page.getByTestId('settings-page').waitFor();
+    const rows = page.getByTestId('settings-row');
+    const count = await rows.count();
+    expect(count).toBeGreaterThanOrEqual(1);
+    for (let i = 0; i < count; i++) {
+      const row = rows.nth(i);
+      const label = (await row.getAttribute('aria-label')) ?? '';
+      await expect(row.locator('.settings__row-label')).toContainText(label);
+      await expect(row.locator('.settings__row-description')).toBeVisible();
+    }
+  });
+
   test('tab bar has Settings active and routes Chats/Camera/Calls/Status away', async ({ page }) => {
     await page.goto('/settings');
     await page.getByTestId('settings-page').waitFor();

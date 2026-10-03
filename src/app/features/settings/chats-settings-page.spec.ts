@@ -40,6 +40,28 @@ describe('ChatsSettingsPage', () => {
     expect(rows[0]?.getAttribute('aria-label')).toBe('Wallpaper');
   });
 
+  // F-054 FR-001/FR-003: every Chats Settings row — chevron, live switch and
+  // unavailable switch alike — shows its description under the label.
+  it('F-054: every Chats Settings row shows its description under the label', () => {
+    const el = render();
+    const rows = el.querySelectorAll<HTMLElement>('[data-testid="chats-settings-row"]');
+    rows.forEach((row, i) => {
+      const seed = CHATS_SETTINGS_ROWS[i];
+      expect(row.querySelector('.chats-settings__row-label')?.textContent?.trim()).toBe(
+        seed.label,
+      );
+      expect(row.querySelector('.chats-settings__row-description')?.textContent?.trim()).toBe(
+        seed.description,
+      );
+      expect(row.getAttribute('aria-label')).toBe(seed.label);
+      const desc = row.querySelector<HTMLElement>('.chats-settings__row-description');
+      expect(desc).not.toBeNull();
+      if (!desc) return;
+      expect(getComputedStyle(desc).fontSize).toBe('13px');
+      expect(getComputedStyle(desc).color).toBe('rgb(142, 142, 147)');
+    });
+  });
+
   it('does not render the tab bar (pushed surface)', () => {
     const el = render();
     expect(el.querySelector('[role="tab"]')).toBeNull();
