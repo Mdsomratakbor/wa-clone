@@ -269,3 +269,18 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   gate is blocked by the expired OAuth token (`403 Token expired`, 2026-10-03), sharing the
   post-re-auth reconcile with the F-054 strings and the 051/052/053 provisional values. E2E
   authored only.
+- **2026-10-03** — F-056 Camera Capture & Preview landed (**735/735**, +15, build green; closure
+  pending in-line) — closes most of the gap-audit "Camera capture pipeline (row 12)" item and the
+  tier-A **Flip** move. Per the owner's clarify answers (2026-10-03), the `/camera` placeholder now
+  shows the real-control chrome (Flash + Close top bar; gallery + shutter + flip bottom bar; HD
+  chip), a PROVISIONAL viewfinder fill + focus grid + honest hint, and a real **file-picker
+  capture** reusing the F-050 pipeline (`downscaleToJpegDataUrl` + `StatusStore.publishPhoto`): the
+  shutter / viewfinder / gallery open the picker, a decoded photo enters the capture state (preview,
+  shutter becomes **Retake**, **Send to status** appears), Send publishes to the status feed and
+  navigates to `/status`, and Close returns to `/chats` without publishing. **PROVISIONAL for the
+  same capture reason as F-054/055** (expired OAuth token, `403`): 7 new `camera-*` tokens plus all
+  geometry/copy are recorded verbatim in spec 056 §PROVISIONAL inventory for the post-re-auth
+  reconcile with the 051–055 pending values. The shutter no longer needs `getUserMedia` to be
+  useful (picker path), so row 12's capture gap narrows to **live** preview/lens effects, which stay
+  deferred; Flip/Flash as `aria-pressed` toggles are drift candidates at G1. E2E authored only
+  (Playwright pause 2026-09-26).

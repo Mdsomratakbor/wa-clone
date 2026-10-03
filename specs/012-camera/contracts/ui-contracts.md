@@ -4,6 +4,11 @@ Anything not independently derivable from the `001` design tokens is **provision
 `0:9155` node payload is captured (Figma 429 → ~09-28). Testids are hard contract; labels/glyphs
 are PENDING.
 
+> **F-056 (2026-10-03)**: this contract is **superseded for the control surface** by
+> `specs/056-camera-capture-preview/`. Keep <camera-page/camera-close/camera-shutter/camera-flip>
+> ids and <"Close camera"/"Take photo"/"Switch camera"> labels; additions (Flash, gallery, HD chip,
+> capture state, send) and the PENDING list below live in the F-056 contract.
+
 ## Route / track
 
 | Item | Contract |

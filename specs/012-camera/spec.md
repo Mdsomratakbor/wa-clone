@@ -13,6 +13,19 @@ hypothesis values in place until then.
 
 **Input**: `figma/design-map.md` row 12 (`0:9155`) + `specs/012-camera/research.md`
 
+## Drift note (F-056, 2026-10-03) — informative chrome + a real capture flow
+
+By owner decision (`specs/056-camera-capture-preview/`), the structural placeholder is superseded:
+the screen now shows the real-control chrome (top bar **Flash + Close**, bottom bar
+**gallery + shutter + flip**, an HD chip), a PROVISIONAL viewfinder fill + focus grid, and a real
+**file-picker capture** (F-050 pipeline). The shutter is no longer a no-op: it opens the picker in
+viewfinder state and is **Retake** in capture state; Send publishes the captured photo to the
+user's Status and navigates to `/status`. `data-testid`s (`camera-page`, `camera-close`,
+`camera-shutter`, `camera-flip`) and the `aria-label`s "Close camera"/"Take photo"/"Switch camera"
+are unchanged; Flash, the gallery entry, the HD chip and the capture flow are additions. Flip and
+Flash are `aria-pressed` state toggles (PROVISIONAL; live lens/flash stay with `getUserMedia`).
+All new geometry/colour/copy is PROVISIONAL until `0:9155` is captured (expired Figma token).
+
 ---
 
 ## Summary
