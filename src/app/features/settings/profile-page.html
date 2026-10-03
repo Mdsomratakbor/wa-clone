@@ -17,6 +17,8 @@
         [value]="nameDraft()"
         (input)="nameDraft.set(nameInput.value)"
       />
+      <!-- F-055 FR-002: WhatsApp-style hint, same description treatment as F-054. -->
+      <span class="profile__hint">Your name is visible to everyone</span>
     </label>
 
     <label class="profile__field">
@@ -31,6 +33,8 @@
         [value]="aboutDraft()"
         (input)="aboutDraft.set(aboutInput.value)"
       />
+      <!-- F-055 FR-002: drafted hint, recorded verbatim in the spec appendix. -->
+      <span class="profile__hint">Shown next to your name in chats</span>
     </label>
 
     <button type="button" class="profile__save" data-testid="profile-save" (click)="onSave()">

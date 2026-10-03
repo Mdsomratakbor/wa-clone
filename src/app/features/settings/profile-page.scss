@@ -47,6 +47,17 @@
   }
 }
 
+// F-055 FR-002: caption under each input - same treatment as the F-054 row
+// descriptions (13px, secondary, regular), with a small gap so it reads as a
+// footnote below the field rather than a stacked row label.
+.profile__hint {
+  margin-top: 4px;
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-control);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-text-secondary);
+}
+
 .profile__save {
   align-self: flex-start;
   min-width: 120px;

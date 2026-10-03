@@ -40,6 +40,9 @@ export class SettingsPage {
   protected readonly profile = computed(() => ({
     name: this.prefs.profile().name,
     subtitle: SETTINGS_PROFILE.subtitle,
+    // F-055 FR-001: the header shows the user's About text beneath the hint when
+    // set; empty means the line is not rendered (fresh-install default).
+    about: this.prefs.profile().about,
   }));
   protected readonly rows: readonly SettingsRowSeed[] = SETTINGS_ROWS;
 
