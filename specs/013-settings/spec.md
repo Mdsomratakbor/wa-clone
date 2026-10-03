@@ -32,6 +32,16 @@ description style. When `about` is empty the header is unchanged; the date-free 
 reads "Tap to edit profile". Both treatments stay PROVISIONAL until the capture token is
 re-authenticated.
 
+## Defect fix (2026-10-03) — three-dot glyph was squashed at the viewBox edges
+
+Owner reported the Settings "Settings options" (⋮) trigger as *squashed / clipped*. Root cause
+(viewed via headless Chrome): the glyph SVG was `viewBox="0 0 4 18"` with dots at `cy=2` and
+`cy=16`, `r=2` — the top and bottom dots touch the `y=0` / `y=18` viewBox boundary exactly, so
+rasterization clips both end dots. Fix: `viewBox="0 0 4 20"`, `height="20"`, dots at `cy=3,10,17`
+(1px clearance each end, vertical rhythm `7` unchanged). The identical glyph in the chat header
+(`specs/002-chat-window/`) carried the same defect and received the same fix. Contract unchanged:
+`aria-label="Settings options"` and `data-testid="settings-options"` are untouched.
+
 ---
 
 ## Summary

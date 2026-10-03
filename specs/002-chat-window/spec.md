@@ -6,6 +6,15 @@
 
 **Status**: Implemented — all validation targets pass (2026-09-23)
 
+## Defect fix (2026-10-03) — three-dot glyph was squashed at the viewBox edges
+
+The header "More options" (⋮) glyph was rendered with `viewBox="0 0 4 18"` and dots at `cy=2` /
+`cy=16`, `r=2`, so the top and bottom dots sat exactly on the viewBox boundary and were clipped by
+rasterization (reported initially on the Settings trigger, `specs/013-settings/`; same root cause
+here). Fix: `viewBox="0 0 4 20"`, `height="20"`, dots at `cy=3,10,17` (1px clearance each end,
+vertical rhythm `7` unchanged). Contract unchanged: `aria-label="More options"` and
+`data-testid="chat-header__more"` are untouched.
+
 **Input**: Figma design analysis → design-map row 2, node `0:8257`
 
 ## Context
