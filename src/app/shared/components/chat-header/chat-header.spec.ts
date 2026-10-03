@@ -126,6 +126,27 @@ describe('ChatHeader', () => {
     );
   });
 
+  it('keeps every three-dot glyph dot clear of the viewBox edges (defect fix 2026-10-03)', () => {
+    fixture = TestBed.createComponent(ChatHeader);
+    fixture.componentRef.setInput('contact', CONTACT);
+    fixture.detectChanges();
+    const svg = (fixture.nativeElement as HTMLElement).querySelector<SVGSVGElement>(
+      '[data-testid="chat-header__more"] svg',
+    );
+    expect(svg).not.toBeNull();
+    const viewBox = (svg?.getAttribute('viewBox') ?? '').split(/\s+/).map(Number);
+    const height = viewBox[3] ?? Number(svg?.getAttribute('height'));
+    const dots = [...(svg?.querySelectorAll('circle') ?? [])].map((c) => ({
+      cy: Number(c.getAttribute('cy')),
+      r: Number(c.getAttribute('r')),
+    }));
+    expect(dots.length).toBe(3);
+    for (const dot of dots) {
+      expect(dot.cy - dot.r).toBeGreaterThanOrEqual(1);
+      expect(dot.cy + dot.r).toBeLessThanOrEqual(height - 1);
+    }
+  });
+
   it('wraps the avatar and titles in a labelled identity button', () => {
     fixture = TestBed.createComponent(ChatHeader);
     fixture.componentRef.setInput('contact', CONTACT);

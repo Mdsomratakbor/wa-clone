@@ -207,6 +207,22 @@ describe('SettingsPage', () => {
     expect(trigger?.getAttribute('aria-label')).toBe('Settings options');
   });
 
+  it('keeps every three-dot glyph dot clear of the viewBox edges (defect fix 2026-10-03)', () => {
+    const svg = render().querySelector<SVGSVGElement>('[data-testid="settings-options"] svg');
+    expect(svg).not.toBeNull();
+    const viewBox = (svg?.getAttribute('viewBox') ?? '').split(/\s+/).map(Number);
+    const height = viewBox[3] ?? Number(svg?.getAttribute('height'));
+    const dots = [...(svg?.querySelectorAll('circle') ?? [])].map((c) => ({
+      cy: Number(c.getAttribute('cy')),
+      r: Number(c.getAttribute('r')),
+    }));
+    expect(dots.length).toBe(3);
+    for (const dot of dots) {
+      expect(dot.cy - dot.r).toBeGreaterThanOrEqual(1);
+      expect(dot.cy + dot.r).toBeLessThanOrEqual(height - 1);
+    }
+  });
+
   it('does not render the settings sheet when closed', () => {
     const el = render();
     expect(el.querySelector('[data-testid="action-sheet"]')).toBeNull();
