@@ -55,6 +55,22 @@
   }
 }
 
+// F-054 FR-003: label + optional description stack; the chevron stays centred.
+.account__row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.account__row-description {
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-control);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-text-secondary);
+}
+
 .account__chevron {
   margin-left: auto;
   color: var(--wa-text-secondary);

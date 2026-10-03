@@ -16,6 +16,10 @@ export interface SettingsProfileSeed {
 export interface SettingsRowSeed {
   id: string;
   label: string;
+  // F-054 FR-001: owner-approved one-line context shown under the label on every
+  // settings screen. PROVISIONAL copy - design-unverified until the capture token
+  // is re-authenticated (see specs/054-settings-row-descriptions).
+  description?: string;
   // F-046: a preference with no consumer behind it. Distinct from a chevron row,
   // because a chevron implies "opens a screen" while an unavailable setting is a
   // switch that currently does nothing - and the two need different markup.
@@ -28,28 +32,28 @@ export const SETTINGS_PROFILE: SettingsProfileSeed = {
 };
 
 export const SETTINGS_ROWS: readonly SettingsRowSeed[] = [
-  { id: 'account', label: 'Account' },
-  { id: 'chats-settings', label: 'Chats Settings' },
-  { id: 'notifications', label: 'Notifications' },
-  { id: 'data-storage', label: 'Data and Storage' },
-  { id: 'contacts', label: 'Contacts' },
+  { id: 'account', label: 'Account', description: 'Security, two-step verification, change number' },
+  { id: 'chats-settings', label: 'Chats Settings', description: 'Theme, wallpapers, font size and chat history' },
+  { id: 'notifications', label: 'Notifications', description: 'Message, group and call tones' },
+  { id: 'data-storage', label: 'Data and Storage', description: 'Network usage and media auto-download' },
+  { id: 'contacts', label: 'Contacts', description: 'View, invite or block contacts' },
 ];
 
 export const ACCOUNT_ROWS: readonly SettingsRowSeed[] = [
-  { id: 'security', label: 'Security' },
-  { id: 'two-step-verification', label: 'Two-step verification' },
-  { id: 'change-number', label: 'Change number' },
-  { id: 'delete-account', label: 'Delete my account' },
+  { id: 'security', label: 'Security', description: 'Account security options' },
+  { id: 'two-step-verification', label: 'Two-step verification', description: 'Additional PIN you can create to further protect your account' },
+  { id: 'change-number', label: 'Change number', description: 'Transfer your account information to a new phone number' },
+  { id: 'delete-account', label: 'Delete my account', description: 'Delete your account and all of your message history' },
 ];
 
 export const CHATS_SETTINGS_ROWS: readonly SettingsRowSeed[] = [
-  { id: 'chats-wallpaper', label: 'Wallpaper' },
-  { id: 'chats-font-size', label: 'Font size' },
-  { id: 'chats-keyboard', label: 'Keyboard' },
-  { id: 'chats-enter-sends', label: 'Enter key sends' },
+  { id: 'chats-wallpaper', label: 'Wallpaper', description: 'Set a default wallpaper for your chats' },
+  { id: 'chats-font-size', label: 'Font size', description: 'Change the text size in chats' },
+  { id: 'chats-keyboard', label: 'Keyboard', description: 'Keyboard shortcuts and preferences' },
+  { id: 'chats-enter-sends', label: 'Enter key sends', description: "Assigns the Enter key to send messages" },
   // F-046 FR-006: mediaVisibility had a live switch and no consumer. Marked
   // unavailable and the key removed from PrefsStore.
-  { id: 'chats-media-visibility', label: 'Media visibility', unavailable: true },
+  { id: 'chats-media-visibility', label: 'Media visibility', description: 'Shows the most recently shared media in your apps and devices', unavailable: true },
 ];
 
 export const NOTIFICATIONS_ROWS: readonly SettingsRowSeed[] = [
@@ -57,19 +61,19 @@ export const NOTIFICATIONS_ROWS: readonly SettingsRowSeed[] = [
   // consumer - there is no notification delivery in the app at all. Marked
   // unavailable and the keys removed from PrefsStore. `notifications-previews`
   // is NOT unavailable: it is wired to the chat-list preview (F-046 FR-006).
-  { id: 'notifications-sound', label: 'Sound', unavailable: true },
-  { id: 'notifications-vibrate', label: 'Vibrate', unavailable: true },
-  { id: 'notifications-popup', label: 'Popup notification', unavailable: true },
-  { id: 'notifications-light', label: 'Light', unavailable: true },
-  { id: 'notifications-previews', label: 'Show previews' },
+  { id: 'notifications-sound', label: 'Sound', description: 'For incoming messages', unavailable: true },
+  { id: 'notifications-vibrate', label: 'Vibrate', description: 'For incoming messages and calls', unavailable: true },
+  { id: 'notifications-popup', label: 'Popup notification', description: 'When your phone is locked', unavailable: true },
+  { id: 'notifications-light', label: 'Light', description: 'Flash for incoming messages', unavailable: true },
+  { id: 'notifications-previews', label: 'Show previews', description: 'Show message text in notifications' },
 ];
 
 export const DATA_STORAGE_ROWS: readonly SettingsRowSeed[] = [
-  { id: 'ds-storage-usage', label: 'Storage usage' },
-  { id: 'ds-auto-download', label: 'Media auto-download' },
-  { id: 'ds-images', label: 'Images' },
-  { id: 'ds-audio', label: 'Audio' },
-  { id: 'ds-videos', label: 'Videos' },
-  { id: 'ds-documents', label: 'Documents' },
-  { id: 'ds-network-usage', label: 'Network usage' },
+  { id: 'ds-storage-usage', label: 'Storage usage', description: 'Manage the storage used by chats' },
+  { id: 'ds-auto-download', label: 'Media auto-download', description: 'Automatically download media you receive' },
+  { id: 'ds-images', label: 'Images', description: 'Save incoming photos to your gallery' },
+  { id: 'ds-audio', label: 'Audio', description: 'Save incoming audio to your device' },
+  { id: 'ds-videos', label: 'Videos', description: 'Save incoming videos to your device' },
+  { id: 'ds-documents', label: 'Documents', description: 'Save incoming documents to your device' },
+  { id: 'ds-network-usage', label: 'Network usage', description: 'See network usage by chats' },
 ];

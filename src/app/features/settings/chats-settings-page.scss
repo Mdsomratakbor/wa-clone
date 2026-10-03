@@ -35,6 +35,23 @@
   color: var(--wa-text-primary);
 }
 
+// F-054 FR-003: label + optional description stack in every row kind (chevron,
+// live toggle, unavailable); the right control stays vertically centred.
+.chats-settings__row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.chats-settings__row-description {
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-control);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-text-secondary);
+}
+
 .chats-settings__switch-row app-toggle {
   margin-left: auto;
   flex: 0 0 auto;

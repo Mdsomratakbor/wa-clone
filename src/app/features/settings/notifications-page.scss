@@ -35,6 +35,22 @@
   color: var(--wa-text-primary);
 }
 
+// F-054 FR-003: label + optional description stack; the toggle stays centred.
+.notifications__row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.notifications__row-description {
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-control);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-text-secondary);
+}
+
 .notifications__switch-row app-toggle {
   margin-left: auto;
   flex: 0 0 auto;

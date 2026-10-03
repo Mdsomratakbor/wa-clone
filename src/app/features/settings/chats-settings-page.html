@@ -20,7 +20,12 @@
             [attr.data-testid-unavailable]="'true'"
             [attr.aria-label]="row.label"
           >
-            <span class="chats-settings__row-label">{{ row.label }}</span>
+            <span class="chats-settings__row-text">
+              <span class="chats-settings__row-label">{{ row.label }}</span>
+              @if (row.description) {
+                <span class="chats-settings__row-description">{{ row.description }}</span>
+              }
+            </span>
             <app-toggle [label]="row.label" [disabled]="true" />
           </div>
         } @else {
@@ -31,7 +36,12 @@
               data-testid="chats-settings-row"
               [attr.aria-label]="row.label"
             >
-              <span class="chats-settings__row-label">{{ row.label }}</span>
+              <span class="chats-settings__row-text">
+                <span class="chats-settings__row-label">{{ row.label }}</span>
+                @if (row.description) {
+                  <span class="chats-settings__row-description">{{ row.description }}</span>
+                }
+              </span>
               <app-toggle
                 [checked]="prefs()[prefsKey]"
                 [label]="row.label"
@@ -46,7 +56,12 @@
               [attr.aria-label]="row.label"
               (click)="onRowActivate(row)"
             >
-              <span class="chats-settings__row-label">{{ row.label }}</span>
+              <span class="chats-settings__row-text">
+                <span class="chats-settings__row-label">{{ row.label }}</span>
+                @if (row.description) {
+                  <span class="chats-settings__row-description">{{ row.description }}</span>
+                }
+              </span>
               <svg class="chats-settings__chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
                 <path d="M1.5 1 6.5 6.5 1.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
               </svg>

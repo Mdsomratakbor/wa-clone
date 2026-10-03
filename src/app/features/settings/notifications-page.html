@@ -22,7 +22,12 @@
             [attr.data-testid-unavailable]="'true'"
             [attr.aria-label]="row.label"
           >
-            <span class="notifications__row-label">{{ row.label }}</span>
+            <span class="notifications__row-text">
+              <span class="notifications__row-label">{{ row.label }}</span>
+              @if (row.description) {
+                <span class="notifications__row-description">{{ row.description }}</span>
+              }
+            </span>
             <app-toggle [label]="row.label" [disabled]="true" />
           </div>
         } @else if (toggleKey(row.id); as prefsKey) {
@@ -31,7 +36,12 @@
             data-testid="notifications-row"
             [attr.aria-label]="row.label"
           >
-            <span class="notifications__row-label">{{ row.label }}</span>
+            <span class="notifications__row-text">
+              <span class="notifications__row-label">{{ row.label }}</span>
+              @if (row.description) {
+                <span class="notifications__row-description">{{ row.description }}</span>
+              }
+            </span>
             <app-toggle
               [checked]="prefs()[prefsKey]"
               [label]="row.label"
@@ -51,7 +61,12 @@
             [attr.data-testid-unavailable]="'true'"
             [attr.aria-label]="row.label"
           >
-            <span class="notifications__row-label">{{ row.label }}</span>
+            <span class="notifications__row-text">
+              <span class="notifications__row-label">{{ row.label }}</span>
+              @if (row.description) {
+                <span class="notifications__row-description">{{ row.description }}</span>
+              }
+            </span>
             <app-toggle [label]="row.label" [disabled]="true" />
           </div>
         }

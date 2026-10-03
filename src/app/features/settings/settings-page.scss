@@ -123,3 +123,20 @@
     outline-offset: -2px;
   }
 }
+
+// F-054 FR-003: the label stacks with the optional description; the block keeps
+// the trailing chevron centred on the whole row.
+.settings__row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.settings__row-description {
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-control);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-text-secondary);
+}
