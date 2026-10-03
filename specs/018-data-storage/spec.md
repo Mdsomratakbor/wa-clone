@@ -12,6 +12,13 @@ Figma capture (~2026-09-28) and are gated at G1; provisional/hypothesis values i
 
 **Input**: `figma/design-map.md` row 18 (`0:10894`) + `specs/018-data-storage/research.md`
 
+## Drift note (F-054, 2026-10-03) — Data & Storage rows now carry a description line
+
+By owner decision on **2026-10-03** (`specs/054-settings-row-descriptions/`), every Data & Storage
+row now renders an owner-approved one-line description beneath its label (PROVISIONAL copy; the
+Figma capture is blocked by an expired OAuth token). Routes, `aria-label` and the pinned header are
+unchanged; the F-054 spec records every string literally for the reconcile.
+
 ---
 
 ## Summary

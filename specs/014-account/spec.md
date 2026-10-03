@@ -14,6 +14,13 @@ are gated at G1; provisional/hypothesis values in place until then.
 
 **Input**: `figma/design-map.md` row 14 (`0:9371`) + `specs/014-account/research.md`
 
+## Drift note (F-054, 2026-10-03) — Account rows now carry a description line
+
+By owner decision on **2026-10-03** (`specs/054-settings-row-descriptions/`), every Account row now
+renders an owner-approved one-line description beneath its label (PROVISIONAL copy; the Figma
+capture is blocked by an expired OAuth token). Routes, `aria-label` and the hero are unchanged; the
+F-054 spec records every string literally for the reconcile.
+
 ---
 
 ## Summary

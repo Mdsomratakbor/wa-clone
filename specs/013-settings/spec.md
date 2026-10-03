@@ -16,6 +16,14 @@ values in place until then.
 
 **Input**: `figma/design-map.md` row 13 (`0:9198`) + `specs/013-settings/research.md`
 
+## Drift note (F-054, 2026-10-03) — Settings rows now carry a description line
+
+By owner decision on **2026-10-03** (`specs/054-settings-row-descriptions/`), every Settings row now
+renders an owner-approved one-line description beneath its label (PROVISIONAL copy: the Figma
+capture is blocked by an expired OAuth token, so row `0:9198` cannot be fetched). Routes,
+`aria-label`, the pinned header and the tab bar are unchanged; the F-054 spec inherits them and
+records every string literally for the reconcile.
+
 ---
 
 ## Summary

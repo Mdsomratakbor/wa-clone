@@ -13,6 +13,14 @@ in place.
 
 **Input**: `figma/design-map.md` row 17 (`0:10758`) + `specs/017-notifications/research.md`
 
+## Drift note (F-054, 2026-10-03) — Notifications rows now carry a description line
+
+By owner decision on **2026-10-03** (`specs/054-settings-row-descriptions/`), every Notifications
+row — live toggle and `unavailable` alike — now renders an owner-approved one-line description
+beneath its label (PROVISIONAL copy; the Figma capture is blocked by an expired OAuth token).
+Routes, toggles, `aria-label` and the F-046 `unavailable` semantics are unchanged; the F-054 spec
+records every string literally for the reconcile.
+
 ---
 
 ## Summary

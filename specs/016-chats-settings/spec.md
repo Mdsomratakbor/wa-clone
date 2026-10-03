@@ -12,6 +12,14 @@ the Figma capture (~2026-09-28) and are gated at G1; provisional/hypothesis valu
 
 **Input**: `figma/design-map.md` row 16 (`0:9973`) + `specs/016-chats-settings/research.md`
 
+## Drift note (F-054, 2026-10-03) — Chats Settings rows now carry a description line
+
+By owner decision on **2026-10-03** (`specs/054-settings-row-descriptions/`), every Chats Settings
+row — chevron, live toggle and `unavailable` alike — now renders an owner-approved one-line
+description beneath its label (PROVISIONAL copy; the Figma capture is blocked by an expired OAuth
+token). Routes, toggles, `aria-label` and the F-046 `unavailable` semantics are unchanged; the F-054
+spec records every string literally for the reconcile.
+
 ---
 
 ## Summary
