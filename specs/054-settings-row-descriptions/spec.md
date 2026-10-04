@@ -128,6 +128,23 @@ description under every row label across the five screens. The header, routes, t
 - [ ] `npm run build` green; full unit suite green with the exact count reported
 - [ ] Playwright specs authored; execution deferred per the owner directive (2026-09-26)
 
+## Drift note (F-059, 2026-10-04) — Chats Settings copy and row set changed
+
+`specs/059-chats-settings-complete/` (owner clarify Q2/Q3, 2026-10-04) altered two rows of this
+feature's Chats Settings appendix, all PROVISIONAL pending the G1 reconcile:
+
+- The standalone **`chats-enter-sends` row is removed** (its pref now lives under Keyboard —
+  one preference, one switch), so its "Assigns the Enter key…" description moved to the
+  **`chats-keyboard`** row.
+- **`chats-media-visibility`** is no longer `unavailable` (the pref returned with its consumer)
+  and its description is rewritten to **"Show photos and files inside chats"** — the old
+  "apps and devices" copy cannot be honoured by this clone and is deliberately superseded.
+- All other five screens' copy is unchanged.
+
+FR-001/FR-003 behaviour (description line in every row kind) is untouched and still applies to the
+new four-row Chats Settings list. Reconcile both new strings against the real design after token
+re-auth.
+
 ## Appendix — PROVISIONAL copy
 
 Literal strings, owner-approved 2026-10-03. Reconcile against the real design after token re-auth.
@@ -157,9 +174,9 @@ Literal strings, owner-approved 2026-10-03. Reconcile against the real design af
 |---|---|---|
 | `chats-wallpaper` | Wallpaper | Set a default wallpaper for your chats |
 | `chats-font-size` | Font size | Change the text size in chats |
-| `chats-keyboard` | Keyboard | Keyboard shortcuts and preferences |
-| `chats-enter-sends` | Enter key sends | Assigns the Enter key to send messages |
-| `chats-media-visibility` | Media visibility *(unavailable)* | Shows the most recently shared media in your apps and devices |
+| `chats-keyboard` | Keyboard | **Assigns the Enter key to send messages** *(rewritten by F-059; see drift note)* |
+| ~~`chats-enter-sends`~~ | ~~Enter key sends~~ | **removed by F-059** — one pref, one switch (Enter key sends lives under Keyboard) |
+| `chats-media-visibility` | Media visibility | **Show photos and files inside chats** *(rewritten by F-059; no longer unavailable)* |
 
 ### Notifications
 

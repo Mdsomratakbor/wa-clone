@@ -106,3 +106,24 @@ replaced at G1 with the captured design.
 - **Deferred, still inert**: `Wallpaper` and `Keyboard`, named in
   `specs/046-inert-control-sweep/disposition.md`. The wallpaper picker remains capture-blocked until
   2026-10-02 18:38 UTC.
+
+## Drift note (F-059, 2026-10-04) — every Chats Settings row is now real
+
+`specs/059-chats-settings-complete/` supersedes the remaining "no-op" claims in this spec. Per the
+059 clarify pass (2026-10-04, all three recommended options, verbatim):
+
+- **Wallpaper** is no longer inert — it opens a PROVISIONAL token-colour picker at
+  `/settings/chats/wallpaper`; the choice recolours the chat window's scroll canvas through a
+  `[data-wallpaper]` scope (`--wa-wallpaper-bg`, default `var(--wa-surface)`, byte-identical today).
+- **Keyboard** is no longer inert — `/settings/chats/keyboard` hosts the Enter-key-sends toggle
+  plus the PROVISIONAL reference note. The **standalone `Enter key sends` row is removed**: one
+  preference now has exactly one switch (owner decision Q2).
+- **Media visibility** is no longer honestly disabled — the `mediaVisibility` key returned **with
+  its consumer in the same commit** (bubble-level masking, `MessageBubble`), the F-046 disposition's
+  own allowed path; its F-054 description is rewritten PROVISIONAL to "Show photos and files inside
+  chats".
+- The **6-vs-5 open finding** (design shows 4 row groups when the seed ships 5) stays open; the seed
+  now ships 4 rows, changing the hypothesis — a reconcile record, not an assertion.
+
+FR-004/US3 "rows are no-ops" is superseded: every row on this screen navigates or toggles a real
+consumer. See `specs/059-chats-settings-complete/` for the FR set and PROVISIONAL inventory.

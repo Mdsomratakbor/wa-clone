@@ -20,6 +20,7 @@ swallows activation is a lie.
 | Composer `Camera` | Router → `/camera` | Destination already existed (F-012); the button just never called it. |
 | `showPreviews` | `chat-list-item` preview visibility | Judgment call: there is no notification pipeline to gate, so the pref was wired to the one place message content is shown. Name, timestamp, and read ticks are unaffected. |
 | Calls `All` / `Missed` | `filter` signal → derived `items` | Required fixing `isMissedCall` first — see Clarification 5. |
+| `mediaVisibility` | `MessageBubble` media masking | **RESOLVED by F-059 (2026-10-04)**: returned from the "deleted keys" set only because a consumer landed in the same commit (bubble-level privacy placeholder), which is exactly the rule in "What a later feature must not do" below. Preview on the chat list is untouched. |
 
 ## Honestly disabled
 
@@ -32,11 +33,12 @@ swallows activation is a lie.
 | Composer `Emoji stickers` | Sticker picker |
 | Composer `Record audio` | Voice notes (record + upload) |
 | Prefs `sound`, `vibrate`, `popup`, `light` | Notification delivery pipeline |
-| Pref `mediaVisibility` | Media-privacy filtering of message bubbles |
+| ~~Pref `mediaVisibility`~~ | ~~Media-privacy filtering of message bubbles~~ — **RESOLVED by F-059 (2026-10-04)**: the pref returned **with its consumer in the same commit** (`MessageBubble` masking; see the wired table and the drift note at the end of this file) and the row is a live toggle again |
 
-The five prefs also had their **storage keys deleted**, not just their switches
+The four prefs also had their **storage keys deleted**, not just their switches
 disabled. A disabled switch over a persisted key would leave a setting the app
-remembers and never honours.
+remembers and never honours. (`mediaVisibility` was a fifth; F-059 restored its
+key together with a consumer — see the drift note.)
 
 ## Removed
 
@@ -62,8 +64,8 @@ gap, not a claim of coverage. G4 does not extend to them.
 | ------- | ------ | ------------------- |
 | `settings-security`, `settings-two-step-verification`, `settings-change-number`, `settings-delete-account` | Account (4) | ~~Account & privacy screens~~ — **RESOLVED by F-057 (2026-10-04)**: every row now navigates to a real pushed sub-screen (`/settings/account/security` etc.) with honest local flows (persisted two-step PIN, persisted device number, type-to-confirm delete wipe). See `specs/057-account-settings/` |
 | `ds-storage-usage`, `ds-auto-download`, `ds-images`, `ds-audio`, `ds-videos`, `ds-documents`, `ds-network-usage` | Data & storage (7) | Storage usage + media auto-download |
-| `chats-wallpaper` | Chats settings | Wallpaper picker (capture-blocked) |
-| `chats-keyboard` | Chats settings | Chat-wallpaper/keyboard shortcut sheet |
+| ~~`chats-wallpaper`~~ | ~~Chats settings~~ — **RESOLVED by F-059 (2026-10-04)**: opens `/settings/chats/wallpaper`, a PROVISIONAL token-colour picker that recolours the chat scroll canvas through a `[data-wallpaper]` scope |
+| ~~`chats-keyboard`~~ | ~~Chats settings~~ — **RESOLVED by F-059 (2026-10-04)**: opens `/settings/chats/keyboard`, which hosts the Enter-key-sends toggle + PROVISIONAL note; the standalone `Enter key sends` row was removed (one pref, one switch) |
 | ~~`contact-groups`~~ | Contact info | **RESOLVED by F-048 (2026-10-01)** — now live, opens `/contact/:id/groups` |
 | Status `Send` | Status | Status publishing |
 | Camera `Shutter`, `Flip` | Camera | Capture pipeline — **blocked**, `getUserMedia` unavailable |
@@ -81,10 +83,10 @@ gap, not a claim of coverage. G4 does not extend to them.
 
 ## What a later feature must not do
 
-Do not re-enable a control without wiring it. The five deleted pref keys must not
-come back as switches: a pref with no consumer is a setting that lies. If a
-future feature adds a consumer, the key returns with the consumer, in the same
-commit.
+Do not re-enable a control without wiring it. The four remaining deleted pref keys must not
+come back as switches: a pref with no consumer is a setting that lies. If a future feature
+adds a consumer, the key returns with the consumer, in the same commit — **F-059 (2026-10-04)
+did exactly this for `mediaVisibility`** (see the wired table and the F-059 drift note below).
 
 ## Drift note (2026-10-04, F-058)
 
@@ -95,3 +97,15 @@ in the wired set). Remaining composer deferrals — `Emoji stickers` and
 `Record audio` — are unchanged and stay honestly disabled. The 058 attachment
 sheet, pending strip, photo bubble, and chat-list preview string are PROVISIONAL
 chrome pending the Figma re-capture (G1 blocked 2026-10-03, expired token).
+
+## Drift note (2026-10-04, F-059)
+
+`mediaVisibility` — deleted by F-046, returned by `059-chats-settings-complete`
+**with its consumer in the same commit** (bubble-level masking in `MessageBubble`,
+`specs/059-chats-settings-complete/` FR-008/FR-009), the exact path this
+disposition's closing rule allows. The `chats-wallpaper` and `chats-keyboard`
+deferrals are RESOLVED (picker + keyboard screens). Remaining honestly-disabled
+Chats-adjacent controls: `Chat actions → Wallpaper` (per-chat wallpaper is a
+recorded follow-up) and the four Notifications prefs (no delivery pipeline).
+Wallpaper palette/labels, picker chrome, keyboard note, and the "Media hidden"
+placeholder are PROVISIONAL pending the G1 Figma re-capture.

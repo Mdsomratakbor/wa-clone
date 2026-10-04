@@ -23,6 +23,14 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   persisted file message; photo bubbles render inline; extra chrome PROVISIONAL (capture blocked).
   Remaining composer deferrals: `Emoji stickers`, `Record audio`. See `specs/058-composer-attachment/`
   and the 046 disposition drift note.
+- **2026-10-04 (F-059)**: Chats Settings row 16 **completed** — the three remaining inert/
+  disabled rows are all real (`specs/059-chats-settings-complete/`). Wallpaper opens a PROVISIONAL
+  token-colour picker recolouring the chat canvas via a `[data-wallpaper]` scope; Keyboard hosts
+  the Enter-key-sends toggle (standalone row removed, one pref one switch); Media visibility is a
+  live toggle whose bubble-level masking consumer landed in the same commit (the F-046 key-return
+  rule). All 059 chrome stays PROVISIONAL: wallpaper palette/labels, picker swatches, keyboard
+  note, and "Media hidden" placeholder are unverifiable until the G1 Figma re-capture. The 6-vs-5
+  row finding (frame `0:9973`) stays open but the seed now ships 4 rows — reconcile record.
 
 ## Tier A — target already exists, needs only wiring (no capture required)
 

@@ -4,8 +4,11 @@
 
 **Created**: 2026-10-04
 
-**Status**: ✅ **Specified** (2026-10-04) — clarify answers binding, plan/tasks/implementation
-pending. G1 capture still blocked (expired Figma token), so all 059 chrome is PROVISIONAL.
+**Status**: ✅ **Implemented** (2026-10-04) — build green, full unit suite **824/824** (baseline 800
+for this feature's start, +24; F-058 closed at 800). All three sub-features ship: the wallpaper
+picker + scoped-token chat canvas, the keyboard screen hosting Enter key sends (standalone row
+removed), and the media-visibility masking whose consumer landed in the same commit. G1 capture
+still blocked (expired Figma token), so all 059 chrome remains PROVISIONAL.
 
 **Input**: `figma/design-map.md` row 16 (`Chats Settings`, frame `0:9973`) + `specs/016-chats-settings/`
 + `specs/041-font-size/` (screen + scoped-token precedent) + `specs/046-inert-control-sweep/disposition.md`
@@ -176,3 +179,19 @@ condition F-046's disposition required ("the key returns with the consumer, in t
 - [x] The F-046 key-return contract (key returns with its consumer in the same commit) is honoured
       (FR-008 + FR-009)
 - [x] The blocked G1 gate is recorded, not skipped
+
+## Implementation record (closure, 2026-10-04)
+
+Committed as `docs(spec)` → `feat` → `feat` → `feat` → `test` → `test(e2e, authored)` →
+`docs(spec)`:
+
+- `874130d` docs(spec) — spec/plan/research/tasks; `9b3735a` feat(prefs) — mediaVisibility +
+  wallpaper + v5 envelope (F-046 block inverted); `fd85590` feat(wallpaper) — tokens, scope,
+  picker, route; `6626376` feat(chats-settings) — keyboard screen, rows restructure, media
+  visibility live, two stale specs inverted; `651d587` feat(message-bubble) — masking;
+  `b05c934` test(units) — picker/keyboard/masking/chat-window specs (824/824);
+  `3b9f862` test(e2e) — chats-settings cases authored (not executed); closure = this T8.
+
+Full FR → test-name traceability, the blocked-gate record, and the reconcile items (016's 6-vs-5
+finding, the unmasked media screens, the PROVISIONAL palette/copy) live in the `tasks.md` Closure
+section.
