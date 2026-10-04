@@ -149,6 +149,18 @@ describe('StatusStore', () => {
     expect(port.read(STATUS_PERSISTENCE_KEY)).toContain('via port');
   });
 
+  it('reset removes the key and restores the empty state (F-057 FR-008)', () => {
+    const port = new InMemoryPersistencePort();
+    const store = new StatusStore(port);
+    store.publish('to erase', 1);
+
+    store.reset();
+
+    expect(port.read(STATUS_PERSISTENCE_KEY)).toBeNull();
+    expect(store.myStatus()).toBeNull();
+    expect(store.publish('after reset', 1)?.id).toBe('status-1');
+  });
+
   // ---------------------------------------------------------------- F-050 ------
 
   const PHOTO = 'data:image/jpeg;base64,/9j/4AAQSkZJRg==';

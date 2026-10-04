@@ -72,16 +72,27 @@ describe('AccountPage', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/settings']);
   });
 
-  // F-046: recorded deferral, not a decision. The Account rows still swallow
-  // activation; `disposition.md` names the Account & privacy screens as the
-  // destination. The assertion is unchanged, the name is not: "is a no-op"
-  // read like the intended behaviour of a finished screen.
-  it('Account rows are still inert: deferred to the Account & privacy feature (F-046 G4)', () => {
+  // F-057 FR-001..FR-004: the F-046 deferral is resolved - every Account row now
+  // navigates to its screen. This replaces the old "still inert" assertion, whose
+  // name described the defect this feature removes.
+  it('navigates to each sub-screen when its row is activated (F-057)', () => {
+    const router = TestBed.inject(Router);
+    const spy = spyOn(router, 'navigate').and.resolveTo(true);
     const el = render();
     const rows = el.querySelectorAll<HTMLButtonElement>('[data-testid="account-row"]');
-    expect(rows.length).toBeGreaterThan(0);
-    rows[0]?.click();
-    fixture.detectChanges();
-    expect(el.querySelector('[data-testid="account-page"]')).not.toBeNull();
+
+    const expected: Record<string, string> = {
+      Security: '/settings/account/security',
+      'Two-step verification': '/settings/account/two-step',
+      'Change number': '/settings/account/change-number',
+      'Delete my account': '/settings/account/delete',
+    };
+
+    rows.forEach((row) => {
+      const label = row.getAttribute('aria-label') ?? '';
+      row.click();
+      fixture.detectChanges();
+      expect(spy.calls.mostRecent().args[0]).toEqual([expected[label]]);
+    });
   });
 });
