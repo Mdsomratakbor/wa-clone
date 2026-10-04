@@ -6,6 +6,7 @@ import { ChatActionsModal } from './chat-actions-modal';
 import { CallStore } from '../../core/call.store';
 import { ChatStore } from '../../core/chat.store';
 import { PrefsStore } from '../../core/prefs.store';
+import { BrowserFeedbackEffects } from '../../core/send-feedback';
 import { CHAT_CONTACT, CHAT_SEED } from './chat-window.seed';
 
 function stubRoute(id: string | null): ActivatedRoute {
@@ -33,6 +34,19 @@ describe('ChatWindowPage', () => {
   let fixture: ComponentFixture<ChatWindowPage>;
   let navSpy: jasmine.Spy;
 
+  // F-060 FR-005/FR-006: the effects port is faked at the page boundary so the
+  // routing is asserted without ever touching a real AudioContext or vibration
+  // motor (no real audio in the unit harness).
+  function fakeEffects(): { tone: jasmine.Spy; vibrate: jasmine.Spy; provider: unknown } {
+    const tone = jasmine.createSpy('tone');
+    const vibrate = jasmine.createSpy('vibrate');
+    return {
+      tone,
+      vibrate,
+      provider: { provide: BrowserFeedbackEffects, useValue: { tone, vibrate } },
+    };
+  }
+
   beforeEach(async () => {
     navSpy = jasmine.createSpy('navigate');
     await TestBed.configureTestingModule({
@@ -40,6 +54,7 @@ describe('ChatWindowPage', () => {
       providers: [
         { provide: ActivatedRoute, useValue: stubRoute('chat-006') },
         { provide: Router, useValue: { navigate: navSpy } },
+        fakeEffects().provider,
       ],
     }).compileComponents();
     TestBed.inject(ChatStore).reset();
@@ -275,6 +290,96 @@ describe('ChatWindowPage', () => {
     store.sendMessage('chat-006', 'direct');
     expect(store.conversationMessages('chat-006').length).toBe(CHAT_SEED.length + 1);
     expect(store.conversations().find((c) => c.id === 'chat-006')?.preview).toBe('direct');
+  });
+
+  // F-060 FR-005/FR-007: send feedback fires only when the store accepted the
+  // message - never for a blank draft and never for a refused attachment.
+  describe('F-060 FR-005: outbound send feedback', () => {
+    function chooseDoc(el: HTMLElement): void {
+      const input = el.querySelector<HTMLInputElement>('[data-testid="composer-doc-input"]')!;
+      input.files = (() => {
+        const transfer = new DataTransfer();
+        transfer.items.add(new File(['x'], 'notes.pdf', { type: 'application/pdf' }));
+        return transfer.files;
+      })();
+      input.dispatchEvent(new Event('change'));
+    }
+
+    it('plays tone and vibration after an accepted text send', () => {
+      const effects = TestBed.inject(BrowserFeedbackEffects) as unknown as {
+        tone: jasmine.Spy;
+        vibrate: jasmine.Spy;
+      };
+      fixture = TestBed.createComponent(ChatWindowPage);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      const input = el.querySelector<HTMLInputElement>('input[aria-label="Message"]')!;
+      input.value = 'hello tokyo';
+      input.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      (el.querySelector('[aria-label="Send message"]') as HTMLButtonElement).click();
+      fixture.detectChanges();
+
+      expect(effects.tone).toHaveBeenCalledTimes(1);
+      expect(effects.vibrate).toHaveBeenCalledTimes(1);
+    });
+
+    it('stays silent for a blank draft', () => {
+      const effects = TestBed.inject(BrowserFeedbackEffects) as unknown as {
+        tone: jasmine.Spy;
+        vibrate: jasmine.Spy;
+      };
+      fixture = TestBed.createComponent(ChatWindowPage);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      const input = el.querySelector<HTMLInputElement>('input[aria-label="Message"]')!;
+      input.value = '   ';
+      input.dispatchEvent(new Event('input'));
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      fixture.detectChanges();
+
+      expect(effects.tone).not.toHaveBeenCalled();
+      expect(effects.vibrate).not.toHaveBeenCalled();
+    });
+
+    it('plays tone and vibration after an accepted attachment send', () => {
+      const effects = TestBed.inject(BrowserFeedbackEffects) as unknown as {
+        tone: jasmine.Spy;
+        vibrate: jasmine.Spy;
+      };
+      fixture = TestBed.createComponent(ChatWindowPage);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      chooseDoc(el);
+      fixture.detectChanges();
+      (el.querySelector('[aria-label="Send message"]') as HTMLButtonElement).click();
+      fixture.detectChanges();
+
+      expect(TestBed.inject(ChatStore).conversationMessages('chat-006').length).toBe(
+        CHAT_SEED.length + 1,
+      );
+      expect(effects.tone).toHaveBeenCalledTimes(1);
+      expect(effects.vibrate).toHaveBeenCalledTimes(1);
+    });
+
+    it('stays silent when the store refuses the attachment', () => {
+      const effects = TestBed.inject(BrowserFeedbackEffects) as unknown as {
+        tone: jasmine.Spy;
+        vibrate: jasmine.Spy;
+      };
+      const store = TestBed.inject(ChatStore);
+      spyOn(store, 'sendAttachment').and.returnValue(false);
+      fixture = TestBed.createComponent(ChatWindowPage);
+      fixture.detectChanges();
+      const el = fixture.nativeElement as HTMLElement;
+      chooseDoc(el);
+      fixture.detectChanges();
+      (el.querySelector('[aria-label="Send message"]') as HTMLButtonElement).click();
+      fixture.detectChanges();
+
+      expect(effects.tone).not.toHaveBeenCalled();
+      expect(effects.vibrate).not.toHaveBeenCalled();
+    });
   });
 
   it('marks the opened conversation read and leaves the rest unread', () => {

@@ -83,7 +83,7 @@ describe('NotificationsPage', () => {
     expect(el.querySelector('.notifications__chevron')).toBeNull();
   });
 
-  it('renders every row as a switch, with only Show previews live', () => {
+  it('renders every row as a switch, with Sound, Vibrate and Show previews live', () => {
     const el = render();
     const rows = el.querySelectorAll<HTMLElement>('[data-testid="notifications-row"]');
     expect(rows.length).toBe(NOTIFICATIONS_ROWS.length);
@@ -91,11 +91,15 @@ describe('NotificationsPage', () => {
     const switches = Array.from(
       el.querySelectorAll<HTMLButtonElement>('button[role="switch"]'),
     );
-    // F-046 FR-006: four rows have no consumer and are disabled; only the wired
-    // one is a live switch, and it is the one whose label matches the pref.
+    // F-060 FR-003: sound/vibrate returned WITH the send-feedback consumer, so
+    // three rows are live switches; popup/light still have no consumer and are
+    // disabled (F-046).
     const live = switches.filter((s) => !s.disabled);
-    expect(live.length).toBe(1);
-    expect(live[0]?.getAttribute('aria-label')).toBe('Show previews');
+    expect(live.map((s) => s.getAttribute('aria-label'))).toEqual([
+      'Sound',
+      'Vibrate',
+      'Show previews',
+    ]);
   });
 
   it('toggling Show previews persists the change', () => {
@@ -109,8 +113,25 @@ describe('NotificationsPage', () => {
     expect(TestBed.inject(PrefsStore).prefs().showPreviews).toBe(false);
   });
 
-  describe('F-046 FR-006: the four consumer-less settings are honestly disabled', () => {
-    ['Sound', 'Vibrate', 'Popup notification', 'Light'].forEach((label) => {
+  // F-060 FR-003/FR-005: the re-enabled delivery toggles are store-bound switches
+  // gated by the send-feedback consumer.
+  it('toggling Sound and Vibrate persists the change (F-060)', () => {
+    const el = render();
+    const switches = el.querySelectorAll<HTMLButtonElement>('button[role="switch"]');
+    const byLabel = (label: string) =>
+      Array.from(switches).find((s) => s.getAttribute('aria-label') === label);
+
+    byLabel('Sound')?.click();
+    byLabel('Vibrate')?.click();
+    fixture.detectChanges();
+
+    const prefs = TestBed.inject(PrefsStore).prefs();
+    expect(prefs.sound).toBe(false);
+    expect(prefs.vibrate).toBe(false);
+  });
+
+  describe('F-046 FR-006 + F-060 FR-003: the two still-consumer-less settings are honestly disabled', () => {
+    ['Popup notification', 'Light'].forEach((label) => {
       it(`renders ${label} as a disabled switch`, () => {
         const el = render();
         const sw = Array.from(

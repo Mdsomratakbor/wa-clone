@@ -60,6 +60,15 @@ describe('ChatStore', () => {
     expect(store.conversationMessages(THREADED_CONTACT_ID).length).toBe(THREAD_SEED.length);
   });
 
+  // F-060 FR-007: sendMessage mirrors sendAttachment by reporting whether the
+  // message was appended, so the page only plays send feedback on a real send.
+  it('returns true for a non-blank send and false for blank drafts (F-060 FR-007)', () => {
+    expect(store.sendMessage(THREADED_CONTACT_ID, '   ')).toBe(false);
+    expect(store.sendMessage(THREADED_CONTACT_ID, '')).toBe(false);
+    expect(store.sendMessage(THREADED_CONTACT_ID, 'ack')).toBe(true);
+    expect(store.sendMessage(THREADED_CONTACT_ID, '  trimmed copy  ')).toBe(true);
+  });
+
   it('marks a single conversation read on open and leaves others untouched', () => {
     store.sendMessage('chat-001', 'ping');
     store.openConversation('chat-001');
