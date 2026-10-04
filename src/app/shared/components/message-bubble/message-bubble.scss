@@ -122,4 +122,29 @@
   &__file-ext {
     white-space: nowrap;
   }
+
+  // F-058 FR-002/FR-005: an inline photo bubble. Geometry is PROVISIONAL (no Figma
+  // node shows a sent photo); tokens only. The photo may not widen the bubble past
+  // the shared message cap, so the image is bounded the same way text is.
+  &__photo {
+    max-width: 100%;
+  }
+
+  &__photo-img {
+    display: block;
+    max-width: 100%;
+    max-height: 280px;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+
+  &__caption {
+    margin: 4px 0 0;
+    font-size: var(--wa-fs-message);
+    font-weight: var(--wa-fw-regular);
+    line-height: var(--wa-lh-message);
+    letter-spacing: var(--wa-ls-bubble);
+    color: var(--wa-on-surface);
+    overflow-wrap: break-word;
+  }
 }

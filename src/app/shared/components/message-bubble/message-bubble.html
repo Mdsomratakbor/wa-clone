@@ -9,25 +9,39 @@
   (contextmenu)="onContextMenu($event)"
 >
   @if (message().file; as file) {
-    <div class="message-bubble__file">
-      <div class="message-bubble__file-card">
-        <svg class="message-bubble__file-icon" width="20" height="24" viewBox="0 0 20 24" fill="none" aria-hidden="true">
-          <path
-            d="M2 1.5h10.5L18 7v14.5a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-19a1 1 0 0 1 1-1Z"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linejoin="round"
-          />
-          <path d="M12 1.5V7h5.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
-        </svg>
-        <span class="message-bubble__file-name">{{ file.filename }}</span>
+    @if (file.dataUrl; as dataUrl) {
+      <div class="message-bubble__photo">
+        <img
+          class="message-bubble__photo-img"
+          data-testid="bubble-photo"
+          [src]="dataUrl"
+          [alt]="message().text"
+        />
       </div>
-      <div class="message-bubble__file-meta">
-        <span class="message-bubble__file-size">{{ file.size }}</span>
-        <span class="message-bubble__file-dot" aria-hidden="true"></span>
-        <span class="message-bubble__file-ext">{{ file.ext }}</span>
+    } @else {
+      <div class="message-bubble__file">
+        <div class="message-bubble__file-card">
+          <svg class="message-bubble__file-icon" width="20" height="24" viewBox="0 0 20 24" fill="none" aria-hidden="true">
+            <path
+              d="M2 1.5h10.5L18 7v14.5a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-19a1 1 0 0 1 1-1Z"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linejoin="round"
+            />
+            <path d="M12 1.5V7h5.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+          </svg>
+          <span class="message-bubble__file-name">{{ file.filename }}</span>
+        </div>
+        <div class="message-bubble__file-meta">
+          <span class="message-bubble__file-size">{{ file.size }}</span>
+          <span class="message-bubble__file-dot" aria-hidden="true"></span>
+          <span class="message-bubble__file-ext">{{ file.ext }}</span>
+        </div>
       </div>
-    </div>
+    }
+    @if (message().text.trim().length > 0) {
+      <p class="message-bubble__caption" data-testid="bubble-caption">{{ message().text }}</p>
+    }
   } @else {
     <p class="message-bubble__text">{{ message().text }}</p>
   }

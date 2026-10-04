@@ -18,8 +18,21 @@ export class MessageBubble {
 
   protected readonly ariaLabel = computed(() => {
     const m = this.message();
-    const body = m.file ? m.file.filename : m.text || 'image attachment';
     const direction = m.sender === 'outgoing' ? 'sent' : 'received';
+    // F-058 FR-005/FR-007: a photo bubble labels itself as a photo (plus its
+    // caption, if any); a file card keeps the filename (plus caption). The fallback
+    // matches starredEntries()' language for the seed's null-file messages.
+    let body: string;
+    if (m.file) {
+      const caption = m.text.trim();
+      if (m.file.dataUrl !== undefined) {
+        body = caption ? `Photo, ${caption}` : 'Photo';
+      } else {
+        body = caption ? `${m.file.filename}, ${caption}` : m.file.filename;
+      }
+    } else {
+      body = m.text || 'image attachment';
+    }
     return `${m.time}, ${body}, ${direction}`;
   });
 

@@ -23,6 +23,7 @@ import { ChatActionsModal } from './chat-actions-modal';
 import { CHAT_MORE_ACTIONS } from './chat-actions.seed';
 import { CHAT_CONTACT, DATE_CHIP_LABEL } from './chat-window.seed';
 import { ContactHeader } from './chat-window.model';
+import { AttachmentDraft } from '../../shared/components/composer/composer';
 
 @Component({
   selector: 'app-chat-window-page',
@@ -78,6 +79,13 @@ export class ChatWindowPage {
 
   protected onSend(text: string): void {
     this.store.sendMessage(this.chatId(), text);
+  }
+
+  // F-058 FR-005: the composer holds the pending attachment and only emits on an
+  // explicit Send. The store refuses an unsafe/oversized file and leaves the state
+  // untouched, so a refusal is a no-op here rather than a second validation.
+  protected onSendAttachment(draft: AttachmentDraft): void {
+    this.store.sendAttachment(this.chatId(), draft.text, draft.file);
   }
 
   protected isStarred(messageId: string): boolean {

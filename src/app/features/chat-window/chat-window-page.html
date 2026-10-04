@@ -31,7 +31,7 @@
     }
   </div>
 
-  <app-composer (send)="onSend($event)" />
+  <app-composer (send)="onSend($event)" (sendAttachment)="onSendAttachment($event)" />
 
   @if (chatActionsOpen()) {
     <app-chat-actions-modal
