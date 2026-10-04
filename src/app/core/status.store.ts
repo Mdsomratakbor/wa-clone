@@ -150,6 +150,17 @@ export class StatusStore {
     return entry;
   }
 
+  /**
+   * F-057 FR-008: part of the Delete-account wipe. Same convention as
+   * ChatStore.reset() / PrefsStore.reset(): remove the key and restore defaults
+   * (contrast CallStore.clearCalls(), which writes an empty snapshot by design).
+   */
+  reset(): void {
+    this.storage.remove(STATUS_PERSISTENCE_KEY);
+    this.myStatus.set(null);
+    this.nextStatusSeq = 0;
+  }
+
   private persist(): void {
     const snapshot: StatusStoreSnapshot = {
       version: STORE_VERSION,
