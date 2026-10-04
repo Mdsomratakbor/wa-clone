@@ -3,7 +3,8 @@ import { PersistencePort } from './persistence/persistence.port';
 import { ChatKind, ChatPreview } from '../features/chat-list/chat.model';
 import { CHAT_SEED } from '../features/chat-list/chat-list.seed';
 import { CHAT_SEED as THREAD_SEED } from '../features/chat-window/chat-window.seed';
-import { ContactHeader, Message } from '../features/chat-window/chat-window.model';
+import { ContactHeader, FileInfo, Message } from '../features/chat-window/chat-window.model';
+import { PHOTO_MAX_CHARS } from './status-photo';
 
 export const THREADED_CONTACT_ID = 'chat-006';
 export const CONTACT_SUBTITLE = 'tap here for contact info';
@@ -33,6 +34,66 @@ function nowTime(): string {
   const hh = String(d.getHours()).padStart(2, '0');
   const mm = String(d.getMinutes()).padStart(2, '0');
   return `${hh}:${mm}`;
+}
+
+/**
+ * F-058 FR-006. The same safety contract as `StatusStore`'s photo guard: a "local"
+ * image must be an inline data URL (`data:image/`), never a remote reference and
+ * never `data:image/svg` (attacker markup behind `<img src>`). Records only, never
+ * https - a photo src that fetched from the network would not be honest and a
+ * data:text payload would be a script source.
+ */
+export function isSafeImageDataUrl(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    value.startsWith('data:image/') &&
+    !value.startsWith('data:image/svg')
+  );
+}
+
+/**
+ * F-058 FR-003. Human-readable size for the file card. Unit rules are PROVISIONAL
+ * (no Figma node); one decimal keeps the display bounded and mirrors the seed's
+ * "2.4 MB" shape.
+ */
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+  const kb = bytes / 1024;
+  if (kb < 1024) {
+    return `${Math.round(kb * 10) / 10} KB`;
+  }
+  return `${Math.round((kb / 1024) * 10) / 10} MB`;
+}
+
+/**
+ * F-058 FR-002/FR-003. Splits a `File.name` into the card's two halves. A name
+ * without an extension keeps itself as `filename` with an empty `ext`. F-058
+ * produces `ext` lowercased so card and media-grid labels agree with the seed.
+ */
+export function splitFileName(name: string): { filename: string; ext: string } {
+  const dot = name.lastIndexOf('.');
+  if (dot <= 0) {
+    return { filename: name, ext: '' };
+  }
+  return { filename: name.slice(0, dot), ext: name.slice(dot + 1).toLowerCase() };
+}
+
+/**
+ * F-058 FR-005. The chat-list preview string for a file message: the caption when
+ * one was typed, else `Photo` for an inline photo, else `name.ext`. The `Photo`
+ * label is PROVISIONAL copy recorded in the 058 spec.
+ */
+export function filePreviewLabel(caption: string, file: FileInfo): string {
+  const text = caption.trim();
+  if (text.length > 0) {
+    return text;
+  }
+  if (file.dataUrl !== undefined) {
+    return 'Photo';
+  }
+  return file.ext ? `${file.filename}.${file.ext}` : file.filename;
 }
 
 function normalizeChats(seed: readonly ChatPreview[]): readonly ChatPreview[] {
@@ -398,6 +459,45 @@ export class ChatStore {
     this.persist();
   }
 
+  /**
+   * F-058 FR-005/FR-006. Appends a file message and persists it. Returns `false` -
+   * and persists nothing - when the file is missing or its data URL is not safe or
+   * exceeds the character budget. The refusal lives here rather than in the page for
+   * the F-050 reason: the adapter swallows quota errors by design, so only the store
+   * can keep the visible message and the persisted one identical. A blank file is
+   * refused; a blank caption is not (file-only message). Prefers the caption as the
+   * chat-list preview.
+   */
+  sendAttachment(chatId: string, text: string, file: FileInfo): boolean {
+    const caption = text.trim();
+    if (file.dataUrl !== undefined && (!isSafeImageDataUrl(file.dataUrl) || file.dataUrl.length > PHOTO_MAX_CHARS)) {
+      return false;
+    }
+    if (file.dataUrl === undefined && file.filename.length === 0) {
+      return false;
+    }
+    const message: Message = {
+      id: this.nextMessageId(),
+      sender: 'outgoing',
+      text: caption,
+      time: nowTime(),
+      file,
+    };
+    this.threads.update((threads) => ({
+      ...threads,
+      [chatId]: [...(threads[chatId] ?? []), message],
+    }));
+    this.conversations.update((chats) =>
+      chats.map((chat) =>
+        chat.id === chatId
+          ? { ...chat, preview: filePreviewLabel(caption, file), timestamp: message.time, read: true }
+          : chat,
+      ),
+    );
+    this.persist();
+    return true;
+  }
+
   markAllRead(): void {
     this.conversations.update((chats) => chats.map((chat) => ({ ...chat, read: true })));
     this.persist();
@@ -445,9 +545,32 @@ export class ChatStore {
       return;
     }
     this.conversations.set(snapshot.conversations.map((chat) => ({ ...chat, ...hydrateDefaults(chat) })));
-    this.threads.set(snapshot.threads);
+    this.threads.set(this.sanitizeThreads(snapshot.threads));
     this.starred.set(snapshot.starred ?? []);
     this.messageSequence = snapshot.messageSequence;
     this.newChatCounter = snapshot.newChatCounter;
+  }
+
+  /**
+   * F-058 FR-006. A loaded `file.dataUrl` that is not a safe inline image is dropped
+   * from the message (the card metadata stays, so nothing renderable is lost). A
+   * stale or foreign snapshot must not be able to put a network fetch or attacker
+   * markup behind an `<img src>`.
+   */
+  private sanitizeThreads(
+    threads: Record<string, readonly Message[]>,
+  ): Record<string, readonly Message[]> {
+    const next: Record<string, readonly Message[]> = {};
+    for (const chatId of Object.keys(threads)) {
+      next[chatId] = threads[chatId].map((message) => {
+        if (message.file?.dataUrl !== undefined && !isSafeImageDataUrl(message.file.dataUrl)) {
+          const file: FileInfo = { ...message.file };
+          delete file.dataUrl;
+          return { ...message, file };
+        }
+        return message;
+      });
+    }
+    return next;
   }
 }
