@@ -61,12 +61,14 @@ export const CHATS_SETTINGS_ROWS: readonly SettingsRowSeed[] = [
 ];
 
 export const NOTIFICATIONS_ROWS: readonly SettingsRowSeed[] = [
-  // F-046 FR-006: sound, vibrate, popup and light had live switches and no
-  // consumer - there is no notification delivery in the app at all. Marked
-  // unavailable and the keys removed from PrefsStore. `notifications-previews`
-  // is NOT unavailable: it is wired to the chat-list preview (F-046 FR-006).
-  { id: 'notifications-sound', label: 'Sound', description: 'For incoming messages', unavailable: true },
-  { id: 'notifications-vibrate', label: 'Vibrate', description: 'For incoming messages and calls', unavailable: true },
+  // F-046 FR-006 removed sound, vibrate, popup and light keys - live toggles with
+  // no consumer. F-060 FR-003 re-enables sound/vibrate BECAUSE their consumer (a
+  // send-feedback tone/vibration in the chat window) ships in the same feature;
+  // popup/light stay unavailable: a phone-web app has no lock screen or LED, so no
+  // honest consumer exists. Descriptions for sound/vibrate are PROVISIONAL F-060
+  // copy (the real consumer is outgoing-message feedback, not incoming).
+  { id: 'notifications-sound', label: 'Sound', description: 'Play a tone when you send a message' },
+  { id: 'notifications-vibrate', label: 'Vibrate', description: 'Vibrate when you send a message' },
   { id: 'notifications-popup', label: 'Popup notification', description: 'When your phone is locked', unavailable: true },
   { id: 'notifications-light', label: 'Light', description: 'Flash for incoming messages', unavailable: true },
   { id: 'notifications-previews', label: 'Show previews', description: 'Show message text in notifications' },

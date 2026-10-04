@@ -8,6 +8,10 @@ import { NOTIFICATIONS_ROWS, SettingsRowSeed } from './settings.seed';
 
 const TOGGLE_PREFS: Readonly<Record<string, PrefsKey>> = {
   'notifications-previews': 'showPreviews',
+  // F-060 FR-003: sound/vibrate returned WITH the send-feedback consumer (FR-005);
+  // popup/light stay unavailable.
+  'notifications-sound': 'sound',
+  'notifications-vibrate': 'vibrate',
 };
 
 @Component({
@@ -34,8 +38,9 @@ export class NotificationsPage {
   }
 
   protected onToggle(key: PrefsKey, value: boolean): void {
-    // F-027: persisted toggle. F-046 FR-006 makes this the only pref on this
-    // screen with a consumer - showPreviews gates the chat-list preview.
+    // F-027: persisted toggle. F-046 FR-006 removed the consumer-less delivery
+    // keys; F-060 FR-005 returns sound/vibrate because their send-feedback
+    // consumer ships in the same feature. showPreviews gates the chat-list preview.
     this.store.set(key, value);
   }
 
