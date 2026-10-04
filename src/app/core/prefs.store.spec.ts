@@ -4,6 +4,7 @@ import {
   DEFAULT_FONT_SCALE,
   DEFAULT_PREFS,
   DEFAULT_PROFILE,
+  DEFAULT_WALLPAPER,
   PREFS_KEY,
   PrefsStore,
 } from './prefs.store';
@@ -71,10 +72,10 @@ describe('PrefsStore', () => {
     expect(reloaded.chatSort()).toBe(DEFAULT_CHAT_SORT);
   });
 
-  describe('F-046 FR-006: removed keys normalize away on load', () => {
-    it('drops the five removed keys from a persisted v4 snapshot without throwing', () => {
-      // A user who used the app before this feature has these keys on disk. The
-      // envelope version is deliberately not bumped, so hydrate() must normalize.
+  describe('F-046 FR-006 + F-059 FR-008: removed/returned keys on load', () => {
+    it('drops the four still-removed Notifications keys from a v4 snapshot without throwing', () => {
+      // A user who used the app before F-046 has these keys on disk. F-059 returns
+      // mediaVisibility WITH a consumer (FR-009), so it is no longer dropped.
       localStorage.setItem(
         PREFS_KEY,
         JSON.stringify({
@@ -93,12 +94,13 @@ describe('PrefsStore', () => {
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({});
       const reloaded = TestBed.inject(PrefsStore);
-      expect(reloaded.prefs()).toEqual(DEFAULT_PREFS);
+      // The four delivery keys normalize away; mediaVisibility is now honoured.
+      expect(reloaded.prefs()).toEqual({ ...DEFAULT_PREFS, mediaVisibility: false });
       // And the rest of the envelope is still honoured, not discarded.
       expect(reloaded.chatSort()).toBe('name');
     });
 
-    it('keeps the two surviving prefs across the same reload', () => {
+    it('keeps the surviving prefs across the same reload', () => {
       localStorage.setItem(
         PREFS_KEY,
         JSON.stringify({
@@ -112,6 +114,67 @@ describe('PrefsStore', () => {
       const reloaded = TestBed.inject(PrefsStore);
       expect(reloaded.prefs().showPreviews).toBe(false);
       expect(reloaded.prefs().enterKeySends).toBe(false);
+      expect(reloaded.prefs().mediaVisibility).toBe(true);
+    });
+  });
+
+  describe('F-059 FR-001/FR-002: wallpaper preference', () => {
+    it('starts on the default wallpaper', () => {
+      expect(store.wallpaper()).toBe(DEFAULT_WALLPAPER);
+    });
+
+    it('setWallpaper persists the choice across a reload', () => {
+      store.setWallpaper('sky');
+      expect(store.wallpaper()).toBe('sky');
+
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({});
+      expect(TestBed.inject(PrefsStore).wallpaper()).toBe('sky');
+    });
+
+    it('a v5 envelope round-trips wallpaper and mediaVisibility together', () => {
+      store.setWallpaper('slate');
+      store.set('mediaVisibility', false);
+
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({});
+      const reloaded = TestBed.inject(PrefsStore);
+      expect(reloaded.wallpaper()).toBe('slate');
+      expect(reloaded.prefs().mediaVisibility).toBe(false);
+    });
+
+    it('a v4 envelope with no wallpaper key hydrates as default', () => {
+      store.setWallpaper('mint');
+      const raw = localStorage.getItem(PREFS_KEY)!;
+      const parsed = JSON.parse(raw) as { version: number; wallpaper?: string };
+      delete parsed.wallpaper;
+      parsed.version = 4;
+      localStorage.setItem(PREFS_KEY, JSON.stringify(parsed));
+
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({});
+      expect(TestBed.inject(PrefsStore).wallpaper()).toBe(DEFAULT_WALLPAPER);
+    });
+
+    it('an unknown wallpaper id hydrates as default', () => {
+      localStorage.setItem(
+        PREFS_KEY,
+        JSON.stringify({
+          version: 5,
+          prefs: DEFAULT_PREFS,
+          chatSort: 'recent',
+          wallpaper: 'neon',
+        }),
+      );
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({});
+      expect(TestBed.inject(PrefsStore).wallpaper()).toBe(DEFAULT_WALLPAPER);
+    });
+
+    it('reset returns the wallpaper to default', () => {
+      store.setWallpaper('blush');
+      store.reset();
+      expect(store.wallpaper()).toBe(DEFAULT_WALLPAPER);
     });
   });
 
@@ -166,12 +229,14 @@ describe('PrefsStore', () => {
     expect(TestBed.inject(PrefsStore).fontScale()).toBe('large');
   });
 
-  it('persists a version 4 envelope (F-041 FR-002)', () => {
+  it('persists a version 5 envelope with wallpaper (F-041 FR-002, F-059 FR-002)', () => {
     store.setFontScale('small');
+    store.setWallpaper('sky');
     const raw = localStorage.getItem(PREFS_KEY);
     expect(raw).not.toBeNull();
-    expect(JSON.parse(raw as string).version).toBe(4);
+    expect(JSON.parse(raw as string).version).toBe(5);
     expect(JSON.parse(raw as string).fontScale).toBe('small');
+    expect(JSON.parse(raw as string).wallpaper).toBe('sky');
   });
 
   it('hydrates a v3 envelope with the default font scale (F-041 FR-002)', () => {
