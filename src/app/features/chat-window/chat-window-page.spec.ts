@@ -132,6 +132,21 @@ describe('ChatWindowPage', () => {
     expect(root?.getAttribute('data-font-scale')).toBe('default');
   });
 
+  it('carries the stored wallpaper id on the chat window root (F-059 FR-005)', () => {
+    TestBed.inject(PrefsStore).setWallpaper('sky');
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    const root = (fixture.nativeElement as HTMLElement).querySelector('.chat-window');
+    expect(root?.getAttribute('data-wallpaper')).toBe('sky');
+  });
+
+  it('defaults the wallpaper scope to default when none is stored (F-059 FR-001)', () => {
+    fixture = TestBed.createComponent(ChatWindowPage);
+    fixture.detectChanges();
+    const root = (fixture.nativeElement as HTMLElement).querySelector('.chat-window');
+    expect(root?.getAttribute('data-wallpaper')).toBe('default');
+  });
+
   it('renders the contact header from the seeded contact', () => {    fixture = TestBed.createComponent(ChatWindowPage);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;

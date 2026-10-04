@@ -128,6 +128,55 @@ describe('MessageBubble', () => {
     expect(el.querySelector('[data-testid="bubble-caption"]')?.textContent).toBe('The file');
   });
 
+  describe('F-059 FR-008/FR-009/FR-010: media visibility off masks media', () => {
+    function renderWith(message: Message, visible: boolean): HTMLElement {
+      TestBed.inject(PrefsStore).set('mediaVisibility', visible);
+      fixture = TestBed.createComponent(MessageBubble);
+      fixture.componentRef.setInput('message', message);
+      fixture.detectChanges();
+      return fixture.nativeElement as HTMLElement;
+    }
+
+    it('replaces a photo with the privacy placeholder when visibility is off', () => {
+      const el = renderWith(PHOTO_WITH_CAPTION, false);
+      expect(el.querySelector('[data-testid="bubble-media-private"]')).not.toBeNull();
+      expect(el.querySelector('img[data-testid="bubble-photo"]')).toBeNull();
+    });
+
+    it('replaces a file card with the placeholder when visibility is off', () => {
+      const el = renderWith(FILE_MSG, false);
+      expect(el.querySelector('[data-testid="bubble-media-private"]')).not.toBeNull();
+      expect(el.querySelector('.message-bubble__file')).toBeNull();
+    });
+
+    it('keeps the caption and hides only the media surface (F-059 FR-009)', () => {
+      const el = renderWith(PHOTO_WITH_CAPTION, false);
+      expect(el.querySelector('[data-testid="bubble-caption"]')?.textContent).toBe(
+        'Look at the lake',
+      );
+      // the message itself is untouched - only its surface is swapped
+      expect((fixture.componentInstance.message()).text).toBe('Look at the lake');
+    });
+
+    it('keeps the media rendered when visibility is on', () => {
+      const el = renderWith(PHOTO_MSG, true);
+      expect(el.querySelector('img[data-testid="bubble-photo"]')).not.toBeNull();
+      expect(el.querySelector('[data-testid="bubble-media-private"]')).toBeNull();
+    });
+
+    it('announces Media hidden followed by any caption in the aria-label (F-059 FR-010)', () => {
+      const el = renderWith(PHOTO_WITH_CAPTION, false);
+      const label = el.querySelector('.message-bubble')?.getAttribute('aria-label');
+      expect(label).toBe('10:17, Media hidden, Look at the lake, sent');
+    });
+
+    it('announces just Media hidden when the masked bubble has no caption', () => {
+      const el = renderWith(FILE_MSG, false);
+      const label = el.querySelector('.message-bubble')?.getAttribute('aria-label');
+      expect(label).toBe('10:15, Media hidden, sent');
+    });
+  });
+
   it('labels a photo bubble as a photo in the aria-label (F-058 FR-007)', () => {
     fixture = TestBed.createComponent(MessageBubble);
     fixture.componentRef.setInput('message', PHOTO_WITH_CAPTION);
