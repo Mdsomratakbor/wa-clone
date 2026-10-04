@@ -49,11 +49,15 @@ export const ACCOUNT_ROWS: readonly SettingsRowSeed[] = [
 export const CHATS_SETTINGS_ROWS: readonly SettingsRowSeed[] = [
   { id: 'chats-wallpaper', label: 'Wallpaper', description: 'Set a default wallpaper for your chats' },
   { id: 'chats-font-size', label: 'Font size', description: 'Change the text size in chats' },
-  { id: 'chats-keyboard', label: 'Keyboard', description: 'Keyboard shortcuts and preferences' },
-  { id: 'chats-enter-sends', label: 'Enter key sends', description: "Assigns the Enter key to send messages" },
-  // F-046 FR-006: mediaVisibility had a live switch and no consumer. Marked
-  // unavailable and the key removed from PrefsStore.
-  { id: 'chats-media-visibility', label: 'Media visibility', description: 'Shows the most recently shared media in your apps and devices', unavailable: true },
+  // F-059 FR-004/FR-007: the keyboard screen now hosts the Enter key sends switch;
+  // per the clarify pass one preference has exactly one switch, so the standalone
+  // enter-sends row below was removed rather than duplicated.
+  { id: 'chats-keyboard', label: 'Keyboard', description: "Assigns the Enter key to send messages" },
+  // F-046 FR-006: mediaVisibility had a live switch and no consumer, so its key
+  // was removed and the row marked unavailable. F-059 FR-008/FR-009 returns the
+  // key WITH an in-bubble masking consumer (MessageBubble), so the row is live
+  // again and the F-054 copy below is a PROVISIONAL rewrite.
+  { id: 'chats-media-visibility', label: 'Media visibility', description: 'Show photos and files inside chats' },
 ];
 
 export const NOTIFICATIONS_ROWS: readonly SettingsRowSeed[] = [

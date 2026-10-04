@@ -7,7 +7,9 @@ import { PrefsKey, PrefsStore } from '../../core/prefs.store';
 import { CHATS_SETTINGS_ROWS, SettingsRowSeed } from './settings.seed';
 
 const TOGGLE_PREFS: Readonly<Record<string, PrefsKey>> = {
-  'chats-enter-sends': 'enterKeySends',
+  // F-059 FR-009: mediaVisibility is live here BECAUSE its consumer (MessageBubble)
+  // lands in the same series - the F-046 key-return-with-consumer contract.
+  'chats-media-visibility': 'mediaVisibility',
 };
 
 @Component({
@@ -34,8 +36,8 @@ export class ChatsSettingsPage {
   }
 
   protected onToggle(key: PrefsKey, value: boolean): void {
-    // F-027: persisted toggle, and F-046 FR-006 makes this the only pref on this
-    // screen with a real consumer (composer.ts reads enterKeySends).
+    // F-027: persisted toggle. F-059 FR-009: mediaVisibility is the one switch on
+    // this screen whose consumer (message-bubble masking) exists in the same series.
     this.store.set(key, value);
   }
 
@@ -46,9 +48,14 @@ export class ChatsSettingsPage {
   }
 
   protected onRowActivate(row: SettingsRowSeed): void {
-    // F-041: Font size owns its own screen; F-016's other targets stay inert.
+    // F-041 owns the font-size screen; F-059 FR-002/FR-004 add the wallpaper and
+    // keyboard screens. F-016's other targets stay inert.
     if (row.id === 'chats-font-size') {
       void this.router.navigate(['/settings/chats/font-size']);
+    } else if (row.id === 'chats-wallpaper') {
+      void this.router.navigate(['/settings/chats/wallpaper']);
+    } else if (row.id === 'chats-keyboard') {
+      void this.router.navigate(['/settings/chats/keyboard']);
     }
   }
 }

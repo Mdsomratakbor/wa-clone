@@ -1,0 +1,56 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.keyboard {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--wa-surface);
+}
+
+.keyboard__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.keyboard__row {
+  display: block;
+}
+
+.keyboard__switch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.keyboard__row-label {
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-preview);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-on-surface);
+}
+
+.keyboard__row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.keyboard__row-description {
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-control);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-text-secondary);
+}
+
+.keyboard__switch-row app-toggle {
+  margin-left: auto;
+  flex: 0 0 auto;
+}

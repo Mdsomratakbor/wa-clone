@@ -105,6 +105,11 @@ export const routes: Routes = [
       import('./features/settings/wallpaper-page').then((m) => m.WallpaperPage),
   },
   {
+    path: 'settings/chats/keyboard',
+    loadComponent: () =>
+      import('./features/settings/keyboard-page').then((m) => m.KeyboardPage),
+  },
+  {
     path: 'settings/notifications',
     loadComponent: () =>
       import('./features/settings/notifications-page').then((m) => m.NotificationsPage),

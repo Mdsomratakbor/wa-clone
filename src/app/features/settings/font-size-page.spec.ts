@@ -134,11 +134,11 @@ describe('ChatsSettingsPage font size row', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/settings/chats/font-size']);
   });
 
-  // F-046: Wallpaper is a recorded deferral, not a decision. The assertion is
-  // unchanged because the row genuinely is still inert; only the name changed,
-  // so a reader does not take "stays inert" for an intended behaviour. See
-  // `specs/046-inert-control-sweep/disposition.md`.
-  it('the Wallpaper row is still inert: deferred to the wallpaper picker (F-046 G4)', () => {
+  // F-059 FR-002: the Wallpaper row is no longer inert - it opens the wallpaper
+  // picker. F-046 deferred it (capture-blocked); the picker ships PROVISIONAL.
+  // See `specs/046-inert-control-sweep/disposition.md` G4 (marked RESOLVED) and
+  // `specs/059-chats-settings-complete/spec.md`.
+  it('the Wallpaper row opens the wallpaper picker (F-059 FR-002)', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.resolveTo(true);
     const fixture = TestBed.createComponent(ChatsSettingsPage);
@@ -150,6 +150,6 @@ describe('ChatsSettingsPage font size row', () => {
     expect(wall).toBeDefined();
     wall?.click();
     fixture.detectChanges();
-    expect(router.navigate).not.toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/settings/chats/wallpaper']);
   });
 });

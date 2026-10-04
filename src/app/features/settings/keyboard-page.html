@@ -1,0 +1,27 @@
+<app-navigation-bar
+  title="Keyboard"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="keyboard" data-testid="keyboard-page">
+  <ul class="keyboard__list">
+    <li class="keyboard__row">
+      <div
+        class="keyboard__switch-row"
+        data-testid="keyboard-enter-sends"
+        [attr.aria-label]="'Enter key sends'"
+      >
+        <span class="keyboard__row-text">
+          <span class="keyboard__row-label">Enter key sends</span>
+          <span class="keyboard__row-description">Assigns the Enter key to send messages</span>
+        </span>
+        <app-toggle
+          [checked]="prefs()['enterKeySends']"
+          label="Enter key sends"
+          (checkedChange)="onToggle($event)"
+        />
+      </div>
+    </li>
+  </ul>
+</main>
