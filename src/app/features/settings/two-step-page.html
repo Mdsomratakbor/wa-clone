@@ -1,0 +1,211 @@
+<app-navigation-bar
+  title="Two-step verification"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="two-step" data-testid="two-step-page">
+  <!-- Always-present live region: announcement changes announce on action. -->
+  <p class="two-step__status" role="status" data-testid="two-step-status">
+    {{ announcement() }}
+  </p>
+
+  @if (!enabled()) {
+    <section class="two-step__block" data-testid="two-step-disabled">
+      <p class="two-step__intro" data-testid="two-step-intro">
+        Two-step verification adds an extra layer of security to your account. When turned on,
+        you'll be asked for a 6-digit PIN, and a recovery email must be provided in case you
+        forget it.
+      </p>
+
+      <div class="two-step__field">
+        <span class="two-step__label">Enter a 6-digit PIN</span>
+        <input
+          class="two-step__input"
+          data-testid="two-step-pin"
+          #pinInput
+          type="password"
+          inputmode="numeric"
+          autocomplete="new-password"
+          maxlength="6"
+          aria-label="Enter a 6-digit PIN"
+          [value]="pin()"
+          (input)="pin.set(pinInput.value)"
+        />
+      </div>
+
+      <div class="two-step__field">
+        <span class="two-step__label">Re-enter your PIN</span>
+        <input
+          class="two-step__input"
+          data-testid="two-step-pin-confirm"
+          #pinConfirmInput
+          type="password"
+          inputmode="numeric"
+          autocomplete="new-password"
+          maxlength="6"
+          aria-label="Re-enter your PIN"
+          [value]="pinConfirm()"
+          (input)="pinConfirm.set(pinConfirmInput.value)"
+        />
+      </div>
+
+      <div class="two-step__field">
+        <span class="two-step__label">Recovery email</span>
+        <input
+          class="two-step__input"
+          data-testid="two-step-email"
+          #emailInput
+          type="email"
+          autocomplete="email"
+          aria-label="Recovery email"
+          [value]="email()"
+          (input)="email.set(emailInput.value)"
+        />
+      </div>
+
+      <button
+        type="button"
+        class="two-step__primary"
+        data-testid="two-step-set"
+        [disabled]="setDisabled()"
+        (click)="onSet()"
+      >
+        Set PIN
+      </button>
+    </section>
+  } @else {
+    <section class="two-step__block" data-testid="two-step-enabled">
+      <h2 class="two-step__heading">Two-step verification is enabled</h2>
+      <p class="two-step__detail" data-testid="two-step-email-line">
+        Recovery email: {{ emailDisplay() }}
+      </p>
+
+      @if (!editing() && !removing()) {
+        <div class="two-step__actions">
+          <button
+            type="button"
+            class="two-step__row-action"
+            data-testid="two-step-change"
+            (click)="onBeginChange()"
+          >
+            Change PIN
+          </button>
+          <button
+            type="button"
+            class="two-step__row-action two-step__row-action--danger"
+            data-testid="two-step-remove"
+            (click)="onBeginRemove()"
+          >
+            Remove
+          </button>
+        </div>
+      }
+
+      @if (editing()) {
+        <div class="two-step__field">
+          <span class="two-step__label">Enter a 6-digit PIN</span>
+          <input
+            class="two-step__input"
+            data-testid="two-step-pin"
+            #pinInput
+            type="password"
+            inputmode="numeric"
+            autocomplete="new-password"
+            maxlength="6"
+            aria-label="Enter a 6-digit PIN"
+            [value]="pin()"
+            (input)="pin.set(pinInput.value)"
+          />
+        </div>
+
+        <div class="two-step__field">
+          <span class="two-step__label">Re-enter your PIN</span>
+          <input
+            class="two-step__input"
+            data-testid="two-step-pin-confirm"
+            #pinConfirmInput
+            type="password"
+            inputmode="numeric"
+            autocomplete="new-password"
+            maxlength="6"
+            aria-label="Re-enter your PIN"
+            [value]="pinConfirm()"
+            (input)="pinConfirm.set(pinConfirmInput.value)"
+          />
+        </div>
+
+        <div class="two-step__field">
+          <span class="two-step__label">Recovery email</span>
+          <input
+            class="two-step__input"
+            data-testid="two-step-email"
+            #emailInput
+            type="email"
+            autocomplete="email"
+            aria-label="Recovery email"
+            [value]="email()"
+            (input)="email.set(emailInput.value)"
+          />
+        </div>
+
+        <div class="two-step__inline-actions">
+          <button
+            type="button"
+            class="two-step__primary"
+            data-testid="two-step-set"
+            [disabled]="setDisabled()"
+            (click)="onSet()"
+          >
+            Change PIN
+          </button>
+          <button
+            type="button"
+            class="two-step__text-button"
+            data-testid="two-step-cancel-change"
+            (click)="onCancelChange()"
+          >
+            Cancel
+          </button>
+        </div>
+      }
+
+      @if (removing()) {
+        <div class="two-step__field">
+          <span class="two-step__label">Enter your PIN to remove two-step verification</span>
+          <input
+            class="two-step__input"
+            data-testid="two-step-remove-pin"
+            #removePinInput
+            type="password"
+            inputmode="numeric"
+            autocomplete="new-password"
+            maxlength="6"
+            aria-label="Enter your PIN to remove two-step verification"
+            [value]="removePin()"
+            (input)="removePin.set(removePinInput.value)"
+          />
+        </div>
+
+        <div class="two-step__inline-actions">
+          <button
+            type="button"
+            class="two-step__row-action two-step__row-action--danger"
+            data-testid="two-step-remove-confirm"
+            (click)="onRemove()"
+          >
+            Confirm remove
+          </button>
+          <button
+            type="button"
+            class="two-step__text-button"
+            data-testid="two-step-cancel-remove"
+            (click)="onBeginChange()"
+          >
+            Cancel
+          </button>
+        </div>
+      }
+    </section>
+  }
+</main>

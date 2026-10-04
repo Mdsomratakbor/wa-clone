@@ -1,0 +1,59 @@
+.change-number {
+  padding: 16px 16px 32px;
+}
+
+.change-number__status {
+  margin: 0 0 16px;
+  color: var(--wa-accent);
+}
+
+.change-number__intro {
+  margin: 0 0 20px;
+  color: var(--wa-on-surface);
+}
+
+.change-number__field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.change-number__label {
+  color: var(--wa-text-secondary);
+}
+
+.change-number__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--wa-border);
+  border-radius: 8px;
+  background: var(--wa-input-surface);
+  color: var(--wa-on-surface);
+  font: inherit;
+}
+
+.change-number__input:focus-visible {
+  outline: 2px solid var(--wa-accent);
+  outline-offset: 1px;
+}
+
+.change-number__submit {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  background: var(--wa-accent);
+  color: #ffffff;
+  font-weight: var(--wa-fw-semibold);
+  cursor: pointer;
+}
+
+.change-number__submit:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.change-number__submit:focus-visible {
+  outline: 2px solid var(--wa-accent);
+  outline-offset: 2px;
+}

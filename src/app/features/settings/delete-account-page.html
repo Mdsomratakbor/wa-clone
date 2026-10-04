@@ -1,0 +1,64 @@
+@if (!deleted()) {
+  <app-navigation-bar
+    title="Delete my account"
+    [leading]="leadingActions"
+    (action)="onNavAction($event)"
+  ></app-navigation-bar>
+}
+
+<main class="delete-account" data-testid="delete-account-page">
+  @if (!deleted()) {
+    <p class="delete-account__status" role="status" data-testid="delete-account-status">
+      {{ announcement() }}
+    </p>
+
+    <p class="delete-account__warning" data-testid="delete-account-warning">
+      Deleting your account will permanently remove your message history, media and everything
+      stored on this device. Type
+      <strong>DELETE</strong>
+      to confirm. This cannot be undone.
+    </p>
+
+    <div class="delete-account__field">
+      <label class="delete-account__label" for="delete-account-confirm">
+        Type DELETE to confirm
+      </label>
+      <input
+        id="delete-account-confirm"
+        class="delete-account__input"
+        data-testid="delete-account-confirm"
+        #confirmInput
+        type="text"
+        autocomplete="off"
+        aria-label="Type DELETE to confirm"
+        [value]="confirmation()"
+        (input)="confirmation.set(confirmInput.value)"
+      />
+    </div>
+
+    <button
+      type="button"
+      class="delete-account__danger"
+      data-testid="delete-account-confirm-button"
+      [disabled]="!canDelete()"
+      (click)="onDelete()"
+    >
+      Delete my account
+    </button>
+  } @else {
+    <section class="delete-account__done" data-testid="delete-account-deleted">
+      <p class="delete-account__done-title" role="status">{{ announcement() }}</p>
+      <p class="delete-account__done-detail">
+        All data stored on this device has been deleted.
+      </p>
+      <button
+        type="button"
+        class="delete-account__danger"
+        data-testid="delete-account-continue"
+        (click)="onContinue()"
+      >
+        Continue
+      </button>
+    </section>
+  }
+</main>

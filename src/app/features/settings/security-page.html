@@ -1,0 +1,64 @@
+<app-navigation-bar
+  title="Security"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="security" data-testid="security-page">
+  <ul class="security__list" data-testid="security-list">
+    <li class="security__row">
+      <!--
+        F-057 FR-005: "Show security notifications" gates NoMsgs: there is no
+        security-code pipeline to notify about, so it is an honestly-disabled
+        toggle (F-046: a pref with no consumer must not be a live switch) - the
+        Toggle's native disabled keeps it out of the tab order. PROVISIONAL copy.
+      -->
+      <div
+        class="security__switch-row"
+        data-testid="security-notifications"
+        [attr.aria-label]="'Show security notifications'"
+      >
+        <span class="security__row-text">
+          <span class="security__row-label">Show security notifications</span>
+          <span class="security__row-description">
+            You'll be alerted when your security code changes
+          </span>
+        </span>
+        <app-toggle label="Show security notifications" [disabled]="true" />
+      </div>
+    </li>
+
+    <li class="security__row">
+      <button
+        type="button"
+        class="security__row-button"
+        data-testid="security-two-step"
+        [attr.aria-label]="'Two-step verification'"
+        (click)="onTwoStep()"
+      >
+        <span class="security__row-text">
+          <span class="security__row-label">Two-step verification</span>
+          <span class="security__row-description" data-testid="security-two-step-status">
+            {{ account().twoStep ? 'Enabled' : 'Additional PIN you can create to further protect your account' }}
+          </span>
+        </span>
+        <svg
+          class="security__chevron"
+          width="8"
+          height="13"
+          viewBox="0 0 8 13"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M1.5 1 6.5 6.5 1.5 12"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+    </li>
+  </ul>
+</main>

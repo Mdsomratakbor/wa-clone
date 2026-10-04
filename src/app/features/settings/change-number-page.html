@@ -1,0 +1,56 @@
+<app-navigation-bar
+  title="Change number"
+  [leading]="leadingActions"
+  (action)="onNavAction($event)"
+></app-navigation-bar>
+
+<main class="change-number" data-testid="change-number-page">
+  <p class="change-number__status" role="status" data-testid="change-number-status">
+    {{ announcement() }}
+  </p>
+
+  <p class="change-number__intro" data-testid="change-number-intro">
+    Transfer your account information, including your contacts, chats and groups, to a new phone
+    number.
+  </p>
+
+  <div class="change-number__field">
+    <span class="change-number__label">Current phone number</span>
+    <input
+      class="change-number__input"
+      data-testid="change-number-current"
+      #currentInput
+      type="tel"
+      inputmode="tel"
+      autocomplete="tel"
+      aria-label="Current phone number"
+      [value]="current()"
+      (input)="current.set(currentInput.value)"
+    />
+  </div>
+
+  <div class="change-number__field">
+    <span class="change-number__label">New phone number</span>
+    <input
+      class="change-number__input"
+      data-testid="change-number-new"
+      #nextInput
+      type="tel"
+      inputmode="tel"
+      autocomplete="off"
+      aria-label="New phone number"
+      [value]="next()"
+      (input)="next.set(nextInput.value)"
+    />
+  </div>
+
+  <button
+    type="button"
+    class="change-number__submit"
+    data-testid="change-number-submit"
+    [disabled]="!valid()"
+    (click)="onSave()"
+  >
+    Change number
+  </button>
+</main>
