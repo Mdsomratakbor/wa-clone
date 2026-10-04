@@ -42,6 +42,16 @@ export class Composer {
   protected readonly decoding = signal(false);
 
   /**
+   * F-058 FR-002. The decoder is a field, not a direct module call, for the same
+   * reason the stores inject a Clock: an `Image` load is a macrotask zone.js does
+   * not track, so a module-binding spy does not survive the build, and the seek is
+   * the deterministic seam the unit tests replace with a resolved or null-resolving
+   * fake. The real decode path is exercised end-to-end in `status-photo.spec.ts`.
+   */
+  decodePhoto: (file: File, maxEdge?: number, quality?: number) => Promise<string | null> =
+    downscaleToJpegDataUrl;
+
+  /**
    * F-058 FR-001. The sheet offers exactly the two kinds this feature can actually
    * send. `Camera` is deliberately absent: the F-056 screen cannot return a capture
    * to this composer, so a Camera row would be a dead end with no way back to the
@@ -112,7 +122,7 @@ export class Composer {
       return;
     }
     this.decoding.set(true);
-    void downscaleToJpegDataUrl(file).then((dataUrl) => {
+    void this.decodePhoto(file).then((dataUrl) => {
       this.decoding.set(false);
       if (dataUrl === null) {
         return;

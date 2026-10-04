@@ -1,11 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { ChatStore, THREADED_CONTACT_ID, CONTACT_SUBTITLE, PERSISTENCE_KEY } from './chat.store';
+import { ChatStore, THREADED_CONTACT_ID, CONTACT_SUBTITLE, PERSISTENCE_KEY, formatFileSize, isSafeImageDataUrl, splitFileName } from './chat.store';
 import { LocalStorageAdapter } from './persistence/local-storage.adapter';
 import { InMemoryPersistencePort } from './persistence/in-memory.port';
 import { ChatPreview } from '../features/chat-list/chat.model';
 import { CHAT_SEED } from '../features/chat-list/chat-list.seed';
 import { CHAT_SEED as THREAD_SEED } from '../features/chat-window/chat-window.seed';
-import { Message } from '../features/chat-window/chat-window.model';
+import { FileInfo, Message } from '../features/chat-window/chat-window.model';
+import { PHOTO_MAX_CHARS } from './status-photo';
 
 describe('ChatStore', () => {
   let store: ChatStore;
@@ -816,6 +817,175 @@ describe('ChatStore', () => {
       // `{"conversations":[]}` instead, a "no data" and a "reset" state become
       // indistinguishable on disk.
       expect(port.read(PERSISTENCE_KEY)).toBeNull();
+    });
+  });
+
+  describe('F-058 FR-005/FR-006: composer attachment', () => {
+    // A short, plausible inline JPEG data URL for what the downscale helper produces.
+    const safePhoto = 'data:image/jpeg;base64,AAAABBBB';
+
+    function lastMessage(chatId: string): Message | undefined {
+      const messages = store.conversationMessages(chatId);
+      return messages[messages.length - 1];
+    }
+
+    it('splits a file name into card halves, lowercasing the extension (FR-002/FR-003)', () => {
+      expect(splitFileName('IMG_0475.png')).toEqual({ filename: 'IMG_0475', ext: 'png' });
+      expect(splitFileName('Report.FINAL.PDF')).toEqual({ filename: 'Report.FINAL', ext: 'pdf' });
+      expect(splitFileName('noext')).toEqual({ filename: 'noext', ext: '' });
+    });
+
+    it('formats sizes for the card (FR-003)', () => {
+      expect(formatFileSize(512)).toBe('512 B');
+      expect(formatFileSize(2458)).toBe('2.4 KB');
+      expect(formatFileSize(1024 * 1024 * 2.4)).toBe('2.4 MB');
+    });
+
+    it('only ever accepts inline image data URLs for a photo (FR-006)', () => {
+      expect(isSafeImageDataUrl(safePhoto)).toBe(true);
+      expect(isSafeImageDataUrl('https://evil.example/x.jpg')).toBe(false);
+      expect(isSafeImageDataUrl('data:image/svg+xml;base64,PHN2Zz4=')).toBe(false);
+      expect(isSafeImageDataUrl('data:text/html;base64,PHNjcmlwdD4=')).toBe(false);
+      expect(isSafeImageDataUrl('not a url')).toBe(false);
+    });
+
+    it('appends a photo message with its data URL and an honest chat-list preview (FR-005)', () => {
+      const ok = store.sendAttachment(THREADED_CONTACT_ID, '  Look at the lake  ', {
+        filename: 'Alpine',
+        ext: 'jpg',
+        size: '2.4 MB',
+        dataUrl: safePhoto,
+      });
+
+      expect(ok).toBe(true);
+      const sent = lastMessage(THREADED_CONTACT_ID)!;
+      expect(sent.sender).toBe('outgoing');
+      expect(sent.text).toBe('Look at the lake');
+      expect(sent.file).toEqual({ filename: 'Alpine', ext: 'jpg', size: '2.4 MB', dataUrl: safePhoto });
+      expect(store.conversations().find((c) => c.id === THREADED_CONTACT_ID)?.preview).toBe('Look at the lake');
+    });
+
+    it('accepts a file-only message whose preview falls back to the Photo label (FR-005)', () => {
+      const ok = store.sendAttachment(THREADED_CONTACT_ID, '', {
+        filename: 'Shot',
+        ext: 'jpg',
+        size: '1.1 MB',
+        dataUrl: safePhoto,
+      });
+
+      expect(ok).toBe(true);
+      const sent = lastMessage(THREADED_CONTACT_ID)!;
+      expect(sent.text).toBe('');
+      expect(sent.file?.dataUrl).toBe(safePhoto);
+      expect(store.conversations().find((c) => c.id === THREADED_CONTACT_ID)?.preview).toBe('Photo');
+    });
+
+    it('appends a document as metadata only and shows name.ext in the preview (FR-003/FR-005)', () => {
+      const ok = store.sendAttachment(THREADED_CONTACT_ID, '', {
+        filename: 'notes',
+        ext: 'pdf',
+        size: '850 KB',
+      });
+
+      expect(ok).toBe(true);
+      const sent = lastMessage(THREADED_CONTACT_ID)!;
+      expect(sent.file?.dataUrl).toBeUndefined();
+      expect(store.conversations().find((c) => c.id === THREADED_CONTACT_ID)?.preview).toBe('notes.pdf');
+    });
+
+    it('refuses a missing file so nothing is changed (FR-005)', () => {
+      const before = store.conversationMessages(THREADED_CONTACT_ID).length;
+      const ok = store.sendAttachment(THREADED_CONTACT_ID, 'caption', {
+        filename: '',
+        ext: '',
+        size: '0 B',
+      });
+
+      expect(ok).toBe(false);
+      expect(store.conversationMessages(THREADED_CONTACT_ID).length).toBe(before);
+    });
+
+    it('refuses an unsafe data URL before it can reach an img src (FR-006)', () => {
+      const before = store.conversationMessages(THREADED_CONTACT_ID).length;
+      const unsafe = ['https://evil.example/x.jpg', 'data:image/svg+xml,<svg/>'][1]!;
+
+      expect(
+        store.sendAttachment(THREADED_CONTACT_ID, '', {
+          filename: 'markup',
+          ext: 'svg',
+          size: '1 KB',
+          dataUrl: unsafe,
+        }),
+      ).toBe(false);
+      expect(store.conversationMessages(THREADED_CONTACT_ID).length).toBe(before);
+    });
+
+    it('refuses a data URL that cannot fit the persisted snapshot (FR-006)', () => {
+      const before = store.conversationMessages(THREADED_CONTACT_ID).length;
+      const oversized = `data:image/jpeg;base64,${'x'.repeat(PHOTO_MAX_CHARS)}`;
+
+      expect(
+        store.sendAttachment(THREADED_CONTACT_ID, '', {
+          filename: 'big',
+          ext: 'jpg',
+          size: '50 MB',
+          dataUrl: oversized,
+        }),
+      ).toBe(false);
+      expect(store.conversationMessages(THREADED_CONTACT_ID).length).toBe(before);
+    });
+
+    it('persists a file message across a reload with its data URL intact (FR-005)', () => {
+      const port = new InMemoryPersistencePort();
+      const first = new ChatStore(port);
+      first.sendAttachment(THREADED_CONTACT_ID, 'from the first session', {
+        filename: 'Alpine',
+        ext: 'jpg',
+        size: '2.4 MB',
+        dataUrl: safePhoto,
+      });
+
+      const reloaded = new ChatStore(port);
+      const loaded = reloaded.conversationMessages(THREADED_CONTACT_ID);
+      expect(loaded[loaded.length - 1].file?.dataUrl).toBe(safePhoto);
+      expect(loaded[loaded.length - 1].text).toBe('from the first session');
+    });
+
+    it('drops an unsafe data URL on hydrate but keeps the file card (FR-006)', () => {
+      const port = new InMemoryPersistencePort();
+      const poisoned: Message = {
+        id: 'msg-9000',
+        sender: 'outgoing',
+        text: '',
+        time: '10:10',
+        file: { filename: 'trap', ext: 'svg', size: '1 KB', dataUrl: 'data:image/svg+xml,<svg onload="x()"/>' },
+      };
+      port.write(
+        PERSISTENCE_KEY,
+        JSON.stringify({
+          version: 1,
+          conversations: [{ id: 'chat-poison', contactName: 'Poison', preview: '', timestamp: '10:10', avatarRef: null, read: true }],
+          threads: { 'chat-poison': [poisoned] },
+          starred: [],
+          messageSequence: 9000,
+          newChatCounter: 0,
+        }),
+      );
+
+      const hydrated = new ChatStore(port);
+      const loaded = hydrated.conversationMessages('chat-poison');
+      expect(loaded.length).toBe(1);
+      expect(loaded[0].file?.dataUrl).toBeUndefined();
+      expect(loaded[0].file?.filename).toBe('trap');
+    });
+
+    it('keeps the seed file messages loading unchanged (FR-006)', () => {
+      expect(lastMessage(THREADED_CONTACT_ID)?.file?.filename).toBe('IMG_0484');
+
+      const port = new InMemoryPersistencePort();
+      const seedBacked = new ChatStore(port);
+      const count = seedBacked.conversationMessages(THREADED_CONTACT_ID).filter((m) => m.file !== null).length;
+      expect(count).toBeGreaterThan(0);
     });
   });
 });

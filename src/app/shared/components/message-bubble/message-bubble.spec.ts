@@ -26,6 +26,22 @@ const FILE_MSG: Message = {
   file: { filename: 'IMG_0481', ext: 'png', size: '2.8 MB' },
 };
 
+const PHOTO_MSG: Message = {
+  id: 'msg-004',
+  sender: 'outgoing',
+  text: '',
+  time: '10:16',
+  file: { filename: 'Alpine', ext: 'jpg', size: '2.4 MB', dataUrl: 'data:image/jpeg;base64,PHOTO' },
+};
+
+const PHOTO_WITH_CAPTION: Message = {
+  id: 'msg-005',
+  sender: 'outgoing',
+  text: 'Look at the lake',
+  time: '10:17',
+  file: { filename: 'Alpine', ext: 'jpg', size: '2.4 MB', dataUrl: 'data:image/jpeg;base64,PHOTO' },
+};
+
 describe('MessageBubble', () => {
   let fixture: ComponentFixture<MessageBubble>;
 
@@ -73,6 +89,47 @@ describe('MessageBubble', () => {
     expect(el.querySelector('.message-bubble__file-size')?.textContent).toBe('2.8 MB');
     expect(el.querySelector('.message-bubble__file-ext')?.textContent).toBe('png');
     expect(el.querySelector('.message-bubble__text')).toBeNull();
+  });
+
+  it('renders an inline photo for a message whose file carries a data URL (F-058 FR-002)', () => {
+    fixture = TestBed.createComponent(MessageBubble);
+    fixture.componentRef.setInput('message', PHOTO_MSG);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const image = el.querySelector<HTMLImageElement>('[data-testid="bubble-photo"]');
+    expect(image).not.toBeNull();
+    expect(image?.getAttribute('src')).toBe('data:image/jpeg;base64,PHOTO');
+    expect(el.querySelector('.message-bubble__file')).toBeNull();
+  });
+
+  it('renders a caption line for a photo that was sent with one (F-058 FR-005)', () => {
+    fixture = TestBed.createComponent(MessageBubble);
+    fixture.componentRef.setInput('message', PHOTO_WITH_CAPTION);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('[data-testid="bubble-caption"]')?.textContent).toBe('Look at the lake');
+    expect(el.querySelector('[data-testid="bubble-photo"]')).not.toBeNull();
+  });
+
+  it('gains a caption line below the existing file card meanwhile (F-058 FR-005)', () => {
+    fixture = TestBed.createComponent(MessageBubble);
+    fixture.componentRef.setInput('message', {
+      ...FILE_MSG,
+      text: 'The file',
+    });
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.message-bubble__file')).not.toBeNull();
+    expect(el.querySelector('[data-testid="bubble-caption"]')?.textContent).toBe('The file');
+  });
+
+  it('labels a photo bubble as a photo in the aria-label (F-058 FR-007)', () => {
+    fixture = TestBed.createComponent(MessageBubble);
+    fixture.componentRef.setInput('message', PHOTO_WITH_CAPTION);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const label = el.querySelector('.message-bubble')?.getAttribute('aria-label');
+    expect(label).toContain('Photo, Look at the lake');
   });
 
   it('shows the star badge only when starred', () => {
