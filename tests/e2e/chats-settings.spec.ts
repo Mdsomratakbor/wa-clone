@@ -149,6 +149,14 @@ test.describe('Keyboard screen (F-059/FR-004, FR-007, FR-011)', () => {
     await expect(page.getByTestId('tab-bar')).toHaveCount(0);
   });
 
+  test('shows the PROVISIONAL reference note and claims no other shortcuts (F-059 FR-006)', async ({ page }) => {
+    await page.goto('/settings/chats/keyboard');
+    await page.getByTestId('keyboard-page').waitFor();
+    await expect(page.getByTestId('keyboard-note')).toContainText(
+      'Enter is the only keyboard preference this app can honour today.',
+    );
+  });
+
   test('hosts one switch for Enter key sends, persisted across reloads', async ({ page }) => {
     await page.goto('/settings/chats/keyboard');
     await page.getByTestId('keyboard-enter-sends').waitFor();
