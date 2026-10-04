@@ -14,6 +14,7 @@ import { CallStore } from '../../core/call.store';
 import { ChatStore } from '../../core/chat.store';
 import { Clock } from '../../core/clock';
 import { PrefsStore } from '../../core/prefs.store';
+import { SendFeedback } from '../../core/send-feedback';
 import { CallKind } from '../calls/calls.model';
 import { ChatHeader } from '../../shared/components/chat-header/chat-header';
 import { ActionSheet } from '../../shared/components/action-sheet/action-sheet';
@@ -39,6 +40,7 @@ export class ChatWindowPage {
   private readonly callStore = inject(CallStore);
   private readonly clock = inject(Clock);
   private readonly prefs = inject(PrefsStore);
+  private readonly feedback = inject(SendFeedback);
   private readonly header = viewChild(ChatHeader);
   private readonly thread = viewChild<ElementRef<HTMLDivElement>>('thread');
 
@@ -79,14 +81,21 @@ export class ChatWindowPage {
   }
 
   protected onSend(text: string): void {
-    this.store.sendMessage(this.chatId(), text);
+    // F-060 FR-005/FR-007: feedback fires only when the store actually appended
+    // the message; a blank draft returns false and stays silent.
+    if (this.store.sendMessage(this.chatId(), text)) {
+      this.feedback.onMessageSent();
+    }
   }
 
   // F-058 FR-005: the composer holds the pending attachment and only emits on an
   // explicit Send. The store refuses an unsafe/oversized file and leaves the state
   // untouched, so a refusal is a no-op here rather than a second validation.
+  // F-060 FR-005: feedback fires only when the store accepted the attachment.
   protected onSendAttachment(draft: AttachmentDraft): void {
-    this.store.sendAttachment(this.chatId(), draft.text, draft.file);
+    if (this.store.sendAttachment(this.chatId(), draft.text, draft.file)) {
+      this.feedback.onMessageSent();
+    }
   }
 
   protected isStarred(messageId: string): boolean {

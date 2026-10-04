@@ -433,10 +433,13 @@ export class ChatStore {
     this.persist();
   }
 
-  sendMessage(chatId: string, text: string): void {
+  // F-060 FR-007: returns boolean (additive) mirroring sendAttachment so the page
+  // can tell "appended" from "refused" and only then play send feedback. False
+  // only for a blank draft; existing callers ignoring the return keep compiling.
+  sendMessage(chatId: string, text: string): boolean {
     const body = text.trim();
     if (!body) {
-      return;
+      return false;
     }
     const message: Message = {
       id: this.nextMessageId(),
@@ -457,6 +460,7 @@ export class ChatStore {
       ),
     );
     this.persist();
+    return true;
   }
 
   /**
