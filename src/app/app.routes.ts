@@ -65,6 +65,31 @@ export const routes: Routes = [
     loadComponent: () => import('./features/settings/account-page').then((m) => m.AccountPage),
   },
   {
+    // F-057 FR-001: pushed sub-screen of /settings/account. Chrome PROVISIONAL -
+    // no node exists for it in the design file.
+    path: 'settings/account/security',
+    loadComponent: () =>
+      import('./features/settings/security-page').then((m) => m.SecurityPage),
+  },
+  {
+    // F-057 FR-002.
+    path: 'settings/account/two-step',
+    loadComponent: () =>
+      import('./features/settings/two-step-page').then((m) => m.TwoStepPage),
+  },
+  {
+    // F-057 FR-003.
+    path: 'settings/account/change-number',
+    loadComponent: () =>
+      import('./features/settings/change-number-page').then((m) => m.ChangeNumberPage),
+  },
+  {
+    // F-057 FR-004/FR-008.
+    path: 'settings/account/delete',
+    loadComponent: () =>
+      import('./features/settings/delete-account-page').then((m) => m.DeleteAccountPage),
+  },
+  {
     path: 'settings/chats',
     loadComponent: () =>
       import('./features/settings/chats-settings-page').then((m) => m.ChatsSettingsPage),

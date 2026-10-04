@@ -26,7 +26,20 @@ export class AccountPage {
     }
   }
 
-  protected onRowActivate(_row: SettingsRowSeed): void {
-    // F-014: Account-internal targets are not in the design map (later features).
+  protected onRowActivate(row: SettingsRowSeed): void {
+    // F-057 FR-001..FR-004: every seeded Account row now reaches a real screen.
+    // The map is total over ACCOUNT_ROWS; a new seed row without a route would be
+    // the F-046 silent no-op this feature exists to remove, so it gets one here.
+    const route = this.rowRoutes[row.id];
+    if (route !== undefined) {
+      void this.router.navigate([route]);
+    }
   }
+
+  private readonly rowRoutes: Readonly<Record<string, string>> = {
+    security: '/settings/account/security',
+    'two-step-verification': '/settings/account/two-step',
+    'change-number': '/settings/account/change-number',
+    'delete-account': '/settings/account/delete',
+  };
 }
