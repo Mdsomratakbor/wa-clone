@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Message } from '../../../features/chat-window/chat-window.model';
 import { MessageBubble } from './message-bubble';
+import { PrefsStore } from '../../../core/prefs.store';
 
 const OUTGOING: Message = {
   id: 'msg-001',
@@ -46,8 +47,12 @@ describe('MessageBubble', () => {
   let fixture: ComponentFixture<MessageBubble>;
 
   beforeEach(async () => {
+    // F-059 FR-008: the bubble reads mediaVisibility from the prefs store to
+    // decide whether to mask, so the store must exist in the test injector.
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [MessageBubble],
+      providers: [PrefsStore],
     }).compileComponents();
   });
 

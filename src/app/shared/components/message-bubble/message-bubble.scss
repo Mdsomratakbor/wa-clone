@@ -138,6 +138,28 @@
     object-fit: cover;
   }
 
+  // F-059 FR-008/FR-009: the media-visibility placeholder. PROVISIONAL chrome -
+  // no Figma node exists for the hidden state (capture token expired, recorded in
+  // specs/059 research for the reconcile), tokens only.
+  &__private {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: var(--wa-file-card);
+    min-width: 132px;
+    min-height: 34px;
+  }
+
+  &__private-copy {
+    font-size: var(--wa-fs-preview);
+    font-weight: var(--wa-fw-regular);
+    line-height: var(--wa-lh-message);
+    letter-spacing: var(--wa-ls-bubble);
+    color: var(--wa-file-text);
+    white-space: nowrap;
+  }
+
   &__caption {
     margin: 4px 0 0;
     font-size: var(--wa-fs-message);

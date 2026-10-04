@@ -9,7 +9,11 @@
   (contextmenu)="onContextMenu($event)"
 >
   @if (message().file; as file) {
-    @if (file.dataUrl; as dataUrl) {
+    @if (masked()) {
+      <div class="message-bubble__private" data-testid="bubble-media-private" aria-hidden="true">
+        <span class="message-bubble__private-copy">Media hidden</span>
+      </div>
+    } @else if (file.dataUrl; as dataUrl) {
       <div class="message-bubble__photo">
         <img
           class="message-bubble__photo-img"
