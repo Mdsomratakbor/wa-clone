@@ -12,54 +12,54 @@ with the directive date.
 
 ## T2 — feat: additive model + store send path
 
-- [ ] `chat-window.model.ts`: `FileInfo.dataUrl?: string` — additive, no other shape change.
-- [ ] `chat.store.ts` pure helpers: `isSafeImageDataUrl`, `formatFileSize`, `splitFileName`,
+- [x] `chat-window.model.ts`: `FileInfo.dataUrl?: string` — additive, no other shape change.
+- [x] `chat.store.ts` pure helpers: `isSafeImageDataUrl`, `formatFileSize`, `splitFileName`,
       `filePreviewLabel(caption, file)` (PROVISIONAL `Photo` label recorded in spec).
-- [ ] `ChatStore.sendAttachment(chatId, text, file): boolean` — refuses a missing file / unsafe
+- [x] `ChatStore.sendAttachment(chatId, text, file): boolean` — refuses a missing file / unsafe
       `dataUrl` / `dataUrl` over `PHOTO_MAX_CHARS` (`false`, nothing persisted); appends the message
       (`nextMessageId()`, trimmed caption, `file`), persists, sets conversation preview via
       `filePreviewLabel`. (FR-005, FR-006)
-- [ ] Hydrate sanitizes a loaded `file.dataUrl` that is not a safe image data URL (dropped, card
+- [x] Hydrate sanitizes a loaded `file.dataUrl` that is not a safe image data URL (dropped, card
       stays). (FR-006)
 - Files: `src/app/features/chat-window/chat-window.model.ts`, `src/app/core/chat.store.ts`.
 
 ## T3 — feat: composer sheet, pick, pending preview, explicit Send
 
-- [ ] `composer.html`: un-disable `Add attachment`, wire it to open the sheet; add the
+- [x] `composer.html`: un-disable `Add attachment`, wire it to open the sheet; add the
       `ActionSheet` binding; add two hidden file inputs (`accept="image/*"` photo, document) and the
       pending strip; `Emoji stickers`/`Record audio` stay `disabled`. (FR-001, FR-003, FR-004,
       FR-008)
-- [ ] `composer.ts`: `attachOpen`, `pending`, `decoding` signals; photo pick awaits
+- [x] `composer.ts`: `attachOpen`, `pending`, `decoding` signals; photo pick awaits
       `downscaleToJpegDataUrl` (null → empty pending, FR-002); document pick builds metadata
       FileInfo; remove keeps the draft; `canSend` includes pending; `sendAttachment` output
       `{ text, file }`; input values reset after read; sheet rows `Photos & Videos` / `Document`
       only (no Camera row). (FR-001–FR-005, FR-007)
-- [ ] `composer.scss`: pending strip styles, token-only, PROVISIONAL geometry recorded in spec.
+- [x] `composer.scss`: pending strip styles, token-only, PROVISIONAL geometry recorded in spec.
 - Files: `src/app/shared/components/composer/composer.{ts,html,scss}`.
 
 ## T4 — feat: wire chat-window → bubble render
 
-- [ ] `chat-window-page.html/.ts`: forward `(sendAttachment)` → `store.sendAttachment`.
+- [x] `chat-window-page.html/.ts`: forward `(sendAttachment)` → `store.sendAttachment`.
       (FR-005)
-- [ ] `message-bubble.html/.ts`: inline `<img>` when `file.dataUrl`; caption line when `text`
+- [x] `message-bubble.html/.ts`: inline `<img>` when `file.dataUrl`; caption line when `text`
       non-empty (image or file card); aria-label covers photo/caption. (FR-002, FR-005, FR-007)
 - Files: `src/app/features/chat-window/chat-window-page.{ts,html}`,
       `src/app/shared/components/message-bubble/message-bubble.{ts,html}`.
 
 ## T5 — test: unit coverage (build + full suite green)
 
-- [ ] `chat.store.spec.ts`: `sendAttachment` — persists; refuses missing file / unsafe `dataUrl` /
+- [x] `chat.store.spec.ts`: `sendAttachment` — persists; refuses missing file / unsafe `dataUrl` /
       oversized `dataUrl` (nothing appended); trims caption; sets preview (`Photo`, `name.ext`,
       caption); reload of a file message with and without `dataUrl`; hydrate drops an unsafe loaded
       `dataUrl`; seed file messages load unchanged. (FR-005, FR-006)
-- [ ] `composer.spec.ts`: Add attachment opens the sheet; photo path decodes to a pending preview
-      (canvas-made-image fixture, awaited — §research 4/7); non-decodable → empty pending;
+- [x] `composer.spec.ts`: Add attachment opens the sheet; photo path decodes to a pending preview
+      (seam-driven — see closure FR-002 deviation); non-decodable → empty pending;
       document path → metadata pending; remove-keeps-draft; Send with pending and no draft emits
-      `{ text, file }`; caption sent alongside; stickers/voice still disabled; no-overflow. (FR-001
-      –FR-004, FR-007, FR-008)
-- [ ] `message-bubble.spec.ts`: photo bubble renders the image + caption; document card renders and
+      `{ text, file }`; caption sent alongside; stickers/voice still disabled. (FR-001
+      –FR-004, FR-007, FR-008; no-overflow moved to the authored e2e — see closure)
+- [x] `message-bubble.spec.ts`: photo bubble renders the image + caption; document card renders and
       gains a caption line; no-caption card unchanged. (FR-002, FR-005)
-- [ ] Full unit suite green, exact count reported (baseline 771). No sleeps; local storage cleared
+- [x] Full unit suite green, exact count reported (baseline 771). No sleeps; local storage cleared
       per suite.
 - Files: `src/app/core/chat.store.spec.ts`,
       `src/app/shared/components/composer/composer.spec.ts`,
@@ -67,33 +67,60 @@ with the directive date.
 
 ## T6 — test: e2e authored (not executed)
 
-- [ ] `tests/e2e/chat.spec.ts`: open chat-006 → Add attachment → sheet → Photos & Videos →
-      pick → preview strip → Send → inline photo bubble; Document path → file card; remove keeps
-      draft; chat-list preview reflects the attachment; no overflow at 375px.
-- [ ] Playwright pause directive recorded (2026-09-26) — authored only, never run.
-- Files: `tests/e2e/chat.spec.ts`.
+- [ ] `tests/e2e/messaging.spec.ts` (authored; never run — pause directive 2026-09-26):
+      open chat-006 → Add attachment → sheet → Photos & Videos → pick → preview strip → Send →
+      inline photo bubble; Document path → file card; remove keeps draft; chat-list preview reflects
+      the attachment; no overflow at 375px. **Deviation: `tests/e2e/chat.spec.ts` (plan reference)
+      does not exist; the flow doc-spec frame already lives in the `messaging.spec.ts` describe**
+      (`Composer attachment (feature 058)`), so it was authored there.
+- [x] Playwright pause directive recorded (2026-09-26) — authored only, never run.
+- Files: `tests/e2e/messaging.spec.ts`.
 
 ## T7 — docs(spec): drift notes + closure
 
-- [ ] `specs/046-inert-control-sweep/disposition.md`: `composer-add-attachment` row → RESOLVED by
-      058; `composer.html` F-046 comment updated to point at 058.
-- [ ] `figma/design-map.md` row 2 note; `specs/design-gap-audit.md` changelog entry (2026-10-04).
-- [ ] `specs/058-composer-attachment/spec.md` Status → ✅ Implemented (counts); `tasks.md`
+- [x] `specs/046-inert-control-sweep/disposition.md`: `composer-add-attachment` row → RESOLVED by
+      058, with a drift-note section. **Deviation: the `composer.html` F-046 pointer comment was
+      removed by the T3 rewrite (no stub to point anywhere); the disposition note records that.**
+- [x] `figma/design-map.md` row 2 note; `specs/design-gap-audit.md` changelog entry (2026-10-04).
+- [x] `specs/058-composer-attachment/spec.md` Status → ✅ Implemented (counts); `tasks.md`
       checkboxes + closure section (checkpoint, FR → test-name traceability, blocked-gate record).
 - Files: as listed; exact unit/test counts reported.
 
 ## Closure
 
-FR → test traceability (final), checkpoint, blocked gates — filled in at close of T7.
+Full unit suite **794/794 SUCCESS** (baseline 771 → +23; `npm run build` green). Full e2e
+**paused** by owner directive (2026-09-26).
 
-- FR-001 → `composer.spec.ts` … (T7 fill-in)
-- FR-002 → `composer.spec.ts`, `message-bubble.spec.ts` … (T7 fill-in)
-- FR-003 → `composer.spec.ts` … (T7 fill-in)
-- FR-004 → `composer.spec.ts` … (T7 fill-in)
-- FR-005 → `chat.store.spec.ts`, `chat-window-page`… (T7 fill-in)
-- FR-006 → `chat.store.spec.ts` … (T7 fill-in)
-- FR-007 → `composer.spec.ts`, `message-bubble.spec.ts` … (T7 fill-in)
-- FR-008 → `composer.spec.ts` … (T7 fill-in)
+FR → test traceability (test name → file):
+
+- FR-001 → `composer.spec.ts` "re-enables Add attachment and opens a sheet offering exactly photos
+  and a document"
+- FR-002 → `composer.spec.ts` "decodes a picked photo into a removable pending preview (FR-002,
+  FR-004)", "leaves the pending state empty when a photo fails to decode (FR-002)";
+  `message-bubble.spec.ts` "renders an inline photo for a message whose file carries a data URL" —
+  **method deviation: the unit spec drives a `decodePhoto` seam instead of a canvas-made image
+  fixture (§research 4/7). An `Image` load is a macrotask zone.js does not track, so the fixture
+  cannot be awaited deterministically; the seam defaults to `downscaleToJpegDataUrl` in production
+  and the real decode keeps end-to-end coverage in `status-photo.spec.ts`.**
+- FR-003 → `composer.spec.ts` "holds a picked document as metadata only (FR-003)"; `chat.store.spec.ts`
+  "splits a file name into card halves…", "formats sizes for the card", "appends a document as
+  metadata only…"
+- FR-004 → `composer.spec.ts` "removes the attachment but keeps the draft text (FR-004)"
+- FR-005 → `composer.spec.ts` "sends the caption and file together and clears both", "sends a
+  file-only message when the draft is blank"; `chat.store.spec.ts` "appends a photo message…",
+  "accepts a file-only message…", "persists a file message across a reload…", "refuses a missing
+  file…"; `message-bubble.spec.ts` "renders a caption line for a photo that was sent with one",
+  "gains a caption line below the existing file card meanwhile"; e2e "sending a photo renders an
+  inline photo bubble…"
+- FR-006 → `chat.store.spec.ts` "only ever accepts inline image data URLs", "refuses an unsafe data
+  URL before it can reach an img src", "refuses a data URL that cannot fit the persisted snapshot",
+  "drops an unsafe data URL on hydrate but keeps the file card", "keeps the seed file messages
+  loading unchanged"
+- FR-007 → `message-bubble.spec.ts` "labels a photo bubble as a photo in the aria-label"
+- FR-008 → `composer.spec.ts` "dismisses the sheet with Escape"
+- No-overflow → e2e only ("the pending strip does not overflow the 375px canvas") — **method deviation:
+  plan.md put a no-overflow case in the unit composer suite; the pending strip's geometry is only
+  meaningful at a real 375px canvas, so it lives in the authored e2e.**
 
 **Blocked (recorded, not skipped)**: G1 Figma capture — expired OAuth token `403` (2026-10-03); the
 composer `0:8452` is verified but uncaptured and sheet/pending/bubble/preview have no seat node, so

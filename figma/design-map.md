@@ -40,7 +40,7 @@ Node IDs below are taken directly from Figma via the Figma API. URLs use the hyp
 | `chat-list-item` | Chat row (frame `Chat`) | `0:8115`, `0:8873` | Repeated per contact; avatar + name + preview + time |
 | `call-list-item` | Call row (frame `Call`) | `0:8598`, `0:10396` | 12 instances on each Calls screen |
 | `message-bubble` | Group `Message` | `0:8260` … `0:8414` | 13 instances on Chat screen |
-| `composer` | Group `Send Message` | `0:8452` | Bottom input + send/actions |
+| `composer` | Group `Send Message` | `0:8452` | Bottom input + send/actions. F-058 (2026-10-04) wired `Add attachment`; the accessory sheet, pending photo strip, and photo bubble are PROVISIONAL chrome pending re-capture (node `0:8452` verified-uncaptured, G1 expired token 2026-10-03) |
 | `navigation-bar` | Frame `Navigation Bar` | `0:8225`, `0:8995`, `0:10619` | Title + leading/trailing actions |
 | `tab-bar` | Group `Tab Bar` | `0:8549`, `0:9004` | 5 items: Settings, Chats, Camera, Calls, Status |
 | `status-bar` | Frame `Bars / Status Bar / iPhone X` | `0:8233` etc. | iOS status bar, time `9:41` |

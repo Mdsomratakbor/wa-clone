@@ -28,7 +28,7 @@ swallows activation is a lie.
 | Chat actions `Wallpaper` | Wallpaper picker — **capture-blocked**, no capturable imagery until 2026-10-02 18:38 UTC |
 | Add modal `New community` | Broadcast/communities create flow (gap-audit B3) |
 | Settings overflow `More` | Overflow destination list (B-tier settings) |
-| Composer `Add attachment` | Attachment pipeline (media picking + send) |
+| ~~Composer `Add attachment`~~ | ~~Attachment pipeline (media picking + send)~~ — **RESOLVED by F-058 (2026-10-04)**: the composer now opens an attachment ActionSheet (Photos & Videos / Document), decodes photos to a downscaled JPEG data URL (`FileInfo.dataUrl`), shows a removable pending preview, and Send persists a file message with the draft as caption. See drift note at the end of this file |
 | Composer `Emoji stickers` | Sticker picker |
 | Composer `Record audio` | Voice notes (record + upload) |
 | Prefs `sound`, `vibrate`, `popup`, `light` | Notification delivery pipeline |
@@ -85,3 +85,13 @@ Do not re-enable a control without wiring it. The five deleted pref keys must no
 come back as switches: a pref with no consumer is a setting that lies. If a
 future feature adds a consumer, the key returns with the consumer, in the same
 commit.
+
+## Drift note (2026-10-04, F-058)
+
+`composer-add-attachment` is **superseded**: this feature re-enabled the control
+with a full pipeline (`specs/058-composer-attachment/`). The `composer.html`
+F-046 pointer comment was removed by that feature's rewrite (the control is back
+in the wired set). Remaining composer deferrals — `Emoji stickers` and
+`Record audio` — are unchanged and stay honestly disabled. The 058 attachment
+sheet, pending strip, photo bubble, and chat-list preview string are PROVISIONAL
+chrome pending the Figma re-capture (G1 blocked 2026-10-03, expired token).

@@ -17,6 +17,13 @@ against the 5-row `CHATS_SETTINGS_ROWS` seed (open finding, not yet reconciled).
 chat More menu, edit-mode actions, archived screen). What is missing is the **behaviour behind
 ~25 designed controls** — rows and buttons that render exactly as designed and do nothing.
 
+## Changelog
+
+- **2026-10-04 (F-058)**: Composer `Add attachment` (row 2) **wired** — pick → preview → Send →
+  persisted file message; photo bubbles render inline; extra chrome PROVISIONAL (capture blocked).
+  Remaining composer deferrals: `Emoji stickers`, `Record audio`. See `specs/058-composer-attachment/`
+  and the 046 disposition drift note.
+
 ## Tier A — target already exists, needs only wiring (no capture required)
 
 | # | Design row | Dead control | Should do | Status |

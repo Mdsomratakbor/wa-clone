@@ -4,8 +4,10 @@
 
 **Created**: 2026-10-04
 
-**Status**: ✅ **Specified** (2026-10-04) — clarify answers binding, plan/tasks/implementation
-pending. G1 capture blocked (expired Figma token), so all new chrome is PROVISIONAL.
+**Status**: ✅ **Implemented** (2026-10-04) — build green, full unit suite **794/794** (baseline 771
+→ +23), e2e authored only (Playwright paused 2026-09-26). G1 capture still blocked (expired Figma
+token), so the 058 attachment sheet, pending strip, photo bubble, and chat-list preview string
+remain PROVISIONAL until the post-re-auth reconcile.
 
 **Input**: `figma/design-map.md` row 2 (composer, group `Send Message`, node `0:8452`, design-
 verified) + `specs/046-inert-control-sweep/disposition.md` deferral destination "attachment
