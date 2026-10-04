@@ -69,6 +69,14 @@ describe('KeyboardPage', () => {
     ).toBe('Assigns the Enter key to send messages');
   });
 
+  it('shows the PROVISIONAL reference note, so the page claims no other shortcuts (F-059 FR-006)', () => {
+    const el = render();
+    const note = el.querySelector('[data-testid="keyboard-note"]');
+    expect(note?.textContent?.trim()).toBe(
+      'Enter is the only keyboard preference this app can honour today.',
+    );
+  });
+
   it('navigates to /settings/chats when Back is activated (F-059 FR-006)', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.resolveTo(true);
