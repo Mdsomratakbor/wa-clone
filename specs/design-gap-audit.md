@@ -269,18 +269,32 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
   gate is blocked by the expired OAuth token (`403 Token expired`, 2026-10-03), sharing the
   post-re-auth reconcile with the F-054 strings and the 051/052/053 provisional values. E2E
   authored only.
-- **2026-10-03** — F-056 Camera Capture & Preview landed (**735/735**, +15, build green; closure
-  pending in-line) — closes most of the gap-audit "Camera capture pipeline (row 12)" item and the
-  tier-A **Flip** move. Per the owner's clarify answers (2026-10-03), the `/camera` placeholder now
-  shows the real-control chrome (Flash + Close top bar; gallery + shutter + flip bottom bar; HD
-  chip), a PROVISIONAL viewfinder fill + focus grid + honest hint, and a real **file-picker
-  capture** reusing the F-050 pipeline (`downscaleToJpegDataUrl` + `StatusStore.publishPhoto`): the
-  shutter / viewfinder / gallery open the picker, a decoded photo enters the capture state (preview,
-  shutter becomes **Retake**, **Send to status** appears), Send publishes to the status feed and
-  navigates to `/status`, and Close returns to `/chats` without publishing. **PROVISIONAL for the
-  same capture reason as F-054/055** (expired OAuth token, `403`): 7 new `camera-*` tokens plus all
+- **2026-10-03** — F-056 Camera Capture & Preview landed (**735/735**, +15, build green) and closed
+  — closes most of the gap-audit "Camera capture pipeline (row 12)" item and the tier-A **Flip**
+  move. Per the owner's clarify answers (2026-10-03), the `/camera` placeholder now shows the
+  real-control chrome (Flash + Close top bar; gallery + shutter + flip bottom bar; HD chip), a
+  PROVISIONAL viewfinder fill + focus grid + honest hint, and a real **file-picker capture**
+  reusing the F-050 pipeline (`downscaleToJpegDataUrl` + `StatusStore.publishPhoto`): the shutter /
+  viewfinder / gallery open the picker, a decoded photo enters the capture state (preview, shutter
+  becomes **Retake**, **Send to status** appears), Send publishes to the status feed and navigates
+  to `/status`, and Close returns to `/chats` without publishing. **PROVISIONAL for the same
+  capture reason as F-054/055** (expired OAuth token, `403`): 7 new `camera-*` tokens plus all
   geometry/copy are recorded verbatim in spec 056 §PROVISIONAL inventory for the post-re-auth
   reconcile with the 051–055 pending values. The shutter no longer needs `getUserMedia` to be
-  useful (picker path), so row 12's capture gap narrows to **live** preview/lens effects, which stay
-  deferred; Flip/Flash as `aria-pressed` toggles are drift candidates at G1. E2E authored only
+  useful (picker path), so row 12's capture gap narrows to **live** preview/lens effects, which
+  stay deferred; Flip/Flash as `aria-pressed` toggles are drift candidates at G1. E2E authored only
   (Playwright pause 2026-09-26).
+- **2026-10-04** — F-057 Account Settings Subtree landed (**771/771**, +36, build green) and closed
+  — resolves the F-046 deferral "Account & privacy screens": the four `/settings/account` rows are
+  no longer inert. Per clarify (2026-10-04, all three recommended options), each row opens a real
+  pushed sub-screen with honest local flows: **Two-step verification** persists a 6-digit PIN +
+  **required** recovery email (`wa.account.v1`); **Change number** edits a new persisted device
+  number (none existed); **Delete my account** is type-to-confirm (`DELETE`) and wipes
+  chats/prefs/statuses/account; **Security** shows an honestly-disabled "Show security
+  notifications" toggle (no security-code pipeline ⇒ F-046 rule) plus a two-step row with a
+  store-driven status. New `AccountStore` follows the F-013 reset + F-042/045 normalize-on-load
+  conventions; `StatusStore.reset()` was the only missing store reset. **PROVISIONAL for the same
+  capture reason as F-054/055/056** (expired Figma token, `403`): no sub-screen node exists in the
+  design file, so all chrome/copy/rules (6-digit PIN, email rule, `DELETE` word, phone pattern) are
+  recorded for the post-re-auth reconcile — the four F-054 row descriptions stay verbatim. Drift
+  notes in specs 014 & 046, design-map row 14. E2E authored only (Playwright pause 2026-09-26).

@@ -4,8 +4,9 @@
 
 **Created**: 2026-10-04
 
-**Status**: **Specification in progress** — clarify pass open (2026-10-04). Implementation of the
-four Account rows requires owner answers on the functionality depth (§Clarification). No code yet.
+**Status**: ✅ **Implemented** (T001–T008 done, build green, unit 771/771, 2026-10-04) — G1 capture
+still **BLOCKED** (expired Figma token), so every sub-screen value stays PROVISIONAL for the
+post-re-auth reconcile. See [Closure](./tasks.md#closure).
 
 **Input**: `figma/design-map.md` row 14 (`0:9371`, uncaptured) + `specs/014-account/` +
 `specs/046-inert-control-sweep/disposition.md` (deferral destination "Account & privacy screens").
@@ -82,8 +83,8 @@ recorded verbatim in §PENDING inventory for the post-re-auth reconcile.
   is announced and never clears state. Persistence and reload-normalization are covered by tests.
 - **FR-007** (change number): current-number field (prefilled from the persisted device number)
   and new-number field with validation (both non-empty, plausible phone shape, new ≠ current);
-  saving persists the device number and returns to `/settings/account`; the live region announces
-  the change.
+  saving persists the device number and announces the change in the live region (the page stays
+  put; Back returns to `/settings/account`).
 - **FR-008** (delete): a type-to-confirm input (exact uppercase `DELETE` required) gates the danger
   button; confirming wipes persisted chats, prefs, statuses, and the account/two-step keys, then
   swaps to a deletion-confirmation state (brand-style, PROVISIONAL, `role="status"`) with a single

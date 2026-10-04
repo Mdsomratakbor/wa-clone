@@ -60,7 +60,7 @@ gap, not a claim of coverage. G4 does not extend to them.
 
 | Control | Screen | Destination feature |
 | ------- | ------ | ------------------- |
-| `settings-security`, `settings-two-step-verification`, `settings-change-number`, `settings-delete-account` | Account (4) | Account & privacy screens |
+| `settings-security`, `settings-two-step-verification`, `settings-change-number`, `settings-delete-account` | Account (4) | ~~Account & privacy screens~~ — **RESOLVED by F-057 (2026-10-04)**: every row now navigates to a real pushed sub-screen (`/settings/account/security` etc.) with honest local flows (persisted two-step PIN, persisted device number, type-to-confirm delete wipe). See `specs/057-account-settings/` |
 | `ds-storage-usage`, `ds-auto-download`, `ds-images`, `ds-audio`, `ds-videos`, `ds-documents`, `ds-network-usage` | Data & storage (7) | Storage usage + media auto-download |
 | `chats-wallpaper` | Chats settings | Wallpaper picker (capture-blocked) |
 | `chats-keyboard` | Chats settings | Chat-wallpaper/keyboard shortcut sheet |

@@ -21,6 +21,17 @@ renders an owner-approved one-line description beneath its label (PROVISIONAL co
 capture is blocked by an expired OAuth token). Routes, `aria-label` and the hero are unchanged; the
 F-054 spec records every string literally for the reconcile.
 
+## Drift note (F-057, 2026-10-04) — the four Account rows are no longer no-ops
+
+By owner decision on **2026-10-04** (`specs/057-account-settings/`), the F-046 deferral is
+resolved: Security / Two-step verification / Change number / Delete my account each navigate to a
+real pushed sub-screen (Security → `/settings/account/security`, etc.) with honest local flows —
+two-step PIN + required recovery email (persisted), change-number editing a new persisted device
+number, delete-account type-to-confirm wiping chats/prefs/statuses/account. Row labels and
+descriptions are **unchanged** (F-054 strings verbatim); the hero is unchanged; Back stack from the
+sub-screens returns to `/settings/account`. Sub-screen chrome is PROVISIONAL (no design node
+exists; G1 blocked) with all values recorded in the F-057 spec for the post-re-auth reconcile.
+
 ---
 
 ## Summary
