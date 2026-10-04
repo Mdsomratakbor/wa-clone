@@ -40,11 +40,27 @@ test.describe('Notifications screen (US2)', () => {
 });
 
 test.describe('Notifications chroming + visual (US3)', () => {
-  test('Back returns to /settings; rows are no-ops', async ({ page }) => {
+  test('Back returns to /settings; Sound, Vibrate and Show previews are live toggles', async ({
+    page,
+  }) => {
     await page.goto('/settings/notifications');
     await page.getByTestId('notifications-page').waitFor();
-    await page.getByTestId('notifications-row').first().click();
-    await expect(page).toHaveURL(/\/settings\/notifications$/);
+
+    // F-060 FR-003: sound/vibrate returned with the send-feedback consumer and
+    // are live toggles; the Disabled-only claim from F-046 no longer holds for
+    // them (Popup notification and Light remain disabled).
+    const sound = page.getByRole('switch', { name: 'Sound' });
+    const vibrate = page.getByRole('switch', { name: 'Vibrate' });
+    const previews = page.getByRole('switch', { name: 'Show previews' });
+    await expect(sound).toBeEnabled();
+    await expect(vibrate).toBeEnabled();
+    await expect(previews).toBeEnabled();
+
+    await expect(page.getByRole('switch', { name: 'Popup notification' })).toBeDisabled();
+    await expect(page.getByRole('switch', { name: 'Light' })).toBeDisabled();
+
+    await sound.click();
+    await expect(sound).toHaveAttribute('aria-checked', 'false');
 
     await page.getByRole('button', { name: 'Back' }).click();
     await expect(page).toHaveURL(/\/settings$/);

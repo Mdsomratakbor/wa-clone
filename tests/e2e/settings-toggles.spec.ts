@@ -45,4 +45,23 @@ test.describe('Settings toggles (feature 027) - persisted preferences', () => {
       'false',
     );
   });
+
+  // F-060 FR-002/FR-003: the returned delivery toggles persist like every other
+  // pref. The tone/vibration themselves are audible/haptic and not observable by
+  // Playwright; this asserts the wiring that gates them.
+  test('Sound and Vibrate toggles persist across reload (F-060)', async ({ page }) => {
+    await page.goto('/settings/notifications');
+    await page.getByTestId('notifications-page').waitFor();
+    await page.getByRole('switch', { name: 'Sound' }).click();
+    await page.getByRole('switch', { name: 'Vibrate' }).click();
+    await page.reload();
+    await expect(page.getByRole('switch', { name: 'Sound' })).toHaveAttribute(
+      'aria-checked',
+      'false',
+    );
+    await expect(page.getByRole('switch', { name: 'Vibrate' })).toHaveAttribute(
+      'aria-checked',
+      'false',
+    );
+  });
 });
