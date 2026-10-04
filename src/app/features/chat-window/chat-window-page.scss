@@ -9,6 +9,9 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  // F-059 FR-005: this element carries [data-wallpaper], so it reads the scoped
+  // --wa-wallpaper-bg; `default` resolves to --wa-surface (byte-identical today).
+  background: var(--wa-wallpaper-bg);
 
   &__thread {
     flex: 1;

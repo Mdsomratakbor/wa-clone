@@ -100,6 +100,11 @@ export const routes: Routes = [
       import('./features/settings/font-size-page').then((m) => m.FontSizePage),
   },
   {
+    path: 'settings/chats/wallpaper',
+    loadComponent: () =>
+      import('./features/settings/wallpaper-page').then((m) => m.WallpaperPage),
+  },
+  {
     path: 'settings/notifications',
     loadComponent: () =>
       import('./features/settings/notifications-page').then((m) => m.NotificationsPage),

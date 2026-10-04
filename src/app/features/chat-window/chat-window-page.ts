@@ -43,6 +43,7 @@ export class ChatWindowPage {
   private readonly thread = viewChild<ElementRef<HTMLDivElement>>('thread');
 
   protected readonly fontScale = this.prefs.fontScale;
+  protected readonly wallpaper = this.prefs.wallpaper;
 
   protected readonly contact = computed<ContactHeader>(() =>
     this.store.contact(this.chatId()) ?? CHAT_CONTACT,

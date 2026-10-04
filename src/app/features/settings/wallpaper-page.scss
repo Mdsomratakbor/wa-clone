@@ -1,0 +1,72 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.wallpaper {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--wa-surface);
+}
+
+.wallpaper__options {
+  display: flex;
+  flex-direction: column;
+}
+
+.wallpaper__option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--wa-font-family);
+  font-size: var(--wa-fs-preview);
+  font-weight: var(--wa-fw-regular);
+  color: var(--wa-on-surface);
+  text-align: left;
+  appearance: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--wa-accent);
+    outline-offset: -2px;
+  }
+}
+
+.wallpaper__option--selected {
+  color: var(--wa-accent);
+  font-weight: var(--wa-fw-medium);
+}
+
+.wallpaper__swatch {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--wa-border);
+  // The carrying [data-wallpaper] scope repaints --wa-wallpaper-bg per id;
+  // `default` resolves to the :root value, var(--wa-surface).
+  background: var(--wa-wallpaper-bg);
+}
+
+.wallpaper__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wallpaper__check {
+  margin-left: auto;
+  color: var(--wa-accent);
+  flex: 0 0 auto;
+  visibility: hidden;
+}
+
+.wallpaper__option--selected .wallpaper__check {
+  visibility: visible;
+}
