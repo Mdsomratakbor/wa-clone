@@ -6,6 +6,7 @@ import {
   DEFAULT_PROFILE,
   DEFAULT_WALLPAPER,
   PREFS_KEY,
+  PrefsSnapshot,
   PrefsStore,
 } from './prefs.store';
 
@@ -72,10 +73,11 @@ describe('PrefsStore', () => {
     expect(reloaded.chatSort()).toBe(DEFAULT_CHAT_SORT);
   });
 
-  describe('F-046 FR-006 + F-059 FR-008: removed/returned keys on load', () => {
-    it('drops the four still-removed Notifications keys from a v4 snapshot without throwing', () => {
+  describe('F-046 FR-006 + F-059 FR-008 + F-060 FR-001: removed/returned keys on load', () => {
+    it('drops the two still-removed Notifications keys and honours the returned ones from a v4 snapshot', () => {
       // A user who used the app before F-046 has these keys on disk. F-059 returns
-      // mediaVisibility WITH a consumer (FR-009), so it is no longer dropped.
+      // mediaVisibility WITH a consumer (FR-009) and F-060 returns sound/vibrate
+      // WITH the send-feedback consumer (FR-005), so those are no longer dropped.
       localStorage.setItem(
         PREFS_KEY,
         JSON.stringify({
@@ -94,8 +96,13 @@ describe('PrefsStore', () => {
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({});
       const reloaded = TestBed.inject(PrefsStore);
-      // The four delivery keys normalize away; mediaVisibility is now honoured.
-      expect(reloaded.prefs()).toEqual({ ...DEFAULT_PREFS, mediaVisibility: false });
+      // popup/light normalize away; sound/vibrate/mediaVisibility are honoured.
+      expect(reloaded.prefs()).toEqual({
+        ...DEFAULT_PREFS,
+        sound: false,
+        vibrate: false,
+        mediaVisibility: false,
+      });
       // And the rest of the envelope is still honoured, not discarded.
       expect(reloaded.chatSort()).toBe('name');
     });
@@ -115,6 +122,7 @@ describe('PrefsStore', () => {
       expect(reloaded.prefs().showPreviews).toBe(false);
       expect(reloaded.prefs().enterKeySends).toBe(false);
       expect(reloaded.prefs().mediaVisibility).toBe(true);
+      expect(reloaded.prefs().sound).toBe(true);
     });
   });
 
@@ -229,14 +237,45 @@ describe('PrefsStore', () => {
     expect(TestBed.inject(PrefsStore).fontScale()).toBe('large');
   });
 
-  it('persists a version 5 envelope with wallpaper (F-041 FR-002, F-059 FR-002)', () => {
+  it('persists a version 6 envelope with wallpaper and the delivery prefs (F-041 FR-002, F-059 FR-002, F-060 FR-002)', () => {
     store.setFontScale('small');
     store.setWallpaper('sky');
+    store.set('sound', false);
     const raw = localStorage.getItem(PREFS_KEY);
     expect(raw).not.toBeNull();
-    expect(JSON.parse(raw as string).version).toBe(5);
+    expect(JSON.parse(raw as string).version).toBe(6);
     expect(JSON.parse(raw as string).fontScale).toBe('small');
     expect(JSON.parse(raw as string).wallpaper).toBe('sky');
+  });
+
+  it('hydrates a v5 envelope without sound/vibrate keys to their defaults (F-060 FR-002)', () => {
+    store.setWallpaper('sand');
+    store.set('sound', false);
+    store.set('vibrate', false);
+    const raw = localStorage.getItem(PREFS_KEY)!;
+    const parsed = JSON.parse(raw) as { version: number; prefs: Partial<PrefsSnapshot> };
+    delete parsed.prefs.sound;
+    delete parsed.prefs.vibrate;
+    parsed.version = 5;
+    localStorage.setItem(PREFS_KEY, JSON.stringify(parsed));
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const reloaded = TestBed.inject(PrefsStore);
+    expect(reloaded.prefs().sound).toBe(true);
+    expect(reloaded.prefs().vibrate).toBe(true);
+    expect(reloaded.wallpaper()).toBe('sand');
+  });
+
+  it('round-trips sound and vibrate through a v6 envelope (F-060 FR-002)', () => {
+    store.set('sound', false);
+    store.set('vibrate', false);
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const reloaded = TestBed.inject(PrefsStore);
+    expect(reloaded.prefs().sound).toBe(false);
+    expect(reloaded.prefs().vibrate).toBe(false);
   });
 
   it('hydrates a v3 envelope with the default font scale (F-041 FR-002)', () => {

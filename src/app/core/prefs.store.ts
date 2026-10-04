@@ -4,19 +4,25 @@ import { PersistencePort } from './persistence/persistence.port';
 export type PrefsKey =
   | 'enterKeySends'
   | 'showPreviews'
-  | 'mediaVisibility';
+  | 'mediaVisibility'
+  | 'sound'
+  | 'vibrate';
 
 export type PrefsSnapshot = Record<PrefsKey, boolean>;
 
 // F-046 FR-006 removed sound, vibrate, popup, light and mediaVisibility because
-// they had live toggles and no consumer. F-059 FR-008/FR-009 now returns
-// `mediaVisibility` because its consumer (in-bubble media privacy masking) lands
-// in the same commit - the exact condition 046's disposition required. The four
-// Notifications keys stay removed: there is still no notification pipeline.
+// they had live toggles and no consumer. F-059 FR-008/FR-009 returned
+// `mediaVisibility` and F-060 FR-001 now returns `sound`/`vibrate`, each because
+// its consumer (bubble media privacy masking; chat send-feedback tone/vibration)
+// lands in the same commit - the exact condition 046's disposition required.
+// `popup`/`light` stay removed: a phone-web app has no lock screen or LED, so no
+// honest consumer exists. The 060 defaults restore the pre-F-046 shipped baseline.
 export const DEFAULT_PREFS: PrefsSnapshot = {
   enterKeySends: true,
   showPreviews: true,
   mediaVisibility: true,
+  sound: true,
+  vibrate: true,
 };
 
 export type ChatSort = 'recent' | 'name' | 'unread';
@@ -64,11 +70,12 @@ interface PrefsSnapshotEnvelope {
   profile?: ProfileSnapshot;
 }
 
-// F-041 bumped 3 -> 4 for fontScale; F-059 bumps 4 -> 5 for wallpaper. hydrate()
-// accepts every version from 1 up so a snapshot written at any older feature still
-// loads; unknown versions are ignored as foreign.
-const PREFS_VERSION = 5;
-const KNOWN_PREFS_VERSIONS = [1, 2, 3, 4, PREFS_VERSION];
+// F-041 bumped 3 -> 4 for fontScale; F-059 bumps 4 -> 5 for wallpaper;
+// F-060 bumps 5 -> 6 for sound/vibrate. hydrate() accepts every version from 1 up
+// so a snapshot written at any older feature still loads; unknown versions are
+// ignored as foreign.
+const PREFS_VERSION = 6;
+const KNOWN_PREFS_VERSIONS = [1, 2, 3, 4, 5, PREFS_VERSION];
 
 function isFontScale(value: unknown): value is FontScale {
   return FONT_SCALES.includes(value as FontScale);
