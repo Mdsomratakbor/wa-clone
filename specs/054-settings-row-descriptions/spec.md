@@ -145,6 +145,16 @@ FR-001/FR-003 behaviour (description line in every row kind) is untouched and st
 new four-row Chats Settings list. Reconcile both new strings against the real design after token
 re-auth.
 
+## Drift note (F-060, 2026-10-04) — Sound and Vibrate descriptions rewritten
+
+`specs/060-notifications-send-feedback/` re-enabled the Notifications **Sound** and **Vibrate**
+rows with a real consumer (an outbound send-feedback tone/vibration), so their descriptions are
+rewritten — **"Play a tone when you send a message"** / **"Vibrate when you send a message"** — to
+describe the behaviour that actually ships. The previous owner-approved strings ("For incoming
+messages" / "For incoming messages and calls") described incoming delivery that does not exist and
+would have been a lie on a live toggle. `Popup notification` and `Light` keep their copy and stay
+`unavailable`. All four strings require reconcile against the captured design (G1 blocked).
+
 ## Appendix — PROVISIONAL copy
 
 Literal strings, owner-approved 2026-10-03. Reconcile against the real design after token re-auth.
@@ -182,8 +192,8 @@ Literal strings, owner-approved 2026-10-03. Reconcile against the real design af
 
 | id | label | description |
 |---|---|---|
-| `notifications-sound` | Sound *(unavailable)* | For incoming messages |
-| `notifications-vibrate` | Vibrate *(unavailable)* | For incoming messages and calls |
+| `notifications-sound` | Sound | **Play a tone when you send a message** *(rewritten by F-060; no longer unavailable — the send-feedback consumer ships in the same feature)* |
+| `notifications-vibrate` | Vibrate | **Vibrate when you send a message** *(rewritten by F-060; no longer unavailable)* |
 | `notifications-popup` | Popup notification *(unavailable)* | When your phone is locked |
 | `notifications-light` | Light *(unavailable)* | Flash for incoming messages |
 | `notifications-previews` | Show previews | Show message text in notifications |

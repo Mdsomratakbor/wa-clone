@@ -21,6 +21,19 @@ beneath its label (PROVISIONAL copy; the Figma capture is blocked by an expired 
 Routes, toggles, `aria-label` and the F-046 `unavailable` semantics are unchanged; the F-054 spec
 records every string literally for the reconcile.
 
+## Drift note (F-060, 2026-10-04) — Sound and Vibrate are live, gated by send feedback
+
+`specs/060-notifications-send-feedback/` changes two of the four F-046-disabled delivery rows:
+**Sound** and **Vibrate** are live toggles again, returned **with a consumer in the same feature** —
+sending a message in a chat plays a short Web-Audio tone (Sound) and/or a brief vibration (Vibrate),
+fire only when the store accepted the send (`ChatWindowPage`, gated on the store's boolean return).
+This is exactly the F-046 disposition's allowed path for a returned key. **`Popup notification` and
+`Light` remain honestly disabled** with their storage keys deleted: a phone-web app has no lock
+screen or LED, so no honest consumer exists. The two live rows' descriptions were rewritten to the
+real (outgoing-message) behaviour — PROVISIONAL copy pending the G1 Figma re-capture; see the 054
+drift note. FR-004 no-ops wording historically covering "Sound/Vibrate/Popup/Light" is superseded
+for the first two.
+
 ---
 
 ## Summary

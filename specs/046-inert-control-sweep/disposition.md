@@ -21,6 +21,7 @@ swallows activation is a lie.
 | `showPreviews` | `chat-list-item` preview visibility | Judgment call: there is no notification pipeline to gate, so the pref was wired to the one place message content is shown. Name, timestamp, and read ticks are unaffected. |
 | Calls `All` / `Missed` | `filter` signal → derived `items` | Required fixing `isMissedCall` first — see Clarification 5. |
 | `mediaVisibility` | `MessageBubble` media masking | **RESOLVED by F-059 (2026-10-04)**: returned from the "deleted keys" set only because a consumer landed in the same commit (bubble-level privacy placeholder), which is exactly the rule in "What a later feature must not do" below. Preview on the chat list is untouched. |
+| Prefs `sound`, `vibrate` | `ChatWindowPage` outbound send feedback | **RESOLVED by F-060 (2026-10-04)**: keys returned **with a consumer in the same feature** — a successful chat send plays a short Web-Audio tone (sound) and/or `navigator.vibrate` (vibrate) via the `SendFeedback`/`BrowserFeedbackEffects` port, gated on the store's boolean `sendMessage`/`sendAttachment` return. Blank drafts and refused files are silent. Same rule as `mediaVisibility`: key returns only with its consumer |
 
 ## Honestly disabled
 
@@ -32,13 +33,15 @@ swallows activation is a lie.
 | ~~Composer `Add attachment`~~ | ~~Attachment pipeline (media picking + send)~~ — **RESOLVED by F-058 (2026-10-04)**: the composer now opens an attachment ActionSheet (Photos & Videos / Document), decodes photos to a downscaled JPEG data URL (`FileInfo.dataUrl`), shows a removable pending preview, and Send persists a file message with the draft as caption. See drift note at the end of this file |
 | Composer `Emoji stickers` | Sticker picker |
 | Composer `Record audio` | Voice notes (record + upload) |
-| Prefs `sound`, `vibrate`, `popup`, `light` | Notification delivery pipeline |
+| Prefs `popup`, `light` | Notification delivery pipeline — a phone-web app has no lock screen or LED, so no honest browser consumer exists; **F-060 (2026-10-04) kept both honestly disabled with their keys deleted** and re-enabled only `sound`/`vibrate` (see wired table + drift note) |
 | ~~Pref `mediaVisibility`~~ | ~~Media-privacy filtering of message bubbles~~ — **RESOLVED by F-059 (2026-10-04)**: the pref returned **with its consumer in the same commit** (`MessageBubble` masking; see the wired table and the drift note at the end of this file) and the row is a live toggle again |
+| ~~Prefs `sound`, `vibrate`~~ | ~~Notification delivery pipeline~~ — **RESOLVED by F-060 (2026-10-04)**: keys returned **with a consumer in the same feature** (send-feedback tone/vibration); see the wired table and the F-060 drift note |
 
 The four prefs also had their **storage keys deleted**, not just their switches
 disabled. A disabled switch over a persisted key would leave a setting the app
 remembers and never honours. (`mediaVisibility` was a fifth; F-059 restored its
-key together with a consumer — see the drift note.)
+key together with a consumer. `sound` and `vibrate` were restored the same way by
+F-060 — see the drift note. Only `popup` and `light` remain deleted.)
 
 ## Removed
 
@@ -83,10 +86,11 @@ gap, not a claim of coverage. G4 does not extend to them.
 
 ## What a later feature must not do
 
-Do not re-enable a control without wiring it. The four remaining deleted pref keys must not
-come back as switches: a pref with no consumer is a setting that lies. If a future feature
-adds a consumer, the key returns with the consumer, in the same commit — **F-059 (2026-10-04)
-did exactly this for `mediaVisibility`** (see the wired table and the F-059 drift note below).
+Do not re-enable a control without wiring it. The **two** remaining deleted pref keys (`popup`,
+`light`) must not come back as switches: a pref with no consumer is a setting that lies. If a
+future feature adds a consumer, the key returns with the consumer, in the same commit — **F-059
+(2026-10-04) did exactly this for `mediaVisibility`** and **F-060 (2026-10-04) for `sound` and
+`vibrate`** (see the wired table and the drift notes below).
 
 ## Drift note (2026-10-04, F-058)
 
@@ -106,6 +110,19 @@ chrome pending the Figma re-capture (G1 blocked 2026-10-03, expired token).
 disposition's closing rule allows. The `chats-wallpaper` and `chats-keyboard`
 deferrals are RESOLVED (picker + keyboard screens). Remaining honestly-disabled
 Chats-adjacent controls: `Chat actions → Wallpaper` (per-chat wallpaper is a
-recorded follow-up) and the four Notifications prefs (no delivery pipeline).
-Wallpaper palette/labels, picker chrome, keyboard note, and the "Media hidden"
+recorded follow-up) and the two Notifications prefs with no consumer. Wallpaper
+palette/labels, picker chrome, keyboard note, and the "Media hidden"
 placeholder are PROVISIONAL pending the G1 Figma re-capture.
+
+## Drift note (2026-10-04, F-060)
+
+`notifications-send-feedback` re-enables exactly two of the deleted Notifications
+keys — `sound` and `vibrate` — **with a consumer in the same feature**
+(`specs/060-notifications-send-feedback/` FR-005): a successful chat send plays a
+short Web-Audio tone and/or a `navigator.vibrate` pulse via `SendFeedback`, gated
+on the store's boolean `sendMessage`/`sendAttachment` return. This is the same
+"key returns with its consumer" path F-059 used for `mediaVisibility`; the page
+and service specs fake the `BrowserFeedbackEffects` port so no real audio/vibration
+runs in the harness. `popup` and `light` stay removed: a phone-web app has no lock
+screen or LED. The 060 Sound/Vibrate descriptions and the tone shape / vibration
+pattern are PROVISIONAL pending the G1 Figma re-capture.

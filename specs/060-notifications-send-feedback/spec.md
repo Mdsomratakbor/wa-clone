@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-04
 
-**Status**: **In progress** — spec recorded; implementation follows the speckit chain.
+**Status**: ✅ **Implemented** — build green, full unit suite **837/837** (825 at feature start, +12); e2e authored, not executed (Playwright paused 2026-09-26). Closure records, drift notes, and FR → test traceability in `tasks.md`; PROVISIONAL copy/hypotheses in `research.md`.
 
 **Input**: `specs/017-notifications/spec.md` (row 17, frame `0:10758`), the F-046
 "key returns only with a consumer" disposition (`specs/046-inert-control-sweep/disposition.md`),

@@ -19,6 +19,13 @@ chat More menu, edit-mode actions, archived screen). What is missing is the **be
 
 ## Changelog
 
+- **2026-10-04 (F-060)**: Notifications row 17 — **Sound and Vibrate are live toggles again** with a
+  real consumer (`specs/060-notifications-send-feedback/`): a successful chat send plays a short
+  Web-Audio tone and/or a `navigator.vibrate` pulse when the toggles are on, gated on the store's
+  boolean send return. This is the F-046 "key returns only with its consumer, in the same commit"
+  path (same as F-059's `mediaVisibility`). **Popup and Light stay honestly disabled** — a
+  phone-web app has no lock screen or LED. Sound/Vibrate descriptions, the tone shape, and the
+  vibration pattern are PROVISIONAL pending the G1 Figma re-capture.
 - **2026-10-04 (F-058)**: Composer `Add attachment` (row 2) **wired** — pick → preview → Send →
   persisted file message; photo bubbles render inline; extra chrome PROVISIONAL (capture blocked).
   Remaining composer deferrals: `Emoji stickers`, `Record audio`. See `specs/058-composer-attachment/`

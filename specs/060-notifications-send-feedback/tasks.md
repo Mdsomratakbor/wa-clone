@@ -60,6 +60,61 @@ with the directive date.
 - [x] Playwright pause directive recorded (2026-09-26) — authored only, never run.
 - Files: `tests/e2e/notifications.spec.ts`, `tests/e2e/settings-toggles.spec.ts`.
 
+## T1 — docs(spec): spec, plan, research, tasks
+
+- [x] `specs/060-notifications-send-feedback/{spec,plan,research,tasks}.md` exist; clarify answers
+  (2026-10-04) written into §Clarification verbatim; FR-001..FR-008 final; PROVISIONAL copy + tone
+  hypotheses recorded in research.md.
+- Evidence: every FR names real files/consumers; scope excludes status/camera sends.
+
+## T2 — feat: prefs store (sound/vibrate back, envelope v6)
+
+- [x] `prefs.store.ts`: `sound`/`vibrate` re-enter `PrefsKey` and `DEFAULT_PREFS` (default `true`);
+      `PREFS_VERSION` 5→6; `KNOWN_PREFS_VERSIONS` = 1..6. Comment updated (three keys returned by
+      F-059/F-060, two still removed). (FR-001, FR-002)
+- [x] `prefs.store.spec.ts`: update the F-046 block — sound/vibrate are live keys again (inversion
+      called out in commit), only popup/light normalize away; envelope test 5→6; add v5→defaults
+      hydrate and v6 round-trip (sound/vibrate persisted). (FR-001, FR-002)
+- Files: `src/app/core/prefs.store.ts`, `src/app/core/prefs.store.spec.ts`.
+
+## T3 — feat: SendFeedback service + wiring
+
+- [x] `src/app/core/send-feedback.ts`: `FeedbackEffects`/`BrowserFeedbackEffects` +
+      `SendFeedback` (reads prefs, routes through the port; best-effort).
+- [x] `chat.store.ts`: `sendMessage` returns `boolean` (`false` only for blank). (FR-007)
+- [x] `chat-window-page.ts`: fire `SendFeedback` on successful text send and attachment send only.
+      (FR-005)
+- Files: `src/app/core/send-feedback.ts`, `src/app/core/chat.store.ts`,
+      `src/app/features/chat-window/chat-window-page.ts`.
+
+## T4 — feat: notifications screen rows live
+
+- [x] `settings.seed.ts`: `notifications-sound`/`notifications-vibrate` clear `unavailable`;
+      descriptions rewritten (PROVISIONAL per research.md); Popup/Light unchanged. (FR-003, FR-004)
+- [x] `notifications-page.ts`: `TOGGLE_PREFS` gains `'notifications-sound' → 'sound'`,
+      `'notifications-vibrate' → 'vibrate'`. Markup unchanged. (FR-003, FR-008)
+- Files: `src/app/features/settings/settings.seed.ts`, `src/app/features/settings/notifications-page.ts`.
+
+## T5 — test: unit coverage (build + full suite green)
+
+- [x] `send-feedback.spec.ts` (new): default on → tone+vibrate; sound off → no tone; vibrate off →
+      no vibrate; BrowserFeedbackEffects no-throw when APIs absent.
+- [x] `notifications-page.spec.ts`: three live toggles (Sound, Vibrate, Show previews), two
+      disabled (Popup, Light); toggling Sound/Vibrate persists; copy assertions updated.
+- [x] `chat-window-page.spec.ts`: send feedback fires on accepted text + attachment sends; not on
+      blank draft or refused file (fake port).
+- [x] `chat.store.spec.ts`: `sendMessage` returns true on non-blank, false on blank.
+- [x] Full unit suite green, exact count reported; no sleeps; localStorage cleared per suite.
+- Files: as listed + touched spec files.
+
+## T6 — test: e2e authored (not executed)
+
+- [x] `tests/e2e/notifications.spec.ts`: "rows are no-ops" no longer holds — Sound/Vibrate/Show
+      previews live toggles, Popup/Light disabled.
+- [x] `tests/e2e/settings-toggles.spec.ts`: sound/vibrate persist across reload.
+- [x] Playwright pause directive recorded (2026-09-26) — authored only, never run.
+- Files: `tests/e2e/notifications.spec.ts`, `tests/e2e/settings-toggles.spec.ts`.
+
 ## T7 — docs(spec): drift notes + closure
 
 - [x] `specs/017-notifications/spec.md` drift note: F-046 "four delivery rows honestly disabled"
@@ -86,14 +141,14 @@ shape, vibration pattern (research.md), all pending the G1 Figma re-capture.
 
 | FR | Unit test(s) |
 |----|--------------|
-| FR-001 | `PrefsStore` » "starts on the default prefs (sound/vibrate on)"; F-046 block inversion (sound/vibrate live, popup/light normalize away) |
-| FR-002 | `PrefsStore` » "persists a version 6 envelope…"; "a v5 envelope with no sound/vibrate keys hydrates to defaults" |
-| FR-003 | `NotificationsPage` » "three live, two disabled"; "toggling Sound/Vibrate persists the change" |
-| FR-004 | `NotificationsPage` » F-054 description cases for the new Sound/Vibrate copy |
-| FR-005 | `SendFeedback` » routing cases; `ChatWindowPage` » send-feedback cases (fires on accepted, silent on blank/refused) |
-| FR-006 | `SendFeedback` » "BrowserFeedbackEffects never throws when … absent" |
-| FR-007 | `ChatStore` » "sendMessage returns true for non-blank, false for blank" |
-| FR-008 | `NotificationsPage` » chrome tests unchanged; full suite + no-overflow suite |
+| FR-001 | `PrefsStore` » "F-046 FR-006 + F-059 FR-008 + F-060 FR-001: removed/returned keys on load"; "hydrates a v5 envelope without sound/vibrate keys to their defaults (F-060 FR-002)" |
+| FR-002 | `PrefsStore` » "persists a version 6 envelope with wallpaper and the delivery prefs (F-041 FR-002, F-059 FR-002, F-060 FR-002)"; "round-trips sound and vibrate through a v6 envelope (F-060 FR-002)" |
+| FR-003 | `NotificationsPage` » "renders every row as a switch, with Sound, Vibrate and Show previews live"; "toggling Sound and Vibrate persists the change (F-060)"; F-046 two-still-disabled block |
+| FR-004 | `NotificationsPage` » F-054 description assertions for the new Sound/Vibrate copy (PROVISIONAL) |
+| FR-005 | `SendFeedback` » "fires tone and vibration when both prefs are on (default)", "fires only the tone when sound is on and vibration is off", "fires only the vibration when sound is off and vibration is on"; `ChatWindowPage` » "plays tone and vibration after an accepted text send", "stays silent for a blank draft", "plays tone and vibration after an accepted attachment send", "stays silent when the store refuses the attachment" |
+| FR-006 | `BrowserFeedbackEffects` » "never throws when the browser has no vibration API and no audio surface" |
+| FR-007 | `ChatStore` » "returns true for a non-blank send and false for blank drafts (F-060 FR-007)" |
+| FR-008 | `NotificationsPage` » chrome tests unchanged; full suite green (no layout changes introduced) |
 
 ### Blocked gates (recorded, not skipped)
 
